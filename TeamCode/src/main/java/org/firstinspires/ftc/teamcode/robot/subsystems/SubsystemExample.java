@@ -6,13 +6,13 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import static org.firstinspires.ftc.teamcode.core.util.StaticHeading.Mode.ANGLE;
+import static org.firstinspires.ftc.teamcode.core.lib.pid.PIDController.Mode.ANGLE;
 import static org.firstinspires.ftc.teamcode.robot.constants.SubsystemExampleConstants.*;
 import static org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants.*;
 
-import org.firstinspires.ftc.teamcode.core.interfaces.Subsystem;
-import org.firstinspires.ftc.teamcode.core.util.SmartController;
-import org.firstinspires.ftc.teamcode.core.util.StaticHeading;
+import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
+import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 
 public class SubsystemExample implements Subsystem {
     private static SubsystemExample instance;
@@ -21,7 +21,7 @@ public class SubsystemExample implements Subsystem {
     private DcMotor motorLeft;
     private TouchSensor limitRight;
     private TouchSensor limitLeft;
-    private StaticHeading PIDController;
+    private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
 
     private SubsystemExample() {
     }
@@ -39,7 +39,7 @@ public class SubsystemExample implements Subsystem {
         motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        PIDController = new StaticHeading(PID.kP, PID.kI, PID.kD, PID.kF, ANGLE);
+        PIDController = new PIDController(PID.kP, PID.kI, PID.kD, PID.kF, ANGLE);
 
         telemetry.addData("SubsystemExample Subsystem", "Initialized");
     }

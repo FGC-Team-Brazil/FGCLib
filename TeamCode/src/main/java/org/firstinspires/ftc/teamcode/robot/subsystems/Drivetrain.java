@@ -10,9 +10,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainConstants.*;
 import static org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants.HD_HEX_TICKS_PER_REVOLUTION;
 
-import org.firstinspires.ftc.teamcode.core.interfaces.Subsystem;
-import org.firstinspires.ftc.teamcode.core.util.SmartController;
-import org.firstinspires.ftc.teamcode.core.util.StaticHeading;
+import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
+import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 
 public class Drivetrain implements Subsystem {
 
@@ -21,7 +21,7 @@ public class Drivetrain implements Subsystem {
     private DcMotor motorLeft;
     private IMU imu;
     private Telemetry telemetry;
-    private StaticHeading pidController;
+    private PIDController pidController;
 
     private double limiter;
 
@@ -35,7 +35,7 @@ public class Drivetrain implements Subsystem {
         imu = hardwareMap.get(IMU.class, IMU);
         this.telemetry = telemetry;
 
-        pidController = new StaticHeading(0.5, 0.01, 0.0, 0.3);
+        pidController = new PIDController(0.5, 0.01, 0.0, 0.3);
         pidController.setTolerance(0.05);
 
         motorLeft.setDirection(DcMotorSimple.Direction.FORWARD);

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.util;
+package org.firstinspires.ftc.teamcode.core.lib.pid;
 
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * It uses the constants: Proportional, Integral and Derivative.
  * In addition to PID, it implements a FeedForward constant.
  */
-public class StaticHeading {
+public class PIDController {
     public enum Mode {
         POSITION,
         ANGLE,
@@ -34,7 +34,7 @@ public class StaticHeading {
 
     private int revolutionEncoder = 0;
 
-    public StaticHeading(double kP, double kI, double kD, double kF) {
+    public PIDController(double kP, double kI, double kD, double kF) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
@@ -42,7 +42,7 @@ public class StaticHeading {
         this.actualMode = Mode.POSITION;
     }
 
-    public StaticHeading(double kP, double kI, double kD, double kF, Mode mode) {
+    public PIDController(double kP, double kI, double kD, double kF, Mode mode) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;

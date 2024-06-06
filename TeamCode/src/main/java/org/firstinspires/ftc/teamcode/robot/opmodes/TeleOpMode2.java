@@ -3,10 +3,9 @@ package org.firstinspires.ftc.teamcode.robot.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.core.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.core.util.SmartController;
-import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
 
 import java.util.ArrayList;
 

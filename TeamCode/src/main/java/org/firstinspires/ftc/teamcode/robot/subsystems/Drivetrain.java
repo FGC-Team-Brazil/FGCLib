@@ -38,7 +38,7 @@ public class Drivetrain implements Subsystem {
         pidController = new PIDController(0.5, 0.01, 0.0, 0.3);
         pidController.setTolerance(0.05);
 
-        motorLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

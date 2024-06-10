@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
@@ -26,7 +27,7 @@ public class TeleOpMode extends OpMode {
         this.subsystemsDriver = new ArrayList<Subsystem>();
         this.subsystemsOperator = new ArrayList<Subsystem>();
 
-        this.subsystemsDriver.add(Drivetrain.getInstance());
+        this.subsystemsDriver.add(DrivetrainBuilder.configure("drivetrain_motorRight", "drivetrain_motorLeft", false, true));
 
         subsystemsDriver.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
         subsystemsOperator.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));

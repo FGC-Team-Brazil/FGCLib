@@ -52,13 +52,25 @@ public class Drivetrain implements Subsystem {
     public void execute(SmartController driver) {
         telemetry.addData("DriveTrain Subsystem", "Running");
 
-        arcadeDrive(-driver.getLeftStickY(), driver.getRightStickX(), driver);
+        arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
 
         driver.whileButtonA()
-                .run(() -> setPosition(0.0, getAverageEncoderMeters()));
+                .run(() -> {
+                    setPosition(0.0, getAverageEncoderMeters());
+                    telemetry.addData("isButtonA", true);
+                });
+
+        driver.toggleOnButtonA()
+                .run(() -> {
+                    setPosition(0.5, getAverageEncoderMeters());
+                    telemetry.addData("isButtonA", true);
+                });
 
         driver.whileButtonB()
-                .run(() -> setPosition(1.0, resetEncoders()));
+                .run(() -> {
+                    setPosition(1.0, resetEncoders());
+                    telemetry.addData("isButtonB", true);
+                });
 
         if (pidController.atSetPoint()) {
             telemetry.addData("pid", "atSetpoint");

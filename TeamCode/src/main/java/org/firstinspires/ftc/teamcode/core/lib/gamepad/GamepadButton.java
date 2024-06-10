@@ -24,21 +24,6 @@ public class GamepadButton {
 
     public GamepadButton(Gamepad gamepad) {
         this.gamepad = gamepad;
-        this.buttonA = new ButtonListener(gamepad.a);
-        this.buttonB = new ButtonListener(gamepad.b);
-        this.buttonY = new ButtonListener(gamepad.y);
-        this.buttonX = new ButtonListener(gamepad.x);
-        this.buttonDPadUp = new ButtonListener(gamepad.dpad_up);
-        this.buttonDPadDown = new ButtonListener(gamepad.dpad_down);
-        this.buttonDPadLeft = new ButtonListener(gamepad.dpad_left);
-        this.buttonDPadRight = new ButtonListener(gamepad.dpad_right);
-        this.buttonLeftBumper = new ButtonListener(gamepad.left_bumper);
-        this.buttonRightBumper = new ButtonListener(gamepad.right_bumper);
-        this.buttonLeftStickButton = new ButtonListener(gamepad.left_stick_button);
-        this.buttonRightStickButton = new ButtonListener(gamepad.right_stick_button);
-        this.buttonStart = new ButtonListener(gamepad.start);
-        this.buttonBack = new ButtonListener(gamepad.back);
-        this.buttonGuide = new ButtonListener(gamepad.guide);
     }
 
     public double getLeftStickY() {
@@ -134,139 +119,130 @@ public class GamepadButton {
     }
 
     public ButtonListener.ButtonBuilder whileButtonA() {
-        return buttonA.whileTrue();
+        return ButtonListener.whileTrue(isButtonA());
     }
 
     public ButtonListener.ButtonBuilder whileButtonB() {
-        return buttonB.whileTrue();
-    }
-
-    public ButtonListener.ButtonBuilder toggleOnButtonA() {
-        return buttonA.toggleOnTrue();
-    }
-
-    public ButtonListener.ButtonBuilder toggleOnButtonB() {
-        return buttonB.toggleOnTrue();
-    }
-
-    public ButtonListener.ButtonBuilder whileButtonX() {
-        return buttonX.whileTrue();
-    }
-
-    public ButtonListener.ButtonBuilder whileButtonY() {
-        return buttonY.whileTrue();
-    }
-
-    public ButtonListener.ButtonBuilder whileButtonDPadUp() {
-        return buttonDPadUp.whileTrue();
-    }
-
-    public ButtonListener.ButtonBuilder whileButtonDPadDown() {
-        return buttonDPadDown.whileTrue();
-    }
-
-    public ButtonListener.ButtonBuilder whileButtonDPadLeft() {
-        return buttonDPadLeft.whileTrue();
-    }
-
-    public ButtonListener.ButtonBuilder whileButtonDPadRight() {
-        return buttonDPadRight.whileTrue();
-    }
-
-    public ButtonListener.ButtonBuilder whileButtonLeftBumper() {
-        return buttonLeftBumper.whileTrue();
+        return ButtonListener.whileTrue(isButtonB());
     }
 
     public ButtonListener.ButtonBuilder whileButtonRightBumper() {
-        return buttonRightBumper.whileTrue();
+        return ButtonListener.whileTrue(isButtonRightBumper());
+    }
+
+    public ButtonListener.ButtonBuilder whileButtonLeftBumper() {
+        return ButtonListener.whileTrue(isButtonLeftBumper());
+    }
+
+    public ButtonListener.ButtonBuilder whileButtonY() {
+        return ButtonListener.whileTrue(isButtonY());
+    }
+
+    public ButtonListener.ButtonBuilder whileButtonX() {
+        return ButtonListener.whileTrue(isButtonX());
+    }
+
+    public ButtonListener.ButtonBuilder whileButtonDPadUp() {
+        return ButtonListener.whileTrue(isButtonDPadUp());
+    }
+
+    public ButtonListener.ButtonBuilder whileButtonDPadDown() {
+        return ButtonListener.whileTrue(isButtonDPadDown());
+    }
+
+    public ButtonListener.ButtonBuilder whileButtonDPadLeft() {
+        return ButtonListener.whileTrue(isButtonDPadLeft());
+    }
+
+    public ButtonListener.ButtonBuilder whileButtonDPadRight() {
+        return ButtonListener.whileTrue(isButtonDPadRight());
     }
 
     public ButtonListener.ButtonBuilder whileButtonLeftStickButton() {
-        return buttonLeftStickButton.whileTrue();
+        return ButtonListener.whileTrue(isButtonLeftStickButton());
     }
 
     public ButtonListener.ButtonBuilder whileButtonRightStickButton() {
-        return buttonRightStickButton.whileTrue();
+        return ButtonListener.whileTrue(isButtonRightStickButton());
     }
 
     public ButtonListener.ButtonBuilder whileButtonStart() {
-        return buttonStart.whileTrue();
+        return ButtonListener.whileTrue(isButtonStart());
     }
 
     public ButtonListener.ButtonBuilder whileButtonBack() {
-        return buttonBack.whileTrue();
+        return ButtonListener.whileTrue(isButtonBack());
     }
 
     public ButtonListener.ButtonBuilder whileButtonGuide() {
-        return buttonGuide.whileTrue();
+        return ButtonListener.whileTrue(isButtonGuide());
     }
 
-    public ButtonListener.ButtonBuilder toggleOnButtonX() {
-        return buttonX.toggleOnTrue();
+    public ButtonListener.ButtonBuilder toggleOnButtonA() {
+        return ButtonListener.toggleOnTrue(isButtonA());
     }
 
-    public ButtonListener.ButtonBuilder toggleOnButtonY() {
-        return buttonY.toggleOnTrue();
-    }
-
-    public ButtonListener.ButtonBuilder toggleOnButtonDPadUp() {
-        return buttonDPadUp.toggleOnTrue();
-    }
-
-    public ButtonListener.ButtonBuilder toggleOnButtonDPadDown() {
-        return buttonDPadDown.toggleOnTrue();
-    }
-
-    public ButtonListener.ButtonBuilder toggleOnButtonDPadLeft() {
-        return buttonDPadLeft.toggleOnTrue();
-    }
-
-    public ButtonListener.ButtonBuilder toggleOnButtonDPadRight() {
-        return buttonDPadRight.toggleOnTrue();
-    }
-
-    public ButtonListener.ButtonBuilder toggleOnButtonLeftBumper() {
-        return buttonLeftBumper.toggleOnTrue();
+    public ButtonListener.ButtonBuilder toggleOnButtonB() {
+        return ButtonListener.toggleOnTrue(isButtonB());
     }
 
     public ButtonListener.ButtonBuilder toggleOnButtonRightBumper() {
-        return buttonRightBumper.toggleOnTrue();
+        return ButtonListener.toggleOnTrue(isButtonRightBumper());
+    }
+
+    public ButtonListener.ButtonBuilder toggleOnButtonLeftBumper() {
+        return ButtonListener.toggleOnTrue(isButtonLeftBumper());
+    }
+
+    public ButtonListener.ButtonBuilder toggleOnButtonY() {
+        return ButtonListener.toggleOnTrue(isButtonY());
+    }
+
+    public ButtonListener.ButtonBuilder toggleOnButtonX() {
+        return ButtonListener.toggleOnTrue(isButtonX());
+    }
+
+    public ButtonListener.ButtonBuilder toggleOnButtonDPadUp() {
+        return ButtonListener.toggleOnTrue(isButtonDPadUp());
+    }
+
+    public ButtonListener.ButtonBuilder toggleOnButtonDPadDown() {
+        return ButtonListener.toggleOnTrue(isButtonDPadDown());
+    }
+
+    public ButtonListener.ButtonBuilder toggleOnButtonDPadLeft() {
+        return ButtonListener.toggleOnTrue(isButtonDPadLeft());
+    }
+
+    public ButtonListener.ButtonBuilder toggleOnButtonDPadRight() {
+        return ButtonListener.toggleOnTrue(isButtonDPadRight());
     }
 
     public ButtonListener.ButtonBuilder toggleOnButtonLeftStickButton() {
-        return buttonLeftStickButton.toggleOnTrue();
+        return ButtonListener.toggleOnTrue(isButtonLeftStickButton());
     }
 
     public ButtonListener.ButtonBuilder toggleOnButtonRightStickButton() {
-        return buttonRightStickButton.toggleOnTrue();
+        return ButtonListener.toggleOnTrue(isButtonRightStickButton());
     }
 
     public ButtonListener.ButtonBuilder toggleOnButtonStart() {
-        return buttonStart.toggleOnTrue();
+        return ButtonListener.toggleOnTrue(isButtonStart());
     }
 
     public ButtonListener.ButtonBuilder toggleOnButtonBack() {
-        return buttonBack.toggleOnTrue();
+        return ButtonListener.toggleOnTrue(isButtonBack());
     }
 
     public ButtonListener.ButtonBuilder toggleOnButtonGuide() {
-        return buttonGuide.toggleOnTrue();
+        return ButtonListener.toggleOnTrue(isButtonGuide());
     }
 
     public ButtonListener.ButtonBuilder whileLeftTriggerPressed() {
-        return new ButtonListener(gamepad.left_trigger > GlobalConstants.Controller.TRIGGER_PRESSED_THRESHOLD_VALUE).whileTrue();
+        return ButtonListener.whileTrue(isLeftTriggerPressed());
     }
 
     public ButtonListener.ButtonBuilder whileRightTriggerPressed() {
-        return new ButtonListener(gamepad.right_trigger > GlobalConstants.Controller.TRIGGER_PRESSED_THRESHOLD_VALUE).whileTrue();
+        return ButtonListener.whileTrue(isRightTriggerPressed());
     }
-
-    public ButtonListener.ButtonBuilder toggleOnLeftTriggerPressed() {
-        return new ButtonListener(gamepad.left_trigger > GlobalConstants.Controller.TRIGGER_PRESSED_THRESHOLD_VALUE).toggleOnTrue();
-    }
-
-    public ButtonListener.ButtonBuilder toggleOnRightTriggerPressed() {
-        return new ButtonListener(gamepad.right_trigger > GlobalConstants.Controller.TRIGGER_PRESSED_THRESHOLD_VALUE).toggleOnTrue();
-    }
-
 }

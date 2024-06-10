@@ -2,15 +2,22 @@ package org.firstinspires.ftc.teamcode.core.lib.gamepad;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+/**
+ * ButtonListener is a utility class that listens for a button press and runs a Runnable if the button is pressed
+ * or a Runnable if the button is not pressed.
+ * <p>
+ * It can also listen for multiple buttons and do comparisons.
+ */
 public class ButtonListener {
 
     private final List<Boolean> buttonList;
     private boolean button;
     private boolean toggleState;
 
-    public ButtonListener(boolean button) {
-        this.button = button;
+    private ButtonListener() {
+        this.button = false;
         this.toggleState = false;
         this.buttonList = new ArrayList<>();
     }
@@ -20,10 +27,11 @@ public class ButtonListener {
      * <p>
      * ButtonBuilder is a builder class that allows for chaining of conditions.
      *
+     * @param button the button to listen for
      * @return a new ButtonBuilder instance
      */
-    public ButtonListener.ButtonBuilder whileTrue() {
-        return new ButtonListener.ButtonBuilder(this).whileTrue(this.button);
+    public static ButtonBuilder whileTrue(boolean button) {
+        return new ButtonBuilder().whileTrue(button);
     }
 
     /**
@@ -31,22 +39,23 @@ public class ButtonListener {
      * <p>
      * ButtonBuilder is a builder class that allows for chaining of conditions.
      *
+     * @param button the button to listen for
      * @return a new ButtonBuilder instance
      */
-    public ButtonListener.ButtonBuilder toggleOnTrue() {
-        return new ButtonListener.ButtonBuilder(this).toggleOnTrue(this.button);
+    public static ButtonBuilder toggleOnTrue(boolean button) {
+        return new ButtonBuilder().toggleOnTrue(button);
     }
 
     public static class ButtonBuilder {
-        private final ButtonListener buttonListenerInstance;
+        private final ButtonListener ButtonListenerInstance;
 
-        private ButtonBuilder(ButtonListener instance) {
-            this.buttonListenerInstance = instance;
+        private ButtonBuilder() {
+            ButtonListenerInstance = new ButtonListener();
         }
 
-        public ButtonListener.ButtonBuilder whileTrue(boolean button) {
-            buttonListenerInstance.buttonList.add(button);
-            buttonListenerInstance.button = button;
+        public ButtonBuilder whileTrue(boolean button) {
+            ButtonListenerInstance.buttonList.add(button);
+            ButtonListenerInstance.button = button;
             return this;
         }
 
@@ -56,9 +65,9 @@ public class ButtonListener {
          * @param condition the condition to add
          * @return the ButtonBuilder instance
          */
-        public ButtonListener.ButtonBuilder and(boolean condition) {
-            buttonListenerInstance.buttonList.add(condition);
-            buttonListenerInstance.button = buttonListenerInstance.buttonList.stream().allMatch(Boolean::booleanValue);
+        public ButtonBuilder and(boolean condition) {
+            ButtonListenerInstance.buttonList.add(condition);
+            ButtonListenerInstance.button = ButtonListenerInstance.buttonList.stream().allMatch(Boolean::booleanValue);
             return this;
         }
 
@@ -68,17 +77,17 @@ public class ButtonListener {
          * @param condition the condition to add
          * @return the ButtonBuilder instance
          */
-        public ButtonListener.ButtonBuilder or(boolean condition) {
-            buttonListenerInstance.buttonList.add(condition);
-            buttonListenerInstance.button = buttonListenerInstance.buttonList.stream().anyMatch(Boolean::booleanValue);
+        public ButtonBuilder or(boolean condition) {
+            ButtonListenerInstance.buttonList.add(condition);
+            ButtonListenerInstance.button = ButtonListenerInstance.buttonList.stream().anyMatch(Boolean::booleanValue);
             return this;
         }
 
-        public ButtonListener.ButtonBuilder toggleOnTrue(boolean button) {
+        public ButtonBuilder toggleOnTrue(boolean button) {
             if (button) {
-                buttonListenerInstance.toggleState = !buttonListenerInstance.toggleState;
+                ButtonListenerInstance.toggleState = !ButtonListenerInstance.toggleState;
             }
-            buttonListenerInstance.button = buttonListenerInstance.toggleState;
+            ButtonListenerInstance.button = ButtonListenerInstance.toggleState;
             return this;
         }
 
@@ -86,35 +95,33 @@ public class ButtonListener {
          * Runs the given Runnable.
          * <p>
          * Its possible pass a lambda expression or a method reference.
-         *
          * @param runnable the Runnable to run
          */
         public void run(Runnable runnable) {
-            if (buttonListenerInstance.button) {
+            if (ButtonListenerInstance.button) {
                 runnable.run();
             }
 
-            buttonListenerInstance.buttonList.clear();
-            buttonListenerInstance.button = false;
+            ButtonListenerInstance.buttonList.clear();
+            ButtonListenerInstance.button = false;
         }
 
         /**
          * Runs the given Runnable if the conditions are true, otherwise runs the elseRunnable.
          * <p>
          * Its possible pass a lambda expression or a method reference.
-         *
-         * @param runnable     the Runnable to run if the conditions are true
+         * @param runnable the Runnable to run if the conditions are true
          * @param elseRunnable the Runnable to run if the conditions are false
          */
         public void run(Runnable runnable, Runnable elseRunnable) {
-            if (buttonListenerInstance.button) {
+            if (ButtonListenerInstance.button) {
                 runnable.run();
             } else {
                 elseRunnable.run();
             }
 
-            buttonListenerInstance.buttonList.clear();
-            buttonListenerInstance.button = false;
+            ButtonListenerInstance.buttonList.clear();
+            ButtonListenerInstance.button = false;
         }
     }
 }

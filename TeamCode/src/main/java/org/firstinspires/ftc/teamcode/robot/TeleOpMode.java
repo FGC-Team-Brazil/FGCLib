@@ -27,7 +27,6 @@ public class TeleOpMode extends OpMode {
         this.subsystemsOperator = new ArrayList<Subsystem>();
 
         this.subsystemsDriver.add(Drivetrain.getInstance());
-        this.subsystemsOperator.add(SubsystemExample.getInstance());
 
         subsystemsDriver.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
         subsystemsOperator.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));

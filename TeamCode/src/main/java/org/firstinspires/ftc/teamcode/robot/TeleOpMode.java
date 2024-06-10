@@ -21,13 +21,15 @@ public class TeleOpMode extends OpMode {
 
     @Override
     public void init() {
+        DrivetrainBuilder drivetrainBuilder = DrivetrainBuilder.configure("drivetrain_motorRight", "drivetrain_motorLeft", false, true);
+
         this.driver = new SmartController(gamepad1);
         this.operator = new SmartController(gamepad2);
 
         this.subsystemsDriver = new ArrayList<Subsystem>();
         this.subsystemsOperator = new ArrayList<Subsystem>();
 
-        this.subsystemsDriver.add(DrivetrainBuilder.configure("drivetrain_motorRight", "drivetrain_motorLeft", false, true));
+        this.subsystemsDriver.add(drivetrainBuilder);
 
         subsystemsDriver.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
         subsystemsOperator.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));

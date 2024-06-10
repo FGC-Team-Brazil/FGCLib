@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.core.lib.builders;
 
-import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainConstants.MOTOR_LEFT;
-import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainConstants.MOTOR_RIGHT;
+import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainConstants.*;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -9,15 +8,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
-import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.core.lib.interfaces.SubsystemBuilder;
 
-public class DrivetrainBuilder implements Subsystem{
-    private static DrivetrainBuilder instance;
-
-    private String motorRightName;
+public class DrivetrainBuilder implements SubsystemBuilder {
+    private static volatile DrivetrainBuilder instance;
+    private DcMotorSimple.Direction motorRightDirection;
+    private DcMotorSimple.Direction motorLeftDirection;
     private String motorLeftName;
-    private boolean isMotorRightInverted;
-    private boolean isMotorLeftInverted;
+    private String motorRightName;
     private double limiter;
     private DcMotor motorRight;
     private DcMotor motorLeft;
@@ -27,35 +25,43 @@ public class DrivetrainBuilder implements Subsystem{
     }
 
     public static DrivetrainBuilder configure(String motorRightName, String motorLeftName, boolean isMotorRightInverted, boolean isMotorLeftInverted) {
-        if (instance == null) {
-            instance = new DrivetrainBuilder();
-        }
+        getInstance();
 
-        instance.motorRightName = motorRightName;
         instance.motorLeftName = motorLeftName;
-        instance.isMotorRightInverted = isMotorRightInverted;
-        instance.isMotorLeftInverted = isMotorLeftInverted;
+        instance.motorRightName = motorRightName;
+        instance.motorLeftDirection = isMotorLeftInverted
+                ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+        instance.motorRightDirection = isMotorRightInverted
+                ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
 
         return instance;
+    }
+
+    @Override
+    public DrivetrainBuilder configure() {
+        return getInstance();
     }
 
 
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
-        motorLeft = hardwareMap.get(DcMotor.class, MOTOR_LEFT);
-        motorRight = hardwareMap.get(DcMotor.class, MOTOR_RIGHT);
-        motorLeft.setDirection(isMotorLeftInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD);
-        motorRight.setDirection(isMotorRightInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD);
+        motorLeft = hardwareMap.get(DcMotor.class, motorLeftName);
+        motorRight = hardwareMap.get(DcMotor.class, motorRightName);
+        motorLeft.setDirection(motorLeftDirection);
+        motorRight.setDirection(motorRightDirection);
     }
+
     @Override
     public void start() {
 
     }
+
     @Override
     public void stop() {
 
     }
+
     @Override
     public void execute(SmartController driver) {
         telemetry.addData("DrivetrainBuilder Subsystem", "Running");
@@ -63,13 +69,13 @@ public class DrivetrainBuilder implements Subsystem{
     }
 
     public void arcadeDrive(double xSpeed, double zRotation, SmartController driver) {
-        limiter = 0.8;
+        limiter = LIMITER_DEFAULT;
 
         driver.whileButtonRightBumper()
-                .run(() -> limiter = 0.5);
+                .run(() -> limiter = LIMITER_MIN);
 
         driver.whileButtonLeftBumper()
-                .run(() -> limiter = 1.0);
+                .run(() -> limiter = LIMITER_MAX);
 
         double xSpeedLimited = Math.max(-limiter, Math.min(limiter, xSpeed));
         double zRotationLimited = Math.max(-limiter, Math.min(limiter, zRotation));
@@ -83,6 +89,17 @@ public class DrivetrainBuilder implements Subsystem{
     public void setPower(double leftSpeed, double rightSpeed) {
         motorLeft.setPower(leftSpeed);
         motorRight.setPower(rightSpeed);
+    }
+
+    private static DrivetrainBuilder getInstance() {
+        if (instance == null) {
+            synchronized (DrivetrainBuilder.class) {
+                if (instance == null) {
+                    instance = new DrivetrainBuilder();
+                }
+            }
+        }
+        return instance;
     }
 
 }

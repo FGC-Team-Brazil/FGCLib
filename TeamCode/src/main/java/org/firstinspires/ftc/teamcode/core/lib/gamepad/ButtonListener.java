@@ -77,6 +77,18 @@ public class ButtonListener {
          * @param condition the condition to add
          * @return the ButtonBuilder instance
          */
+        public ButtonBuilder andNot(boolean condition) {
+            ButtonListenerInstance.buttonList.add(!condition);
+            ButtonListenerInstance.button = ButtonListenerInstance.buttonList.stream().allMatch(Boolean::booleanValue);
+            return this;
+        }
+
+        /**
+         * Adds a condition to the button listener.
+         *
+         * @param condition the condition to add
+         * @return the ButtonBuilder instance
+         */
         public ButtonBuilder or(boolean condition) {
             ButtonListenerInstance.buttonList.add(condition);
             ButtonListenerInstance.button = ButtonListenerInstance.buttonList.stream().anyMatch(Boolean::booleanValue);

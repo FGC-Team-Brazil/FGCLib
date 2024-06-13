@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.SubsystemBuilder;
 
 public class DrivetrainBuilder implements SubsystemBuilder {
-    private static volatile DrivetrainBuilder instance;
+    private static DrivetrainBuilder instance;
     private DcMotorSimple.Direction motorRightDirection;
     private DcMotorSimple.Direction motorLeftDirection;
     private String motorLeftName;

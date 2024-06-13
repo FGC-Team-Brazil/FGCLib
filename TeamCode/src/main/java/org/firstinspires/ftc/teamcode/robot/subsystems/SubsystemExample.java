@@ -71,15 +71,15 @@ public class SubsystemExample implements Subsystem {
 
         operator.whileLeftTriggerPressed()
                 .and(operator.isRightTriggerPressed())
-                .and(!isLimitRight())
-                .and(!isLimitLeft())
+                .andNot(isLimitRight())
+                .andNot(isLimitLeft())
                 .run(() -> {
                     motorRight.setPower(operator.getRightTrigger());
                     motorLeft.setPower(operator.getLeftTrigger());
                 });
 
         operator.whileLeftTriggerPressed()
-                .and(!isLimitLeft())
+                .andNot(isLimitLeft())
                 .run(() -> {
                     motorLeft.setPower(operator.getLeftTrigger());
                 }, () -> {
@@ -88,7 +88,7 @@ public class SubsystemExample implements Subsystem {
                 });
 
         operator.whileRightTriggerPressed()
-                .and(!isLimitRight())
+                .andNot(isLimitRight())
                 .run(() -> {
                     motorRight.setPower(operator.getRightTrigger());
                 }, () -> {

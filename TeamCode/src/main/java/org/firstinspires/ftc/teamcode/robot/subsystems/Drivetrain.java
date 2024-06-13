@@ -38,7 +38,7 @@ public class Drivetrain implements Subsystem {
         pidController = new PIDController(0.5, 0.01, 0.0, 0.3);
         pidController.setTolerance(0.05);
 
-        motorLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorRight.setDirection(DcMotorSimple.Direction.FORWARD);
         motorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -52,13 +52,25 @@ public class Drivetrain implements Subsystem {
     public void execute(SmartController driver) {
         telemetry.addData("DriveTrain Subsystem", "Running");
 
-        arcadeDrive(-driver.getLeftStickY(), driver.getRightStickX(), driver);
+        arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
 
         driver.whileButtonA()
-                .run(() -> setPosition(0.0, getAverageEncoderMeters()));
+                .run(() -> {
+                    setPosition(0.0, getAverageEncoderMeters());
+                    telemetry.addData("isButtonA", true);
+                });
+
+        driver.toggleOnButtonA()
+                .run(() -> {
+                    setPosition(0.5, getAverageEncoderMeters());
+                    telemetry.addData("isButtonA", true);
+                });
 
         driver.whileButtonB()
-                .run(() -> setPosition(1.0, resetEncoders()));
+                .run(() -> {
+                    setPosition(1.0, resetEncoders());
+                    telemetry.addData("isButtonB", true);
+                });
 
         if (pidController.atSetPoint()) {
             telemetry.addData("pid", "atSetpoint");

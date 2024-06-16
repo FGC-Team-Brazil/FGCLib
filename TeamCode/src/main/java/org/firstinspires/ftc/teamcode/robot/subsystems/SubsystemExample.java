@@ -45,7 +45,7 @@ public class SubsystemExample implements Subsystem {
     }
 
     @Override
-    public void execute(SmartController operator) {
+    public void execute(SmartController driver,SmartController operator) {
         telemetry.addData("SubsystemExample Subsystem", "Running");
 
         PIDController.calculate(TARGET_DEGREE, motorLeft.getCurrentPosition());

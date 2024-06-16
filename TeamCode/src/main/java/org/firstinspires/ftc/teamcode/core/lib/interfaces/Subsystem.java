@@ -20,5 +20,5 @@ public interface Subsystem {
 
     void stop();
 
-    void execute(SmartController controller);
+    void execute(SmartController driver, SmartController operator);
 }

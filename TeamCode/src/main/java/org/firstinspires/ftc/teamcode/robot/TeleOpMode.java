@@ -14,47 +14,42 @@ import java.util.ArrayList;
 @TeleOp(name = "TeleOp", group = "Official TeleOp")
 public class TeleOpMode extends OpMode {
 
-    private ArrayList<Subsystem> subsystemsDriver;
-    private ArrayList<Subsystem> subsystemsOperator;
+
     private SmartController driver;
     private SmartController operator;
+    private ArrayList<Subsystem> subsystems = new ArrayList<Subsystem>();
+    private final Robot robot = new Robot();
 
     @Override
     public void init() {
+
         DrivetrainBuilder drivetrainBuilder = DrivetrainBuilder.configure("drivetrain_motorRight", "drivetrain_motorLeft", false, true);
 
-        this.driver = new SmartController(gamepad1);
-        this.operator = new SmartController(gamepad2);
+        this.subsystems.add(drivetrainBuilder);
 
-        this.subsystemsDriver = new ArrayList<Subsystem>();
-        this.subsystemsOperator = new ArrayList<Subsystem>();
-
-        this.subsystemsDriver.add(drivetrainBuilder);
-
-        subsystemsDriver.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
-        subsystemsOperator.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
-        telemetry.update();
+        // Don't remove this line
+        robot.init(hardwareMap, telemetry, gamepad1, gamepad2, subsystems);
     }
 
     @Override
     public void start() {
-        subsystemsDriver.forEach(Subsystem::start);
-        subsystemsOperator.forEach(Subsystem::start);
-        telemetry.update();
+        // Don't remove this line
+        robot.start();
+
     }
 
     @Override
     public void loop() {
-        subsystemsDriver.forEach(subsystem -> subsystem.execute(driver));
-        subsystemsOperator.forEach(subsystem -> subsystem.execute(operator));
-        telemetry.update();
+        // Don't remove this line
+        robot.loop();
+
     }
 
     @Override
     public void stop() {
-        subsystemsDriver.forEach(Subsystem::stop);
-        subsystemsOperator.forEach(Subsystem::stop);
-        telemetry.update();
+        // Don't remove this line
+        robot.stop();
+
     }
 
 }

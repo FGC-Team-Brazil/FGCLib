@@ -63,7 +63,7 @@ public class DrivetrainBuilder implements SubsystemBuilder {
     }
 
     @Override
-    public void execute(SmartController driver) {
+    public void execute(SmartController driver, SmartController operator) {
         telemetry.addData("DrivetrainBuilder Subsystem", "Running");
         arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
     }

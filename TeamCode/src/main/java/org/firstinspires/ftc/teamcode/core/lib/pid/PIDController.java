@@ -5,9 +5,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * Standard class for building PIDF control systems.
+ * PIDController is a standard class for building PIDF control systems.
  * It uses the constants: Proportional, Integral and Derivative.
  * In addition to PID, it implements a FeedForward constant.
+ * The class works in two modes: Position and Angle.
  */
 public class PIDController {
     public enum Mode {

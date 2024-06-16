@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot.constants;
 
+/**
+ * SubsystemExampleConstants is a example of constant class.
+ * You would like to have a constant class for every subsystem.
+ */
 public class SubsystemExampleConstants {
     public static final String MOTOR_LEFT = "subsystemExample_motorLeft";
     public static final String MOTOR_RIGHT = "subsystemExample_motorRight";

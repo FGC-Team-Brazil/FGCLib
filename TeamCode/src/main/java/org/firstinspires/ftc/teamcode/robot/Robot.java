@@ -25,6 +25,7 @@ public class Robot {
         this.operator = new SmartController(operator);
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
+        this.subsystems = subsystems;
 
         subsystems.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
 

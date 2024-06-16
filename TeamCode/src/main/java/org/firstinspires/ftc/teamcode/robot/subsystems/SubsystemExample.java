@@ -14,10 +14,6 @@ import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 
-/**
- * Example subsystem that implements the FGCLib.
- * Look at the example to build your own subsystems
- */
 public class SubsystemExample implements Subsystem {
     private static SubsystemExample instance;
     private Telemetry telemetry;

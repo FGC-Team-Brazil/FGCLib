@@ -2,11 +2,6 @@ package org.firstinspires.ftc.teamcode.core.lib.gamepad;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-/**
- * SmartController class is a extension of the GamepadButton class.
- * It contains other functions of the gamepads, as rumble, LED, etc.
- * Always use this class instead of the GamepadButton.
- */
 public class SmartController extends GamepadButton {
     public Gamepad gamepad;
 

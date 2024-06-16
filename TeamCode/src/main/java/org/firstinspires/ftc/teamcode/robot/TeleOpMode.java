@@ -11,12 +11,6 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
 
 import java.util.ArrayList;
 
-/**
- * TeleOp class template for building TeleOp modes.
- * Look at the example to build your own TeleOps.
- * This class will be your main TeleOp mode.
- * Put other OpModes in the opmodes folder.
- */
 @TeleOp(name = "TeleOp", group = "Official TeleOp")
 public class TeleOpMode extends OpMode {
 

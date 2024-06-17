@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode.robot;
+package org.firstinspires.ftc.teamcode.core.lib;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadConfig;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 
@@ -20,9 +21,9 @@ public class Robot {
     public Robot() {
     }
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry, Gamepad driver, Gamepad operator, ArrayList<Subsystem> subsystems) {
-        this.driver = new SmartController(driver);
-        this.operator = new SmartController(operator);
+    public void init(@NonNull HardwareMap hardwareMap, @NonNull Telemetry telemetry, @NonNull GamepadConfig gamepadConfig, @NonNull ArrayList<Subsystem> subsystems) {
+        this.driver = new SmartController(gamepadConfig.getDriver());
+        this.operator = new SmartController(gamepadConfig.getOperator());
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
         this.subsystems = subsystems;
@@ -39,6 +40,8 @@ public class Robot {
 
     public void loop() {
         subsystems.forEach(subsystem -> subsystem.execute(driver, operator));
+        telemetry.addData("Driver", driver.getRightStickX());
+        telemetry.addData("Operator", operator.getRightStickX());
         telemetry.update();
     }
 

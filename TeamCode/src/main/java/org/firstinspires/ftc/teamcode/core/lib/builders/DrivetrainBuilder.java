@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.core.lib.builders;
 
 import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainConstants.*;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -24,7 +26,7 @@ public class DrivetrainBuilder implements SubsystemBuilder {
     private DrivetrainBuilder() {
     }
 
-    public static DrivetrainBuilder configure(String motorRightName, String motorLeftName, boolean isMotorRightInverted, boolean isMotorLeftInverted) {
+    public static DrivetrainBuilder configure(@NonNull String motorRightName, @NonNull String motorLeftName, boolean isMotorRightInverted, boolean isMotorLeftInverted) {
         getInstance();
 
         instance.motorLeftName = motorLeftName;

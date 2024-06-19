@@ -5,37 +5,29 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class GamepadConfig {
-    private static Gamepad driver;
-    private static Gamepad operator;
+    private static SmartController driver;
+    private static SmartController operator;
 
     public static GamepadConfig use(@NonNull Gamepad driver, @NonNull Gamepad operator) {
-        GamepadConfig.driver = driver;
-        GamepadConfig.operator = operator;
+        GamepadConfig.driver = new SmartController(driver);
+        GamepadConfig.operator = new SmartController(operator);
         return new GamepadConfig();
     }
 
     public static GamepadConfig use(@NonNull Gamepad driver) {
-        GamepadConfig.driver = driver;
-        GamepadConfig.operator = driver;
+        GamepadConfig.driver = new SmartController(driver);
+        GamepadConfig.operator = new SmartController(driver);
         return new GamepadConfig();
     }
 
     private GamepadConfig() {
     }
 
-    public Gamepad getDriver() {
+    public SmartController driver() {
         return driver;
     }
 
-    public Gamepad getOperator() {
+    public SmartController operator() {
         return operator;
-    }
-
-    public void setDriver(Gamepad driver) {
-        GamepadConfig.driver = driver;
-    }
-
-    public void setOperator(Gamepad operator) {
-        GamepadConfig.operator = operator;
     }
 }

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.core.lib.interfaces;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadConfig;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
 
 /**
@@ -17,6 +18,6 @@ public interface Subsystem {
     void initialize(HardwareMap hardwareMap, Telemetry telemetry);
     void start();
     void stop();
-    void execute(SmartController driver, SmartController operator);
+    void execute(GamepadConfig gamepadConfig);
 
 }

@@ -17,14 +17,14 @@ public class TeleOpMode extends OpMode {
 
     @Override
     public void init() {
-        GamepadConfig gamepadConfig = GamepadConfig.use(gamepad1);
+        robot.gamepadConfig(gamepad1);
 
         DrivetrainBuilder drivetrainBuilder = DrivetrainBuilder.configure("drivetrain_motorRight", "drivetrain_motorLeft", false, true);
 
         this.subsystems.add(drivetrainBuilder);
 
         // Don't remove this line
-        robot.init(hardwareMap, telemetry, gamepadConfig, subsystems);
+        robot.init(hardwareMap, telemetry, subsystems);
     }
 
     @Override

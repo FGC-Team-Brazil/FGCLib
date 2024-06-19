@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadConfig;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.SubsystemBuilder;
 
@@ -22,6 +23,7 @@ public class DrivetrainBuilder implements SubsystemBuilder {
     private DcMotor motorRight;
     private DcMotor motorLeft;
     private Telemetry telemetry;
+    private SmartController driver;
 
     private DrivetrainBuilder() {
     }
@@ -65,7 +67,9 @@ public class DrivetrainBuilder implements SubsystemBuilder {
     }
 
     @Override
-    public void execute(SmartController driver, SmartController operator) {
+    public void execute(GamepadConfig gamepadConfig) {
+        driver = gamepadConfig.driver();
+
         telemetry.addData("DrivetrainBuilder Subsystem", "Running");
         arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
     }

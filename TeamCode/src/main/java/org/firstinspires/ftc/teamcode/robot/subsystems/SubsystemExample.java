@@ -10,6 +10,7 @@ import static org.firstinspires.ftc.teamcode.core.lib.pid.PIDController.Mode.ANG
 import static org.firstinspires.ftc.teamcode.robot.constants.SubsystemExampleConstants.*;
 import static org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants.*;
 
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadConfig;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
@@ -21,6 +22,7 @@ public class SubsystemExample implements Subsystem {
     private DcMotor motorLeft;
     private TouchSensor limitRight;
     private TouchSensor limitLeft;
+    private SmartController operator;
     private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
 
     private SubsystemExample() {
@@ -45,7 +47,9 @@ public class SubsystemExample implements Subsystem {
     }
 
     @Override
-    public void execute(SmartController driver,SmartController operator) {
+    public void execute(GamepadConfig gamepadConfig) {
+        operator = gamepadConfig.operator();
+
         telemetry.addData("SubsystemExample Subsystem", "Running");
 
         PIDController.calculate(TARGET_DEGREE, motorLeft.getCurrentPosition());

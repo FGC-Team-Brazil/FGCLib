@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainConstants.*;
 import static org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants.HD_HEX_TICKS_PER_REVOLUTION;
 
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadConfig;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
@@ -22,7 +24,7 @@ public class Drivetrain implements Subsystem {
     private IMU imu;
     private Telemetry telemetry;
     private PIDController pidController;
-
+    private SmartController driver;
     private double limiter;
 
     private Drivetrain() {
@@ -49,7 +51,9 @@ public class Drivetrain implements Subsystem {
     }
 
     @Override
-    public void execute(SmartController driver, SmartController operator) {
+    public void execute(GamepadConfig gamepadConfig) {
+        driver = gamepadConfig.driver();
+
         telemetry.addData("DriveTrain Subsystem", "Running");
 
         arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);

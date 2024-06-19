@@ -6,35 +6,32 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadConfig;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.robot.RobotSubsystems;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class Robot {
-    private ArrayList<Subsystem> subsystems;
-    private SmartController driver;
-    private SmartController operator;
+    private List<Subsystem> subsystems;
     private Telemetry telemetry;
-    private HardwareMap hardwareMap;
-    private GamepadConfig gamepadConfig;
+    private GamepadManager gamepadManager;
     public Robot() {
     }
 
-    public void gamepadConfig(@NonNull Gamepad driver, Gamepad operator) {
-        gamepadConfig = GamepadConfig.use(driver, operator);
+    public void configGamepadManager(@NonNull Gamepad driver, @NonNull Gamepad operator) {
+        gamepadManager = GamepadManager.use(driver, operator);
     }
 
-    public void gamepadConfig(@NonNull Gamepad driver){
-        gamepadConfig = GamepadConfig.use(driver);
+    public void configGamepadManager(@NonNull Gamepad driver){
+        gamepadManager = GamepadManager.use(driver);
     }
 
-    public void init(@NonNull HardwareMap hardwareMap, @NonNull Telemetry telemetry, @NonNull ArrayList<Subsystem> subsystems) {
+    public void init(@NonNull HardwareMap hardwareMap, @NonNull Telemetry telemetry) {
         this.telemetry = telemetry;
-        this.hardwareMap = hardwareMap;
-        this.subsystems = subsystems;
+        this.subsystems = RobotSubsystems.get();
 
         subsystems.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
 
@@ -47,9 +44,9 @@ public class Robot {
     }
 
     public void loop() {
-        subsystems.forEach(subsystem -> subsystem.execute(gamepadConfig));
-        telemetry.addData("Driver", driver.getRightStickX());
-        telemetry.addData("Operator", operator.getRightStickX());
+        subsystems.forEach(subsystem -> subsystem.execute(gamepadManager));
+        telemetry.addData("Driver", gamepadManager.getDriver().getRightStickX());
+        telemetry.addData("Operator", gamepadManager.getOperator().getRightStickX());
         telemetry.update();
     }
 

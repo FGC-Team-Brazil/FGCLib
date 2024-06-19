@@ -2,10 +2,10 @@ package org.firstinspires.ftc.teamcode.core.lib.gamepad;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-public class SmartController extends GamepadButton {
+public class SmartGamepad extends GamepadButton {
     public Gamepad gamepad;
 
-    public SmartController(Gamepad gamepad) {
+    public SmartGamepad(Gamepad gamepad) {
         super(gamepad);
         this.gamepad = gamepad;
     }

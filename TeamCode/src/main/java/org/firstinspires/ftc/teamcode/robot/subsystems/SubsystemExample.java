@@ -10,9 +10,9 @@ import static org.firstinspires.ftc.teamcode.core.lib.pid.PIDController.Mode.ANG
 import static org.firstinspires.ftc.teamcode.robot.constants.SubsystemExampleConstants.*;
 import static org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants.*;
 
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadConfig;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 
 public class SubsystemExample implements Subsystem {
@@ -22,7 +22,7 @@ public class SubsystemExample implements Subsystem {
     private DcMotor motorLeft;
     private TouchSensor limitRight;
     private TouchSensor limitLeft;
-    private SmartController operator;
+    private SmartGamepad operator;
     private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
 
     private SubsystemExample() {
@@ -47,8 +47,8 @@ public class SubsystemExample implements Subsystem {
     }
 
     @Override
-    public void execute(GamepadConfig gamepadConfig) {
-        operator = gamepadConfig.operator();
+    public void execute(GamepadManager gamepadManager) {
+        operator = gamepadManager.getOperator();
 
         telemetry.addData("SubsystemExample Subsystem", "Running");
 

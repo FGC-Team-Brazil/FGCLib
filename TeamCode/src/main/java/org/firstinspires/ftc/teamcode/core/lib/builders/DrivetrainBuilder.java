@@ -1,16 +1,19 @@
 package org.firstinspires.ftc.teamcode.core.lib.builders;
 
-import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainConstants.*;
+import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderConstants.*;
+
+import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
-import org.firstinspires.ftc.teamcode.core.lib.interfaces.SubsystemBuilder;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
+import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 
-public class DrivetrainBuilder implements SubsystemBuilder {
+public class DrivetrainBuilder implements Subsystem {
     private static DrivetrainBuilder instance;
     private DcMotorSimple.Direction motorRightDirection;
     private DcMotorSimple.Direction motorLeftDirection;
@@ -20,11 +23,12 @@ public class DrivetrainBuilder implements SubsystemBuilder {
     private DcMotor motorRight;
     private DcMotor motorLeft;
     private Telemetry telemetry;
+    private SmartGamepad driver;
 
     private DrivetrainBuilder() {
     }
 
-    public static DrivetrainBuilder configure(String motorRightName, String motorLeftName, boolean isMotorRightInverted, boolean isMotorLeftInverted) {
+    public static DrivetrainBuilder build(@NonNull String motorRightName, @NonNull String motorLeftName, boolean isMotorRightInverted, boolean isMotorLeftInverted) {
         getInstance();
 
         instance.motorLeftName = motorLeftName;
@@ -37,10 +41,6 @@ public class DrivetrainBuilder implements SubsystemBuilder {
         return instance;
     }
 
-    @Override
-    public DrivetrainBuilder configure() {
-        return getInstance();
-    }
 
 
     @Override
@@ -63,19 +63,18 @@ public class DrivetrainBuilder implements SubsystemBuilder {
     }
 
     @Override
-    public void execute(SmartController driver) {
+    public void execute(GamepadManager gamepadConfig) {
+        driver = gamepadConfig.getDriver();
+
         telemetry.addData("DrivetrainBuilder Subsystem", "Running");
         arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
     }
 
-    public void arcadeDrive(double xSpeed, double zRotation, SmartController driver) {
+    public void arcadeDrive(double xSpeed, double zRotation, SmartGamepad driver) {
         limiter = LIMITER_DEFAULT;
 
         driver.whileButtonRightBumper()
                 .run(() -> limiter = LIMITER_MIN);
-
-        driver.whileButtonLeftBumper()
-                .run(() -> limiter = LIMITER_MAX);
 
         double xSpeedLimited = Math.max(-limiter, Math.min(limiter, xSpeed));
         double zRotationLimited = Math.max(-limiter, Math.min(limiter, zRotation));
@@ -91,7 +90,7 @@ public class DrivetrainBuilder implements SubsystemBuilder {
         motorRight.setPower(rightSpeed);
     }
 
-    private static DrivetrainBuilder getInstance() {
+    public static DrivetrainBuilder getInstance() {
         if (instance == null) {
             synchronized (DrivetrainBuilder.class) {
                 if (instance == null) {

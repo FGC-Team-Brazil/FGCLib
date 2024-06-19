@@ -3,58 +3,36 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.core.lib.Robot;
 import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
-import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
-import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
+import org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderConstants;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @TeleOp(name = "TeleOp", group = "Official TeleOp")
 public class TeleOpMode extends OpMode {
-
-    private ArrayList<Subsystem> subsystemsDriver;
-    private ArrayList<Subsystem> subsystemsOperator;
-    private SmartController driver;
-    private SmartController operator;
+    private final Robot robot = new Robot();
 
     @Override
     public void init() {
-        DrivetrainBuilder drivetrainBuilder = DrivetrainBuilder.configure("drivetrain_motorRight", "drivetrain_motorLeft", false, true);
-
-        this.driver = new SmartController(gamepad1);
-        this.operator = new SmartController(gamepad2);
-
-        this.subsystemsDriver = new ArrayList<Subsystem>();
-        this.subsystemsOperator = new ArrayList<Subsystem>();
-
-        this.subsystemsDriver.add(drivetrainBuilder);
-
-        subsystemsDriver.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
-        subsystemsOperator.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
-        telemetry.update();
+        robot.configGamepadManager(gamepad1, gamepad2);
+        robot.init(hardwareMap, telemetry);
     }
 
     @Override
     public void start() {
-        subsystemsDriver.forEach(Subsystem::start);
-        subsystemsOperator.forEach(Subsystem::start);
-        telemetry.update();
+        robot.start();
     }
 
     @Override
     public void loop() {
-        subsystemsDriver.forEach(subsystem -> subsystem.execute(driver));
-        subsystemsOperator.forEach(subsystem -> subsystem.execute(operator));
-        telemetry.update();
+        robot.loop();
     }
 
     @Override
     public void stop() {
-        subsystemsDriver.forEach(Subsystem::stop);
-        subsystemsOperator.forEach(Subsystem::stop);
-        telemetry.update();
+        robot.stop();
     }
-
 }

@@ -3,45 +3,34 @@ package org.firstinspires.ftc.teamcode.robot.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
-import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartController;
-
-import java.util.ArrayList;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 
 @TeleOp(name = "TeleOp 2", group = "TeleOp 2")
 public class TeleOpMode2 extends OpMode {
 
-    private ArrayList<Subsystem> subsystemsDriver;
-    private SmartController driver;
+    private SmartGamepad driver;
 
     @Override
     public void init() {
-        this.driver = new SmartController(gamepad1);
-
-        this.subsystemsDriver = new ArrayList<Subsystem>();
-
-        this.subsystemsDriver.add(Drivetrain.getInstance());
-
-        subsystemsDriver.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
-        telemetry.update();
+       // robot.gamepadConfig(gamepad1, gamepad2);
+        //robot.init(hardwareMap, telemetry); // Don't remove this line
     }
 
     @Override
     public void start() {
-        subsystemsDriver.forEach(Subsystem::start);
-        telemetry.update();
+        //subsystemsDriver.forEach(Subsystem::start);
+        //telemetry.update();
     }
 
     @Override
     public void loop() {
-        subsystemsDriver.forEach(subsystem -> subsystem.execute(driver));
+        //subsystemsDriver.forEach(subsystem -> subsystem.execute(driver, null));
         telemetry.update();
     }
 
     @Override
     public void stop() {
-        subsystemsDriver.forEach(Subsystem::stop);
+       // subsystemsDriver.forEach(Subsystem::stop);
         telemetry.update();
     }
 

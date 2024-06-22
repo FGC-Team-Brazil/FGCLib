@@ -13,13 +13,19 @@ public class TrajectoryCourse {
 
     As a result this lib is more applicable to real time movement recalculation and webcam-using odometry
      */
+    ArrayList<Pose2d> pose2dList = new ArrayList<Pose2d>();
     ArrayList<Double> xPointList = new ArrayList<Double>();
     ArrayList<Double> yPointList = new ArrayList<Double>();
     ArrayList<Double> timeAtPointList = new ArrayList<Double>();
     double currentCouseTime = 0;
     private final double bezierControlConstant = Math.E;
+    TrajectoryCourse addPose2d(Pose2d newPose2d){
+        pose2dList.add(newPose2d);
+        return this;
+    }
 
-    TrajectoryCourse addSegment(Pose2d start, Pose2d end){
+    TrajectoryCourse calculateSegment(Pose2d start, Pose2d end){
+        int startT;
         double segmentLengh = Math.hypot(Math.pow(end.getX() - start.getX(),2)
                                         , Math.pow(end.getY() - start.getY(),2));
         Vector2d ControlPoint1 = new Vector2d(
@@ -30,8 +36,15 @@ public class TrajectoryCourse {
                 segmentLengh/bezierControlConstant*Math.cos(end.getHeadingRadians())+end.getX(),
                 segmentLengh/bezierControlConstant*Math.sin(end.getHeadingRadians())+end.getY()
         );
+        if (!xPointList.isEmpty()){
+            //this prevents calculating the same point twice at the beginning and end of two consecutive segments
+            startT=1;
 
-        for (int t = 0; t<=100;t++){
+        } else{
+            startT = 0;
+        }
+
+        for (int t = startT; t<=100; t++){
             /*
             in here we have the fully expanded code for ease of comprehension, it may be a good idea to minify this to
             reduce computation time and make it a bit faster at calculating, expanded equation can be left as a comment
@@ -39,12 +52,6 @@ public class TrajectoryCourse {
              */
 
             //the variable t was used instead of the usual i in the for loop because this is the norm for parametric functions
-
-            if (!xPointList.isEmpty()){
-                //this prevents calculating the same point twice at the beginning and end of two consecutive segments
-                t++;
-
-            }
 
             //main points are calculated according to t
             Vector2d linearPoint1 = new Vector2d(
@@ -73,7 +80,7 @@ public class TrajectoryCourse {
             if (!xPointList.isEmpty()){
                 currentCouseTime += Math.hypot(cubicPoint.getX()-xPointList.get(xPointList.size()-1),cubicPoint.getY()-yPointList.get(yPointList.size()-1));
             }
-
+            //todo add distance traveled list for use in making distance traveled from point based commands as calculations are already done to make the time list
             xPointList.add(cubicPoint.getX());
             yPointList.add(cubicPoint.getY());
             timeAtPointList.add(currentCouseTime);

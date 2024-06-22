@@ -14,11 +14,9 @@ public class ButtonListener {
 
     private final List<Boolean> buttonList;
     private boolean button;
-    private boolean toggleState;
 
     private ButtonListener() {
         this.button = false;
-        this.toggleState = false;
         this.buttonList = new ArrayList<>();
     }
 
@@ -32,18 +30,6 @@ public class ButtonListener {
      */
     public static ButtonBuilder whileTrue(boolean button) {
         return new ButtonBuilder().whileTrue(button);
-    }
-
-    /**
-     * Creates a new ButtonBuilder instance with the given boolean value button.
-     * <p>
-     * ButtonBuilder is a builder class that allows for chaining of conditions.
-     *
-     * @param button the button to listen for
-     * @return a new ButtonBuilder instance
-     */
-    public static ButtonBuilder toggleOnTrue(boolean button) {
-        return new ButtonBuilder().toggleOnTrue(button);
     }
 
     public static class ButtonBuilder {
@@ -92,14 +78,6 @@ public class ButtonListener {
         public ButtonBuilder or(boolean condition) {
             ButtonListenerInstance.buttonList.add(condition);
             ButtonListenerInstance.button = ButtonListenerInstance.buttonList.stream().anyMatch(Boolean::booleanValue);
-            return this;
-        }
-
-        public ButtonBuilder toggleOnTrue(boolean button) {
-            if (button) {
-                ButtonListenerInstance.toggleState = !ButtonListenerInstance.toggleState;
-            }
-            ButtonListenerInstance.button = ButtonListenerInstance.toggleState;
             return this;
         }
 

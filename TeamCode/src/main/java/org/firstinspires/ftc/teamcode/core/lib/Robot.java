@@ -18,6 +18,7 @@ public class Robot {
     private List<Subsystem> subsystems;
     private Telemetry telemetry;
     private GamepadManager gamepadManager;
+
     public Robot() {
     }
 
@@ -25,7 +26,7 @@ public class Robot {
         gamepadManager = GamepadManager.use(driver, operator);
     }
 
-    public void configGamepadManager(@NonNull Gamepad driver){
+    public void configGamepadManager(@NonNull Gamepad driver) {
         gamepadManager = GamepadManager.use(driver);
     }
 
@@ -45,8 +46,6 @@ public class Robot {
 
     public void loop() {
         subsystems.forEach(subsystem -> subsystem.execute(gamepadManager));
-        telemetry.addData("Driver", gamepadManager.getDriver().getRightStickX());
-        telemetry.addData("Operator", gamepadManager.getOperator().getRightStickX());
         telemetry.update();
     }
 
@@ -54,7 +53,6 @@ public class Robot {
         subsystems.forEach(Subsystem::stop);
         telemetry.update();
     }
-
 
 
 }

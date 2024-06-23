@@ -13,10 +13,10 @@ public class TrajectorySequence {
     when making a trajectory sequence, one actually calls the trajectory sequence builder
      */
 
-
-    ArrayList<TrajectoryCourse> TrajectoryCourseList = new ArrayList<TrajectoryCourse>();
+    ArrayList<TrajectoryStructure> TrajectoryStructureList = new ArrayList<>();
 
     //ArrayList<AutonomousCommand> CommandList = new ArrayList<AutonomousCommand>();
+
     /*
     I do not know how this could be done in java exactly, but each of these commands must have the following values:
 

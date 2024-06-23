@@ -5,9 +5,7 @@ import org.firstinspires.ftc.teamcode.robot.constants.AutonomousConstants;
 public class RobotMovementState {
     //i think this whole class could be eliminated, but i have to develop
     //the trajectoryCourseRunner first to see if that is the case
-    double poseY;
-    double poseX;
-    double poseHeading;
+
     double VX;
     double VY;
     double AX;
@@ -17,9 +15,6 @@ public class RobotMovementState {
 
     RobotMovementState(Pose2d RobotPosition,
                        double startVX,double startVY){
-        double poseY = RobotPosition.getY();
-        double poseX = RobotPosition.getX();
-        double poseHeading = RobotPosition.getHeadingRadians();
         double VX = startVX;
         double VY = startVY;
         double AX = 0;
@@ -29,6 +24,7 @@ public class RobotMovementState {
     }
 
     public void update(double ax, double ay,double timePassed){
+        elapsedTime+=timePassed;
         VX += ax*timePassed;
         VY += ay*timePassed;
 

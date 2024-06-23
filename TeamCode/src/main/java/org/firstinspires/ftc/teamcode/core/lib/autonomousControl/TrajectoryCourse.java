@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.core.lib.autonomousControl;
 
+import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
+import org.firstinspires.ftc.teamcode.robot.constants.AutonomousConstants;
+
 import java.util.ArrayList;
 
-public class TrajectoryCourse {
+public class TrajectoryCourse implements TrajectoryStructure{
     /*
     A trajectory course is the way in which our lib stores the path the robot takes between two stops,
     it contains a list of coordinates between these two stops given by a parametric bezier curve.
@@ -13,18 +16,27 @@ public class TrajectoryCourse {
 
     As a result this lib is more applicable to real time movement recalculation and webcam-using odometry
      */
+    private int LastIndex =0;
+    private int CurrentIndex=0;
+    int currentSegmentId;
+    @Override
+    public StructureType getType(){
+        return StructureType.COURSE;
+    }
+
     ArrayList<Pose2d> pose2dList = new ArrayList<Pose2d>();
     ArrayList<Double> xPointList = new ArrayList<Double>();
     ArrayList<Double> yPointList = new ArrayList<Double>();
-    ArrayList<Double> timeAtPointList = new ArrayList<Double>();
-    double currentCouseTime = 0;
+    //ArrayList<Double> timeAtIndexList = new ArrayList<Double>();
+    //ArrayList<Double> DistanceTraveledAtIndexList = new ArrayList<Double>();
+    //double currentCouseTime = 0;
+    //double currentDistanceTraveled =0;
     private final double bezierControlConstant = Math.E;
-    TrajectoryCourse addPose2d(Pose2d newPose2d){
+    public void addPose2d(Pose2d newPose2d){
         pose2dList.add(newPose2d);
-        return this;
     }
 
-    TrajectoryCourse calculateSegment(Pose2d start, Pose2d end){
+    public void calculateSegment(Pose2d start, Pose2d end){
         int startT;
         double segmentLengh = Math.hypot(Math.pow(end.getX() - start.getX(),2)
                                         , Math.pow(end.getY() - start.getY(),2));
@@ -77,17 +89,100 @@ public class TrajectoryCourse {
                     quadraticPoint2.getX()-quadraticPoint1.getX()*t/100+ quadraticPoint1.getX(),
                     quadraticPoint2.getY()-quadraticPoint1.getY()*t/100+ quadraticPoint1.getY());
 
-            if (!xPointList.isEmpty()){
-                currentCouseTime += Math.hypot(cubicPoint.getX()-xPointList.get(xPointList.size()-1),cubicPoint.getY()-yPointList.get(yPointList.size()-1));
-            }
-            //todo add distance traveled list for use in making distance traveled from point based commands as calculations are already done to make the time list
+            //if (!xPointList.isEmpty()){
+                //currentDistanceTraveled += Math.hypot(cubicPoint.getX()-xPointList.get(xPointList.size()-1),cubicPoint.getY()-yPointList.get(yPointList.size()-1));
+                //for use with the
+
+                //currentCouseTime += currentDistanceTraveled / AutonomousConstants.MAXSPEED*0.6; //guarantees that the course finishes even if the robot gets stuck
+            //}
+
             xPointList.add(cubicPoint.getX());
             yPointList.add(cubicPoint.getY());
-            timeAtPointList.add(currentCouseTime);
+            //DistanceTraveledAtIndexList.add(currentDistanceTraveled);
+            //timeAtIndexList.add(currentCouseTime);
 
         }
-        return this;
+    }
+
+    public void updateCurrentIndex(Pose2d currentBotPosition, RobotMovementState currentBotState){
+        double distanceToNextIndex=0;
+        double distanceToThisIndex=0;
+
+        distanceToThisIndex = Math.hypot(currentBotPosition.getX()-xPointList.get(CurrentIndex)
+                ,currentBotPosition.getY()-yPointList.get(CurrentIndex));
+
+        while (true){
+            distanceToNextIndex = Math.hypot(currentBotPosition.getX()-xPointList.get(CurrentIndex)
+                    ,currentBotPosition.getY()-yPointList.get(CurrentIndex));
+
+            if(distanceToNextIndex>distanceToThisIndex) {break;}
+
+            if (CurrentIndex+1<yPointList.size()){CurrentIndex++;}
+
+            distanceToThisIndex = distanceToNextIndex;
+        }
+        LastIndex =CurrentIndex;
+        double lookForwardDistance = AutonomousConstants.SPEEDLOOKFORWARDGAIN * Math.hypot(currentBotState.VX, currentBotState.VY) +
+                AutonomousConstants.LOOKFORWARDCONSTANT;
+
+        while (lookForwardDistance >distanceToNextIndex){
+            if (CurrentIndex+1>yPointList.size()){break;}
+            CurrentIndex++;
+        }
+
+    }
+    public int getSegmentID(int index){
+        return (int) Math.round(((double)index-50)/100);
     }
 
 
+    public TargetVelocityData targetSpeedControl(Pose2d currentBotPosition, RobotMovementState currentBotState){
+        double xVelocity = 0;
+        double yVelocity = 0;
+        LastIndex = CurrentIndex;
+        updateCurrentIndex(currentBotPosition,currentBotState);
+
+        if(LastIndex>CurrentIndex){
+            CurrentIndex=LastIndex; //prevents robot going back the trajectory
+        }
+        double alpha = Math.atan2(yPointList.get(CurrentIndex)-currentBotPosition.YPos,
+        xPointList.get(CurrentIndex)-currentBotPosition.XPos);
+        if (getSegmentID(CurrentIndex)==getSegmentID(yPointList.size())){
+            double distanceToCourseEnd = Math.hypot(xPointList.get(CurrentIndex)-currentBotPosition.getX(),
+                    yPointList.get(CurrentIndex)-currentBotPosition.getY());
+            if(distanceToCourseEnd<currentBotState.deaccelerationDistance){
+                xVelocity =Math.cos(alpha)*AutonomousConstants.MAXSPEED*(distanceToCourseEnd/currentBotState.deaccelerationDistance);
+                yVelocity =Math.sin(alpha)*AutonomousConstants.MAXSPEED*(distanceToCourseEnd/currentBotState.deaccelerationDistance);
+            }
+        } else {
+            xVelocity =Math.cos(alpha)*AutonomousConstants.MAXSPEED;
+            yVelocity =Math.sin(alpha)*AutonomousConstants.MAXSPEED;
+        }
+        TrajectoryCourse course = new TrajectoryCourse();
+
+        return new TargetVelocityData(xVelocity,yVelocity,alpha,CurrentIndex);
+
+    }
+
+    @Override
+    public void start(double startTime) {
+        for (int i=0;i<pose2dList.size();i++){
+            calculateSegment(pose2dList.get(i),pose2dList.get(i+1));
+        }
+        CurrentIndex = 0;
+        LastIndex = 0;
+    }
+    @Override
+    public boolean execute(Pose2d botPosition,RobotMovementState currentBotState){
+        currentSegmentId = (int) Math.round(((double) CurrentIndex-50)/100);
+        TargetVelocityData vData = targetSpeedControl(botPosition,currentBotState);
+
+        DrivetrainBuilder.controlBasedOnVelocity(vData);
+
+        return CurrentIndex==xPointList.size()-1;//this checks whether or not the Structure is done being followed
+    }
+    @Override
+    public Pose2d getLastPose2d(){
+        return pose2dList.get(pose2dList.size()-1);
+    }
 }

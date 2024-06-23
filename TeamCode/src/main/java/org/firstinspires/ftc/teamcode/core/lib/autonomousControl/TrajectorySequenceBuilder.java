@@ -5,18 +5,46 @@ public class TrajectorySequenceBuilder {
     this will add the trajectory sequences and external action triggers to the
     actual trajectory sequence being created
      */
+    TrajectorySequence sequenceUnderConstruction;
+    TrajectoryCourseBuilder courseUnderConstruction;
+    TrajectorySequenceBuilder(){
+        sequenceUnderConstruction = new TrajectorySequence();
+    }
+    public TrajectorySequenceBuilder startTrajectoryCourse(Pose2d end){
+        TrajectoryCourseBuilder courseUnderConstruction = new TrajectoryCourseBuilder();
+        courseUnderConstruction.addSegment(end);
+        return this;
+    }
+    public TrajectorySequenceBuilder addCourseSegment(Pose2d end){
+        courseUnderConstruction.addSegment(end);
+        return this;
+    }
 
-    //public TrajectoryCourseBuilder startCourse(Pose2d start,Pose2d end)
-    /*
-    creates a new trajectory course builder and returns it in order to add segments to it, commands or to finish the process of building it
-     */
 
-    //public void stopSeconds()
-    /*
-    adds to the sequence some time that the robot spends stationary at the end of a trajectory course and stops the robot for the said amount of time
-     */
+    public TrajectorySequenceBuilder holdPositionForSeconds(double seconds){
+        sequenceUnderConstruction.TrajectoryStructureList.add(new TimeStop(seconds,sequenceUnderConstruction.TrajectoryStructureList.get(
+                    sequenceUnderConstruction.TrajectoryStructureList.size()-1)
+                .getLastPose2d()));
+        /*
+        adds to the sequence some time that the robot spends stationary at the end of a trajectory course and stops the robot for the said
+         amount of time
 
-    //public TrajectoryCourseBuilder addMidCourseCommand(command)
+         must be used after a built trajectory course
+        */
+        return this;
+    }
+
+    public TrajectorySequenceBuilder addDisplacementCommand(BasicCommand.CommandType commandType,double travelDistance,Runnable runnable){
+        sequenceUnderConstruction.TrajectoryStructureList
+            return this;
+    }
+
+
+
+    public TrajectorySequenceBuilder buildMovement(){
+        sequenceUnderConstruction.TrajectoryStructureList.add(courseUnderConstruction.build());
+        return this;
+    }
     /*
     this will probably be broken up in time and position commands, but the purpose will be to make the robot do stuff while it is still moving in autonomous
 

@@ -35,7 +35,7 @@ public class TrajectorySequenceBuilder {
     }
 
     public TrajectorySequenceBuilder addDisplacementCommand(BasicCommand.CommandType commandType,double travelDistance,Runnable runnable){
-        sequenceUnderConstruction.TrajectoryStructureList
+        //sequenceUnderConstruction.TrajectoryStructureList make actual command list to handle this
             return this;
     }
 

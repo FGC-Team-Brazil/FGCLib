@@ -19,8 +19,8 @@ public class TrajectoryStructureRunner {
         currentStructureType=currentStructure.getType();
     }
 
-    public void start(){
-        currentStructure.start();
+    public void startStructure(double startTime){
+        currentStructure.start(startTime);
     }
 
     public boolean execute(Pose2d botPosition,RobotMovementState currentBotState){

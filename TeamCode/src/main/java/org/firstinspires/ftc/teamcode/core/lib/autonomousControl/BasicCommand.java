@@ -1,26 +1,15 @@
 package org.firstinspires.ftc.teamcode.core.lib.autonomousControl;
 
 public class BasicCommand {
-    @Override
-    public StructureType getType() {
-        return null;
-    }
-
-    @Override
-    public void start(double startTime) {
-
-    }
-
-    @Override
-    public boolean execute(Pose2d botPosition, RobotMovementState currentBotState) {
-        runCommand(personalCommand);
+    public boolean isConditionMetYet(){
         return true;
     }
-
-    @Override
-    public Pose2d getLastPose2d() {
-        return null;
+    public void executeCommand(Pose2d botPosition, RobotMovementState currentBotState) {
+        runCommand(personalCommand);
     }
+
+
+
 
     public enum CommandType{
         BASIC,

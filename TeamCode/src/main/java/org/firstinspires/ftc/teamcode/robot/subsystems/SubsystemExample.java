@@ -30,6 +30,9 @@ public class SubsystemExample implements Subsystem {
     private SubsystemExample() {
     }
 
+    /**
+     * Initialize Method from the Subsystem Interface
+     * */
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
         motorRight = hardwareMap.get(DcMotor.class, MOTOR_RIGHT);
@@ -48,6 +51,9 @@ public class SubsystemExample implements Subsystem {
         telemetry.addData("SubsystemExample Subsystem", "Initialized");
     }
 
+    /**
+     * Execute Method from the Subsystem Interface
+     * */
     @Override
     public void execute(SmartController operator) {
         telemetry.addData("SubsystemExample Subsystem", "Running");
@@ -103,11 +109,17 @@ public class SubsystemExample implements Subsystem {
         stop();
     }
 
+    /**
+     * Start Method from the Subsystem Interface
+     * */
     @Override
     public void start() {
 
     }
 
+    /**
+     * Stop Method from the Subsystem Interface
+     * */
     @Override
     public void stop() {
         motorRight.setPower(0);

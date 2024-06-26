@@ -1,4 +1,4 @@
-![FGC Team Brazil](doc/media/logoTeamBrazil.png)
+![FGC Team Brazil](./../media/logoTeamBrazil.png)
 
 [![Static Badge](https://img.shields.io/badge/en-readme-blue)](README.md)
 

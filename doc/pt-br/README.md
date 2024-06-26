@@ -1,6 +1,6 @@
 ![FGC Team Brazil](./../media/logoTeamBrazil.png)
 
-[![Static Badge](https://img.shields.io/badge/en-readme-blue)](README.md)
+[![Static Badge](https://img.shields.io/badge/en-readme-blue)](./../../README.md)
 
 # First Global Challenge Java Library
 A First Global Challenge Java Library(FGCLib) é uma biblioteca de código Java,

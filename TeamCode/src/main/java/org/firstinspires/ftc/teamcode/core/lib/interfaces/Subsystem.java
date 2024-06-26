@@ -14,9 +14,29 @@ import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
  * Stop: deactivates the subsystem hardware.
  */
 public interface Subsystem {
+    /**
+     * Initialize: instantiates the subsystem hardware here;
+     * @param hardwareMap
+     * @param telemetry
+     */
     void initialize(HardwareMap hardwareMap, Telemetry telemetry);
+
+    /**
+     * Start method is supposed to run when the start button is pressed.
+     */
     void start();
+
+    /**
+     * Stop method is supposed to run when the stop button is pressed.
+     * Stop all the subsystems here.
+     */
     void stop();
+
+    /**
+     * execute is supposed to run when the start button is pressed.
+     * It loops till the end of the opMode.
+     * @param gamepadManager
+     */
     void execute(GamepadManager gamepadManager);
 
 }

@@ -4,6 +4,11 @@ import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+/**
+ * GamepadManager is a utility class that controls the instances
+ * of the gamepads on the Lib. It grants that will be existing only
+ * two instances of the GamePad class
+ */
 public class GamepadManager {
     private static SmartGamepad driver;
     private static SmartGamepad operator;

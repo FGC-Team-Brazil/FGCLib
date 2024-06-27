@@ -82,6 +82,13 @@ public class PIDController {
         return output;
     }
 
+    public double calculate(double realPosition) {
+        double setPoint = this.setPoint;
+        double output = calculate(setPoint, realPosition);
+
+        return output;
+    }
+
     public void setPowerMotor(DcMotor dcMotor, int revolutionEncoder) {
         int conversionValue = this.revolutionEncoder / 360;
         dcMotor.setPower(output * conversionValue);

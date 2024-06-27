@@ -3,6 +3,7 @@
 Seja bem-vindo a FGCLib, uma biblioteca para FGC e FTC que automatiza algumas tarefas
 essências (boilerplate) para a programação do robô, além de trazer uma estrutura de código 
 padronizada e de fácil entendimento.
+Para preparar o seu ambiente de programação, veja este [vídeo](https://www.youtube.com/watch?v=_te1nUU-av4).
 
 ## Estrutura da Biblioteca
 A estrutura padrão da Lib é muito parecida com qualquer código padrão da FGC, para acessar o código

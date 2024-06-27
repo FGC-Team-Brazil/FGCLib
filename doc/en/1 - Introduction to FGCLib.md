@@ -2,6 +2,7 @@
 
 Welcome to FGCLib, a library for FGC and FTC that automates some essential tasks (boilerplate)
 for programming the robot, as well as providing a standardized and easy-to-understand code structure.
+To prepare your programming environment, access this [video](https://www.youtube.com/watch?v=_te1nUU-av4).
 
 ## Library structure
 The standard Lib structure is very similar to any standard FGC code. To access the code, simply navigate to

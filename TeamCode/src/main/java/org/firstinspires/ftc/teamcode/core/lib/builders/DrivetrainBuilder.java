@@ -13,6 +13,16 @@ import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 
+
+/**
+ * DrivetrainBuilder is a helper class that assists on the creation
+ * of a Drivetrain Subsystem.
+ * It contains some usual boilerplate for creating a subsystem.
+ * Use it when creating tank drivetrains with two motors.
+ * <p>
+ * Caution: This class don't support holonomic
+ * drivetrains
+ */
 public class DrivetrainBuilder implements Subsystem {
     private static DrivetrainBuilder instance;
     private DcMotorSimple.Direction motorRightDirection;
@@ -41,7 +51,9 @@ public class DrivetrainBuilder implements Subsystem {
         return instance;
     }
 
-
+    /**
+     * Initialize method from Subsystem Interface
+     */
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -51,16 +63,18 @@ public class DrivetrainBuilder implements Subsystem {
         motorRight.setDirection(motorRightDirection);
     }
 
+    /**
+     * Start method from Subsystem Interface
+     */
     @Override
     public void start() {
 
     }
 
-    @Override
-    public void stop() {
-
-    }
-
+    /**
+     * Execute method from Subsystem Interface
+     * @param gamepadConfig
+     */
     @Override
     public void execute(GamepadManager gamepadConfig) {
         driver = gamepadConfig.getDriver();
@@ -69,6 +83,21 @@ public class DrivetrainBuilder implements Subsystem {
         arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
     }
 
+    /**
+     * Stop method from Subsystem Interface
+     */
+    @Override
+    public void stop() {
+
+    }
+
+    /**
+     * Default Method for drive control. This method is for
+     * tank drivetrains.
+     * @param xSpeed
+     * @param zRotation
+     * @param driver
+     */
     public void arcadeDrive(double xSpeed, double zRotation, SmartGamepad driver) {
         limiter = LIMITER_DEFAULT;
 
@@ -89,6 +118,13 @@ public class DrivetrainBuilder implements Subsystem {
         motorRight.setPower(rightSpeed);
     }
 
+    /**
+     * getInstance is a method used to create a instance of the subsystem.
+     * It's not good to have many objects of the same subsystem, so every
+     * subsystem in FGCLib will have just one instance, that is created
+     * with the getInstance method
+     * @return DriveTrainBuilder SingleTon
+     */
     public static DrivetrainBuilder getInstance() {
         if (instance == null) {
             synchronized (DrivetrainBuilder.class) {

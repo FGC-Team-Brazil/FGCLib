@@ -13,7 +13,13 @@ import org.firstinspires.ftc.teamcode.robot.RobotSubsystems;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Robot class is the main class of the FGCLib. It executes
+ * all the subsystems created on code, and runs their main methods
+ * from Subsystem Interface.
+ * <br>
+ * This class is used in the TeleOp mainly.
+ */
 public class Robot {
     private List<Subsystem> subsystems;
     private Telemetry telemetry;
@@ -22,14 +28,28 @@ public class Robot {
     public Robot() {
     }
 
+    /**
+     * Configure the gamepads that will be used to control the robot
+     * @param driver
+     * @param operator
+     */
     public void configGamepadManager(@NonNull Gamepad driver, @NonNull Gamepad operator) {
         gamepadManager = GamepadManager.use(driver, operator);
     }
 
-    public void configGamepadManager(@NonNull Gamepad driver) {
+    /**
+     * Configure the gamepad that will be used to control the robot
+     * @param driver
+     */
+    public void configGamepadManager(@NonNull Gamepad driver){
         gamepadManager = GamepadManager.use(driver);
     }
 
+    /**
+     * Run the init method from all subsystems
+     * @param hardwareMap
+     * @param telemetry
+     */
     public void init(@NonNull HardwareMap hardwareMap, @NonNull Telemetry telemetry) {
         this.telemetry = telemetry;
         this.subsystems = RobotSubsystems.get();
@@ -39,20 +59,27 @@ public class Robot {
         telemetry.update();
     }
 
+    /**
+     * Run the start method from all subsystems
+     */
     public void start() {
         subsystems.forEach(Subsystem::start);
         telemetry.update();
     }
 
+    /**
+     * Run the loop method from all subsystems
+     */
     public void loop() {
         subsystems.forEach(subsystem -> subsystem.execute(gamepadManager));
         telemetry.update();
     }
 
+    /**
+     * Run the stop method from all subsystems
+     */
     public void stop() {
         subsystems.forEach(Subsystem::stop);
         telemetry.update();
     }
-
-
 }

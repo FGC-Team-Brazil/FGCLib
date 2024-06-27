@@ -4,6 +4,14 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants;
 
+/**
+ * GamepadButton is a utility class that intermediates the access to the gamepads.
+ * The class maps all the buttons of the gamepads, so other classes can use them.
+ * <br>
+ * It uses the ButtonListener utility class to control the interactions
+ * with the buttons
+ * Always use the SmartController class instead of this class
+ */
 public class GamepadButton {
     public Gamepad gamepad;
     public ButtonListener buttonA;

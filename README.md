@@ -59,9 +59,9 @@ the link below:
 [Documentation First Global Challenge Java Library](doc/en/1%20-%20Introduction%20to%20FGCLib.md)
 - [Introduction to FGCLib](doc/en/1%20-%20Introduction%20to%20FGCLib.md)
 - [Creating a subsystem](doc/en/2%20-%20Creating%20a%20Subsystem.md)
-- [Using the DrivetrainBuilder](doc/en/3%20-%20Creating%20a%20Subsystem.md)
-- [PIDF Controller](doc/en/4%20-%20Using%20the%20PIDF%20Controller.md)
-- [Using the SmartGamePad](doc/en/5%20-%20Utility%20Class%20SmartGamePad.md)
+- [Using the DrivetrainBuilder](doc/en/3%20-%Using%20the%20DrivetrainBuilder.md)
+- [PIDF Controller](doc/en/5%20-%20Using%20the%20PIDF%20Controller.md)
+- [Using the SmartGamePad](doc/en/4%20-%20Utility%20Class%20SmartGamePad.md)
 
 # Contribution
 Contribute to the evolution of the project!

@@ -56,12 +56,12 @@ em seu IDE.
 Todas as funcionalidades da biblioteca estão documentadas neste repositório. Acesse as documentações através
 do link abaixo:
 
-[Documentação First Global Challenge Java Library](doc/en/Introduction%20to%20FGCLib.md)
-- [Introdução À FGCLib](Introdução%20à%20FGCLib.md)
-- [Criando um subsistema](Criando%20um%20Subsistema.md)
-- [Usando o DrivetrainBuilder](Usando%20o%20DrivetrainBuilder.md)
-- [Controlador PIDF](Usando%20o%20Controlador%20PIDF.md)
-- [Usando o SmartGamePad](Classe%20utilitária%20SmartGamePad.md)
+[Documentação First Global Challenge Java Library](doc/pt-br/1%20-%20Introdução%20à%20FGCLib.md)
+- [Introdução À FGCLib](doc/pt-br/1%20-%20Introdução%20à%20FGCLib.md)
+- [Criando um subsistema](doc/pt-br/2%20-%20Criando%20um%20Subsistema.md)
+- [Usando o DrivetrainBuilder](doc/pt-br/3%20-%Usando%20o%20DrivetrainBuilder.md)
+- [Controlador PIDF](doc/pt-br/5%20-%20Usando%20o%20Controlador%20PIDF.md)
+- [Usando o SmartGamePad](doc/pt-br/4%20-%20Classe%20utilitária%20SmartGamePad.md)
 
 # Contribuição
 Contribua para a evolução do projeto!

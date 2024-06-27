@@ -101,7 +101,7 @@ public class SubsystemExample implements Subsystem {
                     motorLeft.setPower(operator.getLeftTrigger());
                 }, () -> {
                     resetEncoder(motorLeft);
-                    operator.rumble(1, 0, 200);
+                    operator.rumbleTimer( 200);
                 });
 
         operator.whileRightTriggerPressed()
@@ -110,7 +110,7 @@ public class SubsystemExample implements Subsystem {
                     motorRight.setPower(operator.getRightTrigger());
                 }, () -> {
                     resetEncoder(motorRight);
-                    operator.rumble(0, 1, 200);
+                    operator.rumbleTimer(200);
                 });
 
         stop();

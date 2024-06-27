@@ -4,12 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.core.lib.Robot;
-import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
-import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
-import org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderConstants;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * TeleOp class template for building TeleOp modes.

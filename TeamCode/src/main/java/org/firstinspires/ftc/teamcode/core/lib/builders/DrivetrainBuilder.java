@@ -51,7 +51,6 @@ public class DrivetrainBuilder implements Subsystem {
         return instance;
     }
 
-
     /**
      * Initialize method from Subsystem Interface
      */

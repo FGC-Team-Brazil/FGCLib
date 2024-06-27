@@ -1,3 +1,5 @@
 # Criando um Subsistema
 
-Esta documentação ainda está em produção. Logo soltaremos a documentação completa!
+Nesta documentação você encontrará os passos necessários para criar o seu próprio subsistema usando 
+as funcionalidades da FGCLib. Para facilitar o entendimento, o Team Brazil gravou um vídeo, explicando 
+passo a passo todo o processo. Acesse o vídeo [aqui]().

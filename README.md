@@ -74,4 +74,10 @@ if you feel the need, you can contact us through our [Social Networks](#contact)
 </a>
 
 # Contact
+<a href="https://www.instagram.com/fgcteambrazil/">
+
+  ![a](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)
+
+</a>
+
 For any questions or further information, please contact our [email](mailto:fgc.team.br@gmail.com).

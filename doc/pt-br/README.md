@@ -68,5 +68,10 @@ Contribua para a evolução do projeto!
 Você pode ajudar no crescimento da biblioteca através de pull requests ou issues do github. Além do mais,
 caso ache preciso, pode entrar em contato conosco através das nossas [Redes Sociais](#contact).
 
+## Contribuidores
+<a href="https://github.com/FGC-Team-Brazil/FGCLib/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=FGC-Team-Brazil/FGCLib" />
+</a>
+
 # Contato
 Para quaisquer questões, dúvidas ou informações adicionais, nos contato através de nosso [email](mailto:fgc.team.br@gmail.com).

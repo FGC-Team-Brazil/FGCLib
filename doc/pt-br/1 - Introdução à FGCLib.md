@@ -15,7 +15,7 @@ basta navegar para ``TeamCode/src/main/java/org/firstinspires/ftc/teamcode``
 Nesse diretório, você encontrará duas pastas:
 1. **core**: diretório que contém as classes auxiliares da biblioteca, como PIDF e SmartGamePad, 
 recomenda-se que nada na pasta seja alterado, pois como o nome sugere, faz parte do "core" da biblioteca;
-2. **robot**: diretório contendo o código do robô em si, aqui será onde a equipe criará os sistemas do robô e seus opmodes.
+   2. **robot**: diretório contendo o código do robô em si, aqui será onde a equipe criará os sistemas do robô e seus opmodes.
 
 ### Pasta Robot
 A biblioteca separá o código do robô em 3 partes, que são:
@@ -29,7 +29,7 @@ Depois da criação dos subsistemas (diretório subsystems), todos os sistemas c
 listados na classe RobotSubsystems, que é responsável por executá-los. 
 
 Veja a nossa documentação de
-[Criando um Subsistema](2%20-%20Criando%20um%20Subsistema.md) para mais detalhes como criar os seus próprios subsistemas.
+[Criando um Subsistema](./2%20-%20Criando%20um%20Subsistema.md) para mais detalhes como criar os seus próprios subsistemas.
 
 #### Constants
 Nesta pasta estarão todas as constantes do código, ou seja, valores imutáveis os sistemas necessitarão.
@@ -57,7 +57,7 @@ funções que normalmente são usadas dentro do código. Atualmente a biblioteca
 
 ### Lib
 O diretório Lib contém as funcionalidades principais do site. As funcionalidades são divididas em:
-1. **builders**: automatizam a criação de subsistemas, conta apenas com o DrivetrainBuilder ([[Veja como usar aqui](./3%20-%20Usando%20o%20DrivetrainBuilder.md);
-2. **gamepad**: gerenciam o uso dos gamepads para controlar o robô ([Veja mais sobre aqui](./4%20-%20Classe%20utilitária%20SmartGamePad.md));
-3. **interfaces**: interfaces diversas, atualmente contém apenas a interface Subsystem ([Veja como usar aqui](2%20-%20Criando%20um%20Subsistema.md));
-4. **pid**: Funções relacionadas ao uso do controle PID ([Veja como usar aqui](5%20-%20Usando%20o%20Controlador%20PIDF.md)).
+1. **builders**: automatizam a criação de subsistemas, conta apenas com o DrivetrainBuilder ([Veja como usar aqui](./3%20-%20Usando%20o%20DrivetrainBuilder.md));
+   2. **gamepad**: gerenciam o uso dos gamepads para controlar o robô ([Veja mais sobre aqui](./4%20-%20Classe%20utilitária%20SmartGamePad.md));
+   3. **interfaces**: interfaces diversas, atualmente contém apenas a interface Subsystem ([Veja como usar aqui](./2%20-%20Criando%20um%20Subsistema.md));
+   4. **pid**: Funções relacionadas ao uso do controle PID ([Veja como usar aqui](./5%20-%20Usando%20o%20Controlador%20PIDF.md)).

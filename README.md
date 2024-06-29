@@ -18,7 +18,7 @@ Among the library's features are:
   there is no need to create it manually;
 - **FTCDashboard**: Lib also has support for the use of FTCDashboard (currently it is not
   currently in use, but if your team wants to use it, just follow the tutorial
-[Migrating to FTCDashboard](doc/en/Migrating%20to%20FTCDashboard.md))
+[Migrating to FTCDashboard](doc/en/6%20-%20Migrating%20to%20FTCDashboard.md))
 - **DrivetrainBuilder**: FGCLib has a helper class that automates the creation of
   a drivetrain tank.
 
@@ -59,9 +59,9 @@ the link below:
 [Documentation First Global Challenge Java Library](doc/en/1%20-%20Introduction%20to%20FGCLib.md)
 - [Introduction to FGCLib](doc/en/1%20-%20Introduction%20to%20FGCLib.md)
 - [Creating a subsystem](doc/en/2%20-%20Creating%20a%20Subsystem.md)
-- [Using the DrivetrainBuilder](doc/en/3%20-%20Creating%20a%20Subsystem.md)
-- [PIDF Controller](doc/en/4%20-%20Using%20the%20PIDF%20Controller.md)
-- [Using the SmartGamePad](doc/en/5%20-%20Utility%20Class%20SmartGamePad.md)
+- [Using the DrivetrainBuilder](doc/en/3%20-%20Using%20the%20DrivetrainBuilder.md)
+- [PIDF Controller](doc/en/4%20-%20Utility%20Class%20SmartGamePad.md)
+- [Using the SmartGamePad](doc/en/5%20-%20Using%20the%20PIDF%20Controller.md)
 
 # Contribution
 Contribute to the evolution of the project!

@@ -16,14 +16,20 @@ public class TimeStop implements TrajectoryStructure{
     }
 
     @Override
+    public int getSegmentID() {
+        return 0;
+    }
+
+    @Override
     public void start(double stTime) {
         startTime =stTime;
     }
 
     @Override
-    public boolean execute(Pose2d botPosition, RobotMovementState currentBotState) {
+    public boolean execute(Pose2d botPosition,RobotMovementState currentBotState,double elapsedTime) {
 
-        //DrivetrainBuilder.controlBasedOnVelocity();//todo make this return an appropriate velocity data as a paramether to the drivebase
+        //DrivetrainBuilder.controlBasedOnVelocity();
+        // todo make this return an appropriate velocity data as a paramether to the drivebase that keeps robot stationary
         return currentBotState.elapsedTime - startTime >= waitTime;
     }
 

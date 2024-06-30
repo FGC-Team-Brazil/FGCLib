@@ -9,11 +9,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.Pose2d;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.RobotMovementState;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.TargetVelocityData;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.robot.constants.AutonomousConstants;
 
 public class DrivetrainBuilder implements Subsystem {
     private static DrivetrainBuilder instance;
@@ -26,13 +28,21 @@ public class DrivetrainBuilder implements Subsystem {
     private DcMotor motorLeft;
     private Telemetry telemetry;
     private SmartGamepad driver;
+    public Pose2d currentPose;
+    double currVX;
+    double currVY;
+    double desiredVX;
+    double desiredVY;
+    double currHeadingVelocity;
+    public RobotMovementState movementState = new RobotMovementState(0,0);
 
     private DrivetrainBuilder() {
     }
 
-    public static DrivetrainBuilder build(@NonNull String motorRightName, @NonNull String motorLeftName, boolean isMotorRightInverted, boolean isMotorLeftInverted) {
-        getInstance();
+    public static DrivetrainBuilder build(@NonNull String motorRightName, @NonNull String motorLeftName, boolean isMotorRightInverted, boolean isMotorLeftInverted,Pose2d botStartingPosition) {
 
+        getInstance();
+        instance.currentPose = botStartingPosition;
         instance.motorLeftName = motorLeftName;
         instance.motorRightName = motorRightName;
         instance.motorLeftDirection = isMotorLeftInverted
@@ -67,8 +77,8 @@ public class DrivetrainBuilder implements Subsystem {
     public void execute(GamepadManager gamepadConfig) {
         driver = gamepadConfig.getDriver();
 
-        telemetry.addData("DrivetrainBuilder Subsystem", "Running");
-        arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
+        //telemetry.addData("DrivetrainBuilder Subsystem", "Running");
+        //arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
     }
 
     public void arcadeDrive(double xSpeed, double zRotation, SmartGamepad driver) {
@@ -102,8 +112,21 @@ public class DrivetrainBuilder implements Subsystem {
         return instance;
     }
 
-    public static void controlBasedOnVelocity(TargetVelocityData movementState){
-        //field centered drive that controls robot based on Velocity todo
+    public void controlBasedOnVelocity(TargetVelocityData movementState,double elapsedTime){
+        updatePose2d();
+        desiredVX += (movementState.getXV()-currVX)*elapsedTime*(AutonomousConstants.MAXACCELERATION/AutonomousConstants.MAXSPEED);
+        desiredVY += (movementState.getXV()-currVX)*elapsedTime*(AutonomousConstants.MAXACCELERATION/AutonomousConstants.MAXSPEED);
+
+        
+
+
+    }
+    public void updatePose2d(){
+
+        //does math to determine bot position and velocity todo
+    }
+    public Pose2d getCurrentPose(){
+        return currentPose;
     }
 
 }

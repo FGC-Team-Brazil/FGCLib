@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.core.lib.autonomousControl;
 
-public class BasicCommand {
+public class BasicCommand implements AutonomousCommand{
+    int CourseID = 0;
+    int CourseSegmentID =0;
+    boolean conditionMet = false;
     public boolean isConditionMetYet(){
-        return true;
+        return conditionMet;
     }
-    public void executeCommand(Pose2d botPosition, RobotMovementState currentBotState) {
-        runCommand(personalCommand);
-    }
-
 
 
 
@@ -18,15 +17,21 @@ public class BasicCommand {
     }
     CommandType commandType = CommandType.BASIC;
     Runnable personalCommand;
-    BasicCommand (Runnable runnable){
+    BasicCommand (Runnable runnable,int courseID,int segmentID)
+    {
         personalCommand = runnable;
+        CourseID =courseID;
+        CourseSegmentID = segmentID;
     }
-    BasicCommand (CommandType type, Runnable runnable){
-        commandType = type;
-        personalCommand = runnable;
+    public void executeCommand(){
+        if(conditionMet){
+            personalCommand.run();
+        }
     }
 
-    public void runCommand(Runnable runnable){
-        personalCommand.run();
+    @Override
+    public boolean runConditionMet(int currentCourseID,int currentCourseSegmentID) {
+        conditionMet = (CourseID == currentCourseID &&CourseSegmentID == currentCourseSegmentID);
+        return conditionMet;
     }
 }

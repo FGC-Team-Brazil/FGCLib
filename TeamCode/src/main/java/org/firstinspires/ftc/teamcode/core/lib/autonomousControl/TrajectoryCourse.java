@@ -4,7 +4,7 @@ import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.robot.constants.AutonomousConstants;
 
 import java.util.ArrayList;
-
+//this is done
 public class TrajectoryCourse implements TrajectoryStructure{
     /*
     A trajectory course is the way in which our lib stores the path the robot takes between two stops,
@@ -19,6 +19,8 @@ public class TrajectoryCourse implements TrajectoryStructure{
     private int LastIndex =0;
     private int CurrentIndex=0;
     int currentSegmentId;
+    TargetVelocityData vData;
+
     @Override
     public StructureType getType(){
         return StructureType.COURSE;
@@ -34,6 +36,9 @@ public class TrajectoryCourse implements TrajectoryStructure{
     private final double bezierControlConstant = Math.E;
     public void addPose2d(Pose2d newPose2d){
         pose2dList.add(newPose2d);
+    }
+    TrajectoryCourse(Pose2d startPose){
+        pose2dList.add(startPose);
     }
 
     public void calculateSegment(Pose2d start, Pose2d end){
@@ -122,7 +127,7 @@ public class TrajectoryCourse implements TrajectoryStructure{
             distanceToThisIndex = distanceToNextIndex;
         }
         LastIndex =CurrentIndex;
-        double lookForwardDistance = AutonomousConstants.SPEEDLOOKFORWARDGAIN * Math.hypot(currentBotState.VX, currentBotState.VY) +
+        double lookForwardDistance = AutonomousConstants.SPEEDPROPORTIONALGAIN * Math.hypot(currentBotState.VX, currentBotState.VY) +
                 AutonomousConstants.LOOKFORWARDCONSTANT;
 
         while (lookForwardDistance >distanceToNextIndex){
@@ -131,7 +136,10 @@ public class TrajectoryCourse implements TrajectoryStructure{
         }
 
     }
-    public int getSegmentID(int index){
+    public int getSegmentID(){
+        return (int) Math.round(((double) vData.index-50)/100);
+    }
+    public int segmentIDatIndex(int index){
         return (int) Math.round(((double)index-50)/100);
     }
 
@@ -147,7 +155,7 @@ public class TrajectoryCourse implements TrajectoryStructure{
         }
         double alpha = Math.atan2(yPointList.get(CurrentIndex)-currentBotPosition.YPos,
         xPointList.get(CurrentIndex)-currentBotPosition.XPos);
-        if (getSegmentID(CurrentIndex)==getSegmentID(yPointList.size())){
+        if (segmentIDatIndex(CurrentIndex)==segmentIDatIndex(yPointList.size())){
             double distanceToCourseEnd = Math.hypot(xPointList.get(CurrentIndex)-currentBotPosition.getX(),
                     yPointList.get(CurrentIndex)-currentBotPosition.getY());
             if(distanceToCourseEnd<currentBotState.deaccelerationDistance){
@@ -158,7 +166,6 @@ public class TrajectoryCourse implements TrajectoryStructure{
             xVelocity =Math.cos(alpha)*AutonomousConstants.MAXSPEED;
             yVelocity =Math.sin(alpha)*AutonomousConstants.MAXSPEED;
         }
-        TrajectoryCourse course = new TrajectoryCourse();
 
         return new TargetVelocityData(xVelocity,yVelocity,alpha,CurrentIndex);
 
@@ -173,11 +180,11 @@ public class TrajectoryCourse implements TrajectoryStructure{
         LastIndex = 0;
     }
     @Override
-    public boolean execute(Pose2d botPosition,RobotMovementState currentBotState){
+    public boolean execute(Pose2d currentBotPosition,RobotMovementState currentBotState,double elapsedTime){
         currentSegmentId = (int) Math.round(((double) CurrentIndex-50)/100);
-        TargetVelocityData vData = targetSpeedControl(botPosition,currentBotState);
+        vData = targetSpeedControl(currentBotPosition,currentBotState);
 
-        DrivetrainBuilder.controlBasedOnVelocity(vData);
+        DrivetrainBuilder.getInstance().controlBasedOnVelocity(vData,elapsedTime);
 
         return CurrentIndex==xPointList.size()-1;//this checks whether or not the Structure is done being followed
     }

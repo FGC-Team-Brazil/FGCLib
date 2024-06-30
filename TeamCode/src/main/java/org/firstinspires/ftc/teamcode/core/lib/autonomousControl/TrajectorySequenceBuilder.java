@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.lib.autonomousControl;
 
+import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
+
 public class TrajectorySequenceBuilder {
     /*
     this will add the trajectory sequences and external action triggers to the
@@ -7,24 +9,30 @@ public class TrajectorySequenceBuilder {
      */
     TrajectorySequence sequenceUnderConstruction;
     TrajectoryCourseBuilder courseUnderConstruction;
-    TrajectorySequenceBuilder(){
+    int currentStructureID=0;
+    int currentStructureSegmentID=0;
+    Pose2d lastPose2d = DrivetrainBuilder.getInstance().getCurrentPose();
+    public TrajectorySequenceBuilder(){
         sequenceUnderConstruction = new TrajectorySequence();
     }
     public TrajectorySequenceBuilder startTrajectoryCourse(Pose2d end){
-        TrajectoryCourseBuilder courseUnderConstruction = new TrajectoryCourseBuilder();
-        courseUnderConstruction.addSegment(end);
+        courseUnderConstruction = new TrajectoryCourseBuilder();
+        courseUnderConstruction
+                .startTrajectory(lastPose2d)
+                .addSegment(end);
         return this;
     }
     public TrajectorySequenceBuilder addCourseSegment(Pose2d end){
-        courseUnderConstruction.addSegment(end);
+        courseUnderConstruction
+                .addSegment(end);
+        lastPose2d = end;
+        currentStructureSegmentID++;
         return this;
     }
 
 
     public TrajectorySequenceBuilder holdPositionForSeconds(double seconds){
-        sequenceUnderConstruction.TrajectoryStructureList.add(new TimeStop(seconds,sequenceUnderConstruction.TrajectoryStructureList.get(
-                    sequenceUnderConstruction.TrajectoryStructureList.size()-1)
-                .getLastPose2d()));
+        sequenceUnderConstruction.TrajectoryStructureList.add(new TimeStop(seconds,lastPose2d));
         /*
         adds to the sequence some time that the robot spends stationary at the end of a trajectory course and stops the robot for the said
          amount of time
@@ -33,18 +41,29 @@ public class TrajectorySequenceBuilder {
         */
         return this;
     }
-
-    public TrajectorySequenceBuilder addDisplacementCommand(BasicCommand.CommandType commandType,double travelDistance,Runnable runnable){
-        //sequenceUnderConstruction.TrajectoryStructureList make actual command list to handle this
-            return this;
-    }
-
-
-
-    public TrajectorySequenceBuilder buildMovement(){
-        sequenceUnderConstruction.TrajectoryStructureList.add(courseUnderConstruction.build());
+    public TrajectorySequenceBuilder addBasicCommand(Runnable runnable){
+        sequenceUnderConstruction.CommandList.add(new BasicCommand(runnable,currentStructureID,currentStructureSegmentID));
         return this;
     }
+
+    //public TrajectorySequenceBuilder addDisplacementCommand(double travelDistance,Runnable runnable){
+        //sequenceUnderConstruction.TrajectoryStructureList make actual command list to handle this
+            //return this;
+    //}
+
+
+
+    public TrajectorySequenceBuilder buildCourse(){
+        sequenceUnderConstruction.TrajectoryStructureList.add(courseUnderConstruction.build());
+        currentStructureID++;
+        currentStructureSegmentID=0;
+        return this;
+    }
+
+    public TrajectorySequence buildSequence() {
+        return sequenceUnderConstruction;
+    }
+
     /*
     this will probably be broken up in time and position commands, but the purpose will be to make the robot do stuff while it is still moving in autonomous
 

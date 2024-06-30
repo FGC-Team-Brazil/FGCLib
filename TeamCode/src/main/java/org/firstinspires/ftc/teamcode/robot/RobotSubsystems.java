@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.Pose2d;
 import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderConstants;
@@ -13,7 +14,8 @@ public class RobotSubsystems {
                     DrivetrainBuilderConstants.MOTOR_RIGHT,
                     DrivetrainBuilderConstants.MOTOR_LEFT,
                     DrivetrainBuilderConstants.MOTOR_RIGHT_INVERTED,
-                    DrivetrainBuilderConstants.MOTOR_LEFT_INVERTED
+                    DrivetrainBuilderConstants.MOTOR_LEFT_INVERTED,
+                    DrivetrainBuilderConstants.START_POSITION
             ),
             // Add more subsystems here
     };

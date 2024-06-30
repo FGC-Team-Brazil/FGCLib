@@ -14,6 +14,8 @@ public class TrajectorySequence {
      */
 
     ArrayList<TrajectoryStructure> TrajectoryStructureList = new ArrayList<>();
+    ArrayList<AutonomousCommand> CommandList = new ArrayList<>();
+
 
     //ArrayList<AutonomousCommand> CommandList = new ArrayList<AutonomousCommand>();
 

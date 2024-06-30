@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.core.lib.autonomousControl;
-
+//this is done
 public class Pose2d {
     double XPos;
     double YPos;
     double head;
-    Pose2d(double xPosition, double yPosition, double heading){
+    public Pose2d(double xPosition, double yPosition, double heading){
         /*
         xPosition means the X axis position relative to the field
         yPosition means the Y axis position relative to the field

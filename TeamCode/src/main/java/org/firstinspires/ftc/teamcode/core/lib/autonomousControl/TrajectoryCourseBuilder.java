@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.core.lib.autonomousControl;
-
+//i think this is done
 public class TrajectoryCourseBuilder {
     TrajectoryCourse trajectoryCourseUnderConstruction;
-    public TrajectoryCourseBuilder startTrajectory(){
-        trajectoryCourseUnderConstruction = new TrajectoryCourse();
+    public TrajectoryCourseBuilder startTrajectory(Pose2d lastPose){
+        trajectoryCourseUnderConstruction = new TrajectoryCourse(lastPose);
         return this;
     }
     public TrajectoryCourseBuilder addSegment(Pose2d end){

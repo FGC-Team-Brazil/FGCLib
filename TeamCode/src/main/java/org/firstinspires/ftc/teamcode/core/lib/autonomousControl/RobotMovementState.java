@@ -13,8 +13,7 @@ public class RobotMovementState {
     double elapsedTime;
     double deaccelerationDistance;
 
-    RobotMovementState(Pose2d RobotPosition,
-                       double startVX,double startVY){
+    public RobotMovementState(double startVX, double startVY){
         double VX = startVX;
         double VY = startVY;
         double AX = 0;
@@ -23,10 +22,10 @@ public class RobotMovementState {
         double deaccelerationDistance = -(Math.pow(AutonomousConstants.MAXACCELERATION,2)+Math.pow(AutonomousConstants.MAXSPEED,2))/(2*AutonomousConstants.MAXACCELERATION);
     }
 
-    public void update(double ax, double ay,double timePassed){
+    public RobotMovementState update(double ax, double ay,double timePassed){
         elapsedTime+=timePassed;
         VX += ax*timePassed;
         VY += ay*timePassed;
-
+        return this;
     }
 }

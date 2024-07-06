@@ -11,8 +11,11 @@ import java.util.List;
 public class RobotSubsystems {
     private static final Subsystem[] subsystems = {
             DrivetrainBuilder.build(
-                    DrivetrainBuilderConstants.MOTOR_RIGHT,
-                    DrivetrainBuilderConstants.MOTOR_LEFT,
+                    DrivetrainBuilderConstants.MOTOR_FRONT_RIGHT,
+                    DrivetrainBuilderConstants.MOTOR_FRONT_LEFT,
+                    DrivetrainBuilderConstants.MOTOR_BACK_RIGHT,
+                    DrivetrainBuilderConstants.MOTOR_BACK_LEFT,
+                    DrivetrainBuilderConstants.IMU_NAME,
                     DrivetrainBuilderConstants.MOTOR_RIGHT_INVERTED,
                     DrivetrainBuilderConstants.MOTOR_LEFT_INVERTED,
                     DrivetrainBuilderConstants.START_POSITION

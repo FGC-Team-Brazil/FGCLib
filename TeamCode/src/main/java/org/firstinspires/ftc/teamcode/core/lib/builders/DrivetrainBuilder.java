@@ -4,11 +4,18 @@ import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderCo
 
 import androidx.annotation.NonNull;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.Pose2d;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.RobotMovementState;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.TargetVelocityData;
@@ -21,11 +28,16 @@ public class DrivetrainBuilder implements Subsystem {
     private static DrivetrainBuilder instance;
     private DcMotorSimple.Direction motorRightDirection;
     private DcMotorSimple.Direction motorLeftDirection;
-    private String motorLeftName;
-    private String motorRightName;
+    private String motorLeftFrontName;
+    private String motorRightFrontName;
+    private String motorLeftBackName;
+    private String motorRightBackName;
     private double limiter;
-    private DcMotor motorRight;
-    private DcMotor motorLeft;
+    private DcMotorEx motorFrontRight;
+    private DcMotorEx motorFrontLeft;
+    private DcMotorEx motorBackRight;
+    private DcMotorEx motorBackLeft;
+    private IMU imu; //deppends on how old each driver hub is, I dont know what is the imu we have
     private Telemetry telemetry;
     private SmartGamepad driver;
     public Pose2d currentPose;
@@ -35,20 +47,25 @@ public class DrivetrainBuilder implements Subsystem {
     double desiredVY;
     double currHeadingVelocity;
     public RobotMovementState movementState = new RobotMovementState(0,0);
+    private String imuName;
 
     private DrivetrainBuilder() {
     }
 
-    public static DrivetrainBuilder build(@NonNull String motorRightName, @NonNull String motorLeftName, boolean isMotorRightInverted, boolean isMotorLeftInverted,Pose2d botStartingPosition) {
+    public static DrivetrainBuilder build(@NonNull String motorFrontRightName, @NonNull String motorFrontLeftName,@NonNull String motorBackRightName, @NonNull String motorBackLeftName,@NonNull String imuName, boolean isMotorRightInverted, boolean isMotorLeftInverted,Pose2d botStartingPosition) {
 
         getInstance();
         instance.currentPose = botStartingPosition;
-        instance.motorLeftName = motorLeftName;
-        instance.motorRightName = motorRightName;
-        instance.motorLeftDirection = isMotorLeftInverted
-                ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
-        instance.motorRightDirection = isMotorRightInverted
-                ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+        instance.motorLeftFrontName = motorFrontLeftName;
+        instance.motorRightFrontName = motorFrontRightName;
+        instance.motorLeftBackName = motorBackLeftName;
+        instance.motorRightBackName = motorBackRightName;
+        instance.imuName = imuName;
+
+        //instance.motorLeftDirection = isMotorLeftInverted
+        //        ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+        //instance.motorRightDirection = isMotorRightInverted
+        //        ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
 
         return instance;
     }
@@ -57,14 +74,27 @@ public class DrivetrainBuilder implements Subsystem {
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
-        motorLeft = hardwareMap.get(DcMotor.class, motorLeftName);
-        motorRight = hardwareMap.get(DcMotor.class, motorRightName);
-        motorLeft.setDirection(motorLeftDirection);
-        motorRight.setDirection(motorRightDirection);
+        motorFrontLeft = hardwareMap.get(DcMotorEx.class, motorLeftFrontName);
+        motorFrontRight = hardwareMap.get(DcMotorEx.class, motorRightFrontName);
+        motorBackLeft = hardwareMap.get(DcMotorEx.class, motorLeftBackName);
+        motorBackRight = hardwareMap.get(DcMotorEx.class, motorRightBackName);
+        imu = hardwareMap.get(IMU.class,imuName);
+
+        imu.initialize(new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+                )
+        ));
+        imu.resetYaw();
+
+        //motorLeft.setDirection(motorLeftDirection);
+        //motorRight.setDirection(motorRightDirection);
     }
 
     @Override
     public void start() {
+
 
     }
 
@@ -97,8 +127,8 @@ public class DrivetrainBuilder implements Subsystem {
     }
 
     public void setPower(double leftSpeed, double rightSpeed) {
-        motorLeft.setPower(leftSpeed);
-        motorRight.setPower(rightSpeed);
+        //motorLeft.setPower(leftSpeed);
+        //motorRight.setPower(rightSpeed);
     }
 
     public static DrivetrainBuilder getInstance() {
@@ -113,7 +143,7 @@ public class DrivetrainBuilder implements Subsystem {
     }
 
     public void controlBasedOnVelocity(TargetVelocityData movementState,double elapsedTime){
-        updatePose2d();
+        updatePose2d(elapsedTime);
         desiredVX += (movementState.getXV()-currVX)*elapsedTime*(AutonomousConstants.MAXACCELERATION/AutonomousConstants.MAXSPEED);
         desiredVY += (movementState.getXV()-currVX)*elapsedTime*(AutonomousConstants.MAXACCELERATION/AutonomousConstants.MAXSPEED);
 
@@ -121,9 +151,31 @@ public class DrivetrainBuilder implements Subsystem {
 
 
     }
-    public void updatePose2d(){
+    public double updatePose2dIMU(){
+        //I cannot for the like of me understand how this imu stuff works,
+        // even less so on a sunday night
+        return 0;
+    }
+    public void updatePose2d(double elapsedTime){
+        // apply x drive kinematic model (with wheel velocities [ticks per sec])
 
-        //does math to determine bot position and velocity todo
+        currVX = (motorFrontLeft.getVelocity() + motorFrontRight.getVelocity()
+                + motorBackLeft.getVelocity() + motorBackRight.getVelocity()) * 1.41;
+
+        currVY=  (+motorFrontLeft.getVelocity() - motorFrontRight.getVelocity()
+                - motorBackLeft.getVelocity() + motorBackRight.getVelocity()) * 1.41;
+
+        // rotate the vector
+        double nx = (currVX*Math.cos(currentPose.getHeadingRadians())-(currVY*Math.sin(currentPose.getHeadingRadians())));
+        double nY = (currVX*Math.sin(currentPose.getHeadingRadians())+(currVY*Math.cos(currentPose.getHeadingRadians())));
+        currVX = nx; currVY= nY;
+
+        // integrate velocity over time
+        currentPose.updatePose(
+                currentPose.getX() +(currVX*(elapsedTime))/AutonomousConstants.TICK_TO_CM_CONVERSION_VALUE,
+                currentPose.getY()+(currVY*(elapsedTime))/AutonomousConstants.TICK_TO_CM_CONVERSION_VALUE,
+                        updatePose2dIMU()
+        );
     }
     public Pose2d getCurrentPose(){
         return currentPose;

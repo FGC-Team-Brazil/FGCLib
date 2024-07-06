@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.Pose2d;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.TrajectorySequenceRunner;
+import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.robot.RobotSubsystems;
@@ -28,6 +29,8 @@ public class TeleOpMode2 extends OpMode {
         robot.init(hardwareMap, telemetry); // Don't remove this line
 
         subsystemsDriver = RobotSubsystems.get();
+
+        DrivetrainBuilder.getInstance().setPose2d(new Pose2d(0,0,0));
 
         TrajectorySequence trajectorySequence= new TrajectorySequenceBuilder()
                 .startTrajectoryCourse(new Pose2d(0,10,0))

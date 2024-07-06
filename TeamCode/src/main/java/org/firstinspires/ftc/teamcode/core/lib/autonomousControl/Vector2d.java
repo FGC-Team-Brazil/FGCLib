@@ -12,7 +12,6 @@ public class Vector2d {
         /*
         xPosition means the X axis position relative to the field
         yPosition means the Y axis position relative to the field
-        heading means the orientation of the robot in degrees relative to the field
          */
         XPos = xPosition;
         YPos = yPosition;

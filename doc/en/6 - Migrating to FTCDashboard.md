@@ -1,7 +1,8 @@
 # Migrating to FTCDashboard
 
 In this documentation we'll teach you how to use FtcDashboard instead of the SDK's standard Telemetry.
-To make it easier to understand, Team Brazil has recorded a video explaining the whole process step by step. Access the video [here]().
+To make it easier to understand, Team Brazil has made a subsystemExample using the FtcDashboard.
+You can access the example in the branch _**new/ftcDashboard**_.
 
 ## Using MultipleTelemetry
 When using standard Telemetry with FGCLib, the Telemetry object is passed to the

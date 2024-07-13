@@ -47,6 +47,6 @@ public class TrajectorySequenceRunner {
                 }
             }
 
-
+        //the thing that controls robot position after ending does'nt exist and i don't think it needs to because deacceleration is done at the end of each Structure
     }
 }

@@ -166,8 +166,8 @@ public class TrajectoryCourse implements TrajectoryStructure{
             double distanceToCourseEnd = Math.hypot(xPointList.get(CurrentIndex)-currentBotPosition.getX(),
                     yPointList.get(CurrentIndex)-currentBotPosition.getY());
             if(distanceToCourseEnd<currentBotState.deaccelerationDistance){
-                xVelocity =Math.cos(alpha)*AutonomousConstants.MAXSPEED*(distanceToCourseEnd/currentBotState.deaccelerationDistance);
-                yVelocity =Math.sin(alpha)*AutonomousConstants.MAXSPEED*(distanceToCourseEnd/currentBotState.deaccelerationDistance);
+                xVelocity =Math.cos(alpha)*AutonomousConstants.MAXSPEED*(distanceToCourseEnd/currentBotState.deaccelerationDistance)+Math.cos(alpha)*AutonomousConstants.MAXACCELERATION;
+                yVelocity =Math.sin(alpha)*AutonomousConstants.MAXSPEED*(distanceToCourseEnd/currentBotState.deaccelerationDistance)+Math.sin(alpha)*AutonomousConstants.MAXACCELERATION;
             }
         } else {
             xVelocity =Math.cos(alpha)*AutonomousConstants.MAXSPEED;

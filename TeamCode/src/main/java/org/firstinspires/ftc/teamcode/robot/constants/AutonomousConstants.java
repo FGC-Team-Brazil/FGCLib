@@ -10,10 +10,13 @@ public class AutonomousConstants {
     public static final double WHEEL_BASE = 0;
     public static final double TRACK_WIDTH=0;
     public static final double LATERAL_MULTIPLIER=0;
+    public static final double TOLERATED_HEADING_ERROR = 1;//degrees
+    public static final double MAX_HEADING_VELOCITY = 0.5;//power applied to motor (0 to 1)
     public static double MAXSPEED = 30; // centimeter per second
     public static  double MAXACCELERATION = 4; //centimeter per second squared
     public static final double SPEEDPROPORTIONALGAIN = 0;
     public static PIDController pathFollowingPID = new PIDController(2,0,0,0); // do not touch kI or the robot goes crazy ü
     public static PIDController stoppedAtPointPID = new PIDController(0.6,0,0,0);
 
+    public static double HeadK= 0.01;
 }

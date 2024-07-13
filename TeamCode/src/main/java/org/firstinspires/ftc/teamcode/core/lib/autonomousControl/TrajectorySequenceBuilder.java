@@ -15,16 +15,16 @@ public class TrajectorySequenceBuilder {
     public TrajectorySequenceBuilder(){
         sequenceUnderConstruction = new TrajectorySequence();
     }
-    public TrajectorySequenceBuilder startTrajectoryCourse(Pose2d end){
+    public TrajectorySequenceBuilder startTrajectoryCourse(Pose2d end,double startTangent,double endTangent){
         courseUnderConstruction = new TrajectoryCourseBuilder();
         courseUnderConstruction
-                .startTrajectory(lastPose2d)
-                .addSegment(end);
+                .startTrajectory(lastPose2d,startTangent,endTangent)
+                .addSegment(end,endTangent);
         return this;
     }
-    public TrajectorySequenceBuilder addCourseSegment(Pose2d end){
+    public TrajectorySequenceBuilder addCourseSegment(Pose2d end,double endTangent){
         courseUnderConstruction
-                .addSegment(end);
+                .addSegment(end,endTangent);
         lastPose2d = end;
         currentStructureSegmentID++;
         return this;

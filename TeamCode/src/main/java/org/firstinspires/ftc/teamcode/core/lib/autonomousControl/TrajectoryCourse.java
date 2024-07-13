@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.core.lib.autonomousControl;
 
+import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.robot.constants.AutonomousConstants;
 
@@ -27,6 +28,7 @@ public class TrajectoryCourse implements TrajectoryStructure{
     }
 
     ArrayList<Pose2d> pose2dList = new ArrayList<Pose2d>();
+    ArrayList<Double> tangentList = new ArrayList<>();
     ArrayList<Double> xPointList = new ArrayList<Double>();
     ArrayList<Double> yPointList = new ArrayList<Double>();
     //ArrayList<Double> timeAtIndexList = new ArrayList<Double>();
@@ -34,24 +36,27 @@ public class TrajectoryCourse implements TrajectoryStructure{
     //double currentCouseTime = 0;
     //double currentDistanceTraveled =0;
     private final double bezierControlConstant = Math.E;
-    public void addPose2d(Pose2d newPose2d){
+    public void addPose2d(Pose2d newPose2d,double endTangent){
         pose2dList.add(newPose2d);
+        tangentList.add(endTangent);
     }
-    TrajectoryCourse(Pose2d startPose){
+    TrajectoryCourse(Pose2d startPose,double startTangent,double endTangent){
         pose2dList.add(startPose);
+        tangentList.add(startTangent);
+        tangentList.add(endTangent);
     }
 
-    public void calculateSegment(Pose2d start, Pose2d end){
+    public void calculateSegment(Pose2d start, Pose2d end,double startTangent,double endTangent){
         int startT;
         double segmentLengh = Math.hypot(Math.pow(end.getX() - start.getX(),2)
                                         , Math.pow(end.getY() - start.getY(),2));
         Vector2d ControlPoint1 = new Vector2d(
-                segmentLengh/bezierControlConstant*Math.cos(start.getHeadingRadians())+start.getX(),
-                segmentLengh/bezierControlConstant*Math.sin(start.getHeadingRadians())+start.getY()
+                segmentLengh/bezierControlConstant*Math.cos(Math.toRadians(startTangent))+start.getX(),
+                segmentLengh/bezierControlConstant*Math.sin(Math.toRadians(startTangent))+start.getY()
         );
         Vector2d ControlPoint2 = new Vector2d(
-                segmentLengh/bezierControlConstant*Math.cos(end.getHeadingRadians())+end.getX(),
-                segmentLengh/bezierControlConstant*Math.sin(end.getHeadingRadians())+end.getY()
+                segmentLengh/bezierControlConstant*Math.cos(Math.toRadians(endTangent))+end.getX(),
+                segmentLengh/bezierControlConstant*Math.sin(Math.toRadians(endTangent))+end.getY()
         );
         if (!xPointList.isEmpty()){
             //this prevents calculating the same point twice at the beginning and end of two consecutive segments
@@ -153,6 +158,8 @@ public class TrajectoryCourse implements TrajectoryStructure{
         if(LastIndex>CurrentIndex){
             CurrentIndex=LastIndex; //prevents robot going back the trajectory
         }
+
+        // calculates desired X and Y speed
         double alpha = Math.atan2(yPointList.get(CurrentIndex)-currentBotPosition.YPos,
         xPointList.get(CurrentIndex)-currentBotPosition.XPos);
         if (segmentIDatIndex(CurrentIndex)==segmentIDatIndex(yPointList.size())){
@@ -166,15 +173,15 @@ public class TrajectoryCourse implements TrajectoryStructure{
             xVelocity =Math.cos(alpha)*AutonomousConstants.MAXSPEED;
             yVelocity =Math.sin(alpha)*AutonomousConstants.MAXSPEED;
         }
-
-        return new TargetVelocityData(xVelocity,yVelocity,alpha,CurrentIndex);
+        double desiredHeading = (CurrentIndex%100)*(pose2dList.get(getSegmentID()-1).getHeadingRadians()-pose2dList.get(getSegmentID()).getHeadingRadians());
+        return new TargetVelocityData(xVelocity,yVelocity,alpha,desiredHeading,CurrentIndex);
 
     }
 
     @Override
     public void start(double startTime) {
         for (int i=0;i<pose2dList.size();i++){
-            calculateSegment(pose2dList.get(i),pose2dList.get(i+1));
+            calculateSegment(pose2dList.get(i),pose2dList.get(i+1),tangentList.get(i),tangentList.get(i+1));
         }
         CurrentIndex = 0;
         LastIndex = 0;
@@ -186,7 +193,9 @@ public class TrajectoryCourse implements TrajectoryStructure{
 
         DrivetrainBuilder.getInstance().controlBasedOnVelocity(vData,elapsedTime);
 
-        return CurrentIndex==xPointList.size()-1;//this checks whether or not the Structure is done being followed
+        return (CurrentIndex==xPointList.size()-1)&&
+                (Math.abs(DrivetrainBuilder.getInstance().getCurrentPose().getHeadingDegrees() - pose2dList.get(getSegmentID()).getHeadingDegrees())) <= AutonomousConstants.TOLERATED_HEADING_ERROR
+                ;//this checks whether or not the Structure is done being followed
     }
     @Override
     public Pose2d getLastPose2d(){

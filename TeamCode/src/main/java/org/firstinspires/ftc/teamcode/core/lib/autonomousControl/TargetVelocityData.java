@@ -4,8 +4,9 @@ public class TargetVelocityData {
     double XVel;
     double YVel;
     double XV_YV_alpha;
+    double heading;
     double index;
-    TargetVelocityData(double xVelocity, double yVelocity, double alpha,int CourseIndex){
+    TargetVelocityData(double xVelocity, double yVelocity, double alpha,double desiredHeading,int CourseIndex){
         /*
         xPosition means the X axis position relative to the field
         yPosition means the Y axis position relative to the field
@@ -14,6 +15,7 @@ public class TargetVelocityData {
         XVel = xVelocity;
         YVel = yVelocity;
         XV_YV_alpha = alpha;
+        heading = desiredHeading;
         index = CourseIndex;
     }
 
@@ -23,6 +25,7 @@ public class TargetVelocityData {
     public double getYV(){
         return YVel;
     }
+    public double getH(){return heading;}
     public double getAlphaRadians(){
         return XV_YV_alpha;
     }

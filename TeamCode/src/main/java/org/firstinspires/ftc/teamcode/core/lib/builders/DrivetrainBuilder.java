@@ -54,9 +54,10 @@ public class DrivetrainBuilder implements Subsystem {
     public Pose2d currentPose;
     double currVX;
     double currVY;
+    double currentHeading;
     double desiredVX;
     double desiredVY;
-    double currHeadingVelocity;
+    double Headingerror;
     public RobotMovementState movementState = new RobotMovementState(0,0);
     private String imuName;
 
@@ -160,18 +161,19 @@ public class DrivetrainBuilder implements Subsystem {
     }
 
     public void controlBasedOnVelocity(TargetVelocityData movementState,double elapsedTime){
+
         relativeOdometryUpdate(elapsedTime);
 
         desiredVX += (movementState.getXV()-currVX)*elapsedTime*(AutonomousConstants.MAXACCELERATION/AutonomousConstants.MAXSPEED);
-        desiredVY += (movementState.getXV()-currVX)*elapsedTime*(AutonomousConstants.MAXACCELERATION/AutonomousConstants.MAXSPEED);
+        desiredVY += (movementState.getYV()-currVY)*elapsedTime*(AutonomousConstants.MAXACCELERATION/AutonomousConstants.MAXSPEED);
+        Headingerror = (movementState.getH()-currentHeading);
+        Pose2d desiredVelocityField = new Pose2d(desiredVX,desiredVY,Headingerror*elapsedTime*AutonomousConstants.HeadK);
+        Pose2d desiredVelocityBot = fieldToRobotVelocity(desiredVelocityField);
 
-        Pose2d registredVelocities = wheelToRobotVelocities();
 
         updatePose2d(elapsedTime);
 
-        Pose2d botRelativeVelocity = fieldToRobotVelocity(registredVelocities);
-
-        MotorVelocityData desiredMotorSpeed = getDesiredWheelVelocities(botRelativeVelocity);
+        MotorVelocityData desiredMotorSpeed = getDesiredWheelVelocities(desiredVelocityBot);
         MotorVelocityData actualMotorSpeed = getRegistredWheelVelocities();
         //pid for motor speeds
         double appliedFL = motorFLPID.calculate(desiredMotorSpeed.velocityFrontLeft,actualMotorSpeed.velocityFrontLeft);
@@ -188,7 +190,7 @@ public class DrivetrainBuilder implements Subsystem {
         return 0;
     }
     public MotorVelocityData getDesiredWheelVelocities(Pose2d botRelativeVelocity){
-        return new MotorVelocityData().updateAppliedVelocities(botRelativeVelocity);
+        return new MotorVelocityData().updateAppliedVelocities(botRelativeVelocity).normalize();
     }
     public MotorVelocityData getRegistredWheelVelocities(){
         double frontLeft = (motorFrontLeft.getVelocity(AngleUnit.RADIANS)*AutonomousConstants.WHEEL_RADIUS);

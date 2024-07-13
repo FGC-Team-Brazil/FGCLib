@@ -32,15 +32,17 @@ public class TeleOpMode2 extends OpMode {
 
         DrivetrainBuilder.getInstance().setPose2d(new Pose2d(0,0,0));
 
+
+
         TrajectorySequence trajectorySequence= new TrajectorySequenceBuilder()
-                .startTrajectoryCourse(new Pose2d(0,10,0))
+                .startTrajectoryCourse(new Pose2d(0,10,0),0,90)
                 .addBasicCommand(()->{
                     telemetry.addData("boo","ahh!");
                 })
-                .addCourseSegment(new Pose2d(10,10,90))
+                .addCourseSegment(new Pose2d(10,10,90),10)
                 .buildCourse()
                 .holdPositionForSeconds(2)
-                .startTrajectoryCourse(new Pose2d(-10,-10,180))
+                .startTrajectoryCourse(new Pose2d(-10,-10,180),180,90)
                 .buildCourse()
                 .buildSequence();
 

@@ -158,7 +158,7 @@ public class TrajectoryCourse implements TrajectoryStructure{
         if(LastIndex>CurrentIndex){
             CurrentIndex=LastIndex; //prevents robot going back the trajectory
         }
-
+        double a = Math.PI;
         // calculates desired X and Y speed
         double alpha = Math.atan2(yPointList.get(CurrentIndex)-currentBotPosition.YPos,
         xPointList.get(CurrentIndex)-currentBotPosition.XPos);
@@ -173,7 +173,7 @@ public class TrajectoryCourse implements TrajectoryStructure{
             xVelocity =Math.cos(alpha)*AutonomousConstants.MAXSPEED;
             yVelocity =Math.sin(alpha)*AutonomousConstants.MAXSPEED;
         }
-        double desiredHeading = (CurrentIndex%100)*(pose2dList.get(getSegmentID()-1).getHeadingRadians()-pose2dList.get(getSegmentID()).getHeadingRadians());
+        double desiredHeading = (CurrentIndex%100)*(pose2dList.get(getSegmentID()-1).getHeadingRadians()-pose2dList.get(getSegmentID()).getHeadingRadians())+pose2dList.get(getSegmentID()-1).getHeadingRadians();
         return new TargetVelocityData(xVelocity,yVelocity,alpha,desiredHeading,CurrentIndex);
 
     }
@@ -194,8 +194,8 @@ public class TrajectoryCourse implements TrajectoryStructure{
         DrivetrainBuilder.getInstance().controlBasedOnVelocity(vData,elapsedTime);
 
         return (CurrentIndex==xPointList.size()-1)&&
-                (Math.abs(DrivetrainBuilder.getInstance().getCurrentPose().getHeadingDegrees() - pose2dList.get(getSegmentID()).getHeadingDegrees())) <= AutonomousConstants.TOLERATED_HEADING_ERROR
-                ;//this checks whether or not the Structure is done being followed
+                (Math.abs(DrivetrainBuilder.getInstance().getCurrentPose().getHeadingDegrees() - pose2dList.get(getSegmentID()).getHeadingDegrees())) <= AutonomousConstants.TOLERATED_HEADING_ERROR;
+                //this checks whether or not the Structure is done being followed
     }
     @Override
     public Pose2d getLastPose2d(){

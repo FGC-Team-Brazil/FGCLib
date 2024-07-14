@@ -160,7 +160,7 @@ public class DrivetrainBuilder implements Subsystem {
         return instance;
     }
 
-    public void controlBasedOnVelocity(TargetVelocityData movementState,double elapsedTime){
+    public void controlBasedOnVelocity(@NonNull TargetVelocityData movementState, double elapsedTime){
 
         relativeOdometryUpdate(elapsedTime);
 
@@ -169,9 +169,6 @@ public class DrivetrainBuilder implements Subsystem {
         Headingerror = (movementState.getH()-currentHeading);
         Pose2d desiredVelocityField = new Pose2d(desiredVX,desiredVY,Headingerror*elapsedTime*AutonomousConstants.HeadK);
         Pose2d desiredVelocityBot = fieldToRobotVelocity(desiredVelocityField);
-
-
-        updatePose2d(elapsedTime);
 
         MotorVelocityData desiredMotorSpeed = getDesiredWheelVelocities(desiredVelocityBot);
         MotorVelocityData actualMotorSpeed = getRegistredWheelVelocities();
@@ -184,11 +181,7 @@ public class DrivetrainBuilder implements Subsystem {
         setPower(appliedFL,appliedFR,appliedBL,appliedBR);
     }
 
-    public double updatePose2dIMU(){
-        //I cannot for the like of me understand how this imu stuff works,
-        // even less so on a sunday night
-        return 0;
-    }
+
     public MotorVelocityData getDesiredWheelVelocities(Pose2d botRelativeVelocity){
         return new MotorVelocityData().updateAppliedVelocities(botRelativeVelocity).normalize();
     }
@@ -199,29 +192,6 @@ public class DrivetrainBuilder implements Subsystem {
         double frontRight = (motorFrontRight.getVelocity(AngleUnit.RADIANS)*AutonomousConstants.WHEEL_RADIUS);
         return new MotorVelocityData(frontLeft,frontRight,rearLeft,rearRight);
     }
-    public void updatePose2d(double elapsedTime){
-        relativeOdometryUpdate(elapsedTime);
-        /*
-        // apply x drive kinematic model (with wheel velocities [ticks per sec])
-
-        currVX = (motorFrontLeft.getVelocity() + motorFrontRight.getVelocity()
-                + motorBackLeft.getVelocity() + motorBackRight.getVelocity()) * 1.41;
-
-        currVY=  (+motorFrontLeft.getVelocity() - motorFrontRight.getVelocity()
-                - motorBackLeft.getVelocity() + motorBackRight.getVelocity()) * 1.41;
-
-        // rotate the vector
-        double nx = (currVX*Math.cos(currentPose.getHeadingRadians())-(currVY*Math.sin(currentPose.getHeadingRadians())));
-        double nY = (currVX*Math.sin(currentPose.getHeadingRadians())+(currVY*Math.cos(currentPose.getHeadingRadians())));
-        currVX = nx; currVY= nY;
-
-        // integrate velocity over time
-        currentPose.updatePose(
-                currentPose.getX() +(currVX*(elapsedTime))/AutonomousConstants.TICK_TO_CM_CONVERSION_VALUE,
-                currentPose.getY()+(currVY*(elapsedTime))/AutonomousConstants.TICK_TO_CM_CONVERSION_VALUE,
-                        updatePose2dIMU()
-        );*/
-    }
     public void setPose2d(Pose2d newPose){
         currentPose =  newPose;
     }
@@ -230,36 +200,42 @@ public class DrivetrainBuilder implements Subsystem {
     }
 
     public  void relativeOdometryUpdate(double elapsedSeconds) {
-
+        double dtheta;
         Pose2d robotPoseDelta = wheelToRobotVelocities();
 
-        double dtheta = currentPose.getHeadingRadians();
+        //double dtheta = currentPose.getHeadingRadians()+(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)-currentPose.getHeadingRadians());
+        if (imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)-currentPose.getHeadingRadians()>Math.PI){
+            dtheta = -2*Math.PI+imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)-currentPose.getHeadingRadians();
+        } else{
+            dtheta = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)-currentPose.getHeadingRadians();
+        }
 
-        double botXComponentRelativeToField = robotPoseDelta.getX()*Math.sin(dtheta) - robotPoseDelta.getY()*Math.cos(dtheta); // i dont know if this is right, gotta test it
-        double botYComponentRelativeToField = robotPoseDelta.getY()*Math.sin(dtheta) + robotPoseDelta.getX()*Math.cos(dtheta);
+        double botXComponentRelativeToField = robotPoseDelta.getX()*Math.sin(currentPose.getHeadingRadians()) - robotPoseDelta.getY()*Math.cos(currentPose.getHeadingRadians()); // i dont know if this is right, gotta test it
+        double botYComponentRelativeToField = robotPoseDelta.getY()*Math.sin(currentPose.getHeadingRadians()) + robotPoseDelta.getX()*Math.cos(currentPose.getHeadingRadians());
 
         //Pair var8 = var10000;
         //double sineTerm = Math.sin(dtheta);
         //double cosTerm = Math.cos(dtheta);
         //Vector2d fieldPositionDelta = new Vector2d(sineTerm * robotPoseDelta.getX() - cosTerm * robotPoseDelta.getY(), cosTerm * robotPoseDelta.getX() + sineTerm * robotPoseDelta.getY()); probably closer to this
 
-        Pose2d fieldPoseDelta = new Pose2d(currentPose.getX()+ botXComponentRelativeToField*elapsedSeconds,currentPose.getY()+botYComponentRelativeToField*elapsedSeconds, robotPoseDelta.getHeadingDegrees());
+        Pose2d fieldPoseDelta = new Pose2d(currentPose.getX()+ botXComponentRelativeToField*elapsedSeconds,currentPose.getY()+botYComponentRelativeToField*elapsedSeconds,
+                robotPoseDelta.getHeadingDegrees());
         currentPose.updatePose(
                 currentPose.getX() + fieldPoseDelta.getX(),
                 currentPose.getY() + fieldPoseDelta.getY(),
-                robotPoseDelta.getHeadingDegrees()*1);
+                currentPose.getHeadingRadians() + dtheta);
     }
     public Pose2d wheelToRobotVelocities() {
-        double k = (AutonomousConstants.TRACK_WIDTH + AutonomousConstants.WHEEL_BASE) / 2.0;
-        double frontLeft = (motorFrontLeft.getVelocity(AngleUnit.RADIANS)*AutonomousConstants.WHEEL_RADIUS);
-        double rearLeft = (motorBackLeft.getVelocity(AngleUnit.RADIANS)*AutonomousConstants.WHEEL_RADIUS);
-        double rearRight = (motorBackRight.getVelocity(AngleUnit.RADIANS)*AutonomousConstants.WHEEL_RADIUS);
-        double frontRight = (motorFrontRight.getVelocity(AngleUnit.RADIANS)*AutonomousConstants.WHEEL_RADIUS);
+        //double k = (AutonomousConstants.TRACK_WIDTH + AutonomousConstants.WHEEL_BASE) / 2.0;
+        double frontLeft = (motorFrontLeft.getVelocity(AngleUnit.RADIANS)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS);
+        double rearLeft = (motorBackLeft.getVelocity(AngleUnit.RADIANS)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS);
+        double rearRight = (motorBackRight.getVelocity(AngleUnit.RADIANS)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS);
+        double frontRight = (motorFrontRight.getVelocity(AngleUnit.RADIANS)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS);
 
         //i think this shouldnt be divided by 4, instead should be multiplied by root(2) but gotta test that first
         return new Pose2d(
                 frontLeft+frontRight+rearLeft+rearRight/4,
-                (rearLeft + frontRight - frontLeft - rearRight) / AutonomousConstants.LATERAL_MULTIPLIER/4,
+                (rearLeft + frontRight - frontLeft - rearRight)/4,
                 imu.getRobotAngularVelocity(AngleUnit.DEGREES).zRotationRate*1 //(rearRight + frontRight - frontLeft - rearLeft) / k/4
                );
         //(novo x = (x * cos a - y* sin a), novo y = () )

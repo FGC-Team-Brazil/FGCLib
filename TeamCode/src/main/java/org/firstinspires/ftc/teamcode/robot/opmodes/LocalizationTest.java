@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.robot.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.core.lib.Robot;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.Pose2d;
@@ -18,11 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TeleOp(name = "TeleOp 2", group = "TeleOp 2")
-public class TeleOpMode2 extends OpMode {
+public class LocalizationTest extends OpMode {
     Robot robot = new Robot();
     private SmartGamepad driver;
-    ElapsedTime timerr = new ElapsedTime();
-    double startTime=0;
     List<Subsystem> subsystemsDriver;
     TrajectorySequenceRunner runner = new TrajectorySequenceRunner();
 
@@ -35,38 +32,20 @@ public class TeleOpMode2 extends OpMode {
 
         DrivetrainBuilder.getInstance().setPose2d(new Pose2d(0,0,0));
 
-
-
-        TrajectorySequence trajectorySequence= new TrajectorySequenceBuilder()
-                .startTrajectoryCourse(new Pose2d(0,10,0),0,90)
-                .addBasicCommand(()->{
-                    telemetry.addData("boo","ahh!");
-                })
-                .addCourseSegment(new Pose2d(10,10,90),10)
-                .buildCourse()
-                .holdPositionForSeconds(2)
-                .startTrajectoryCourse(new Pose2d(-10,-10,180),180,90)
-                .buildCourse()
-                .buildSequence();
-
-
-
-        runner.setSequence(trajectorySequence);
     }
 
     @Override
     public void start() {
         //subsystemsDriver.forEach(Subsystem::start);
         telemetry.update();
-        timerr.reset();
     }
 
     @Override
     public void loop() {
+
         //subsystemsDriver.forEach(subsystem -> subsystem.execute( null));
-        runner.execute(timerr.seconds(),startTime);
+        runner.execute(0,0);
         telemetry.update();
-        startTime = timerr.seconds();
     }
 
     @Override

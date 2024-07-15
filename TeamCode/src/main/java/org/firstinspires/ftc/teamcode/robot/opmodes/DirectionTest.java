@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.robot.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.core.lib.Robot;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.Pose2d;
@@ -17,12 +16,10 @@ import org.firstinspires.ftc.teamcode.robot.RobotSubsystems;
 import java.util.ArrayList;
 import java.util.List;
 
-@TeleOp(name = "TeleOp 2", group = "TeleOp 2")
-public class TeleOpMode2 extends OpMode {
+@TeleOp(name = "DirectionTest", group = "TeleOp 2")
+public class DirectionTest extends OpMode {
     Robot robot = new Robot();
     private SmartGamepad driver;
-    ElapsedTime timerr = new ElapsedTime();
-    double startTime=0;
     List<Subsystem> subsystemsDriver;
     TrajectorySequenceRunner runner = new TrajectorySequenceRunner();
 
@@ -58,15 +55,14 @@ public class TeleOpMode2 extends OpMode {
     public void start() {
         //subsystemsDriver.forEach(Subsystem::start);
         telemetry.update();
-        timerr.reset();
     }
 
     @Override
     public void loop() {
+
         //subsystemsDriver.forEach(subsystem -> subsystem.execute( null));
-        runner.execute(timerr.seconds(),startTime);
+        runner.execute(0,0);
         telemetry.update();
-        startTime = timerr.seconds();
     }
 
     @Override

@@ -62,9 +62,13 @@ public class TeleOpMode2 extends OpMode {
 
     @Override
     public void loop() {
+        //runner.execute(timerr.seconds(), startTime);
+        DrivetrainBuilder.getInstance().relativeOdometryUpdate(timerr.seconds()-startTime);
+        Pose2d posicaoDoRobo = DrivetrainBuilder.getInstance().getCurrentPose();
+        telemetry.addData("posX", posicaoDoRobo.getX());
+        telemetry.addData("posY", posicaoDoRobo.getY());
+        telemetry.addData("heading", posicaoDoRobo.getHeadingDegrees());
         robot.loop();
-        runner.execute(timerr.seconds(), startTime);
-        telemetry.update();
         startTime = timerr.seconds();
     }
 

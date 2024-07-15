@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 public class AutonomousConstants {
     public static final double LOOKFORWARDCONSTANT = 2;
     public static final double WHEEL_RADIUS = 4.5; //cm
-    public static final double MOTOR_REDUCTION = 12; //ticks per revolution of wheel
+    public static final double MOTOR_REDUCTION = 336; //ticks per revolution of wheel
     public static final double TICK_TO_CM_CONVERSION_VALUE = 2*Math.PI*WHEEL_RADIUS/(MOTOR_REDUCTION);
     //public static final double TRACK_WIDTH=0; //distance between parallel wheels viewing the robot from the front
     //public static final double WHEEL_BASE = TRACK_WIDTH; //same as track width but rom the side

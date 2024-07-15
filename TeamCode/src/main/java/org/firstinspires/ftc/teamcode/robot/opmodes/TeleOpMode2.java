@@ -19,19 +19,17 @@ import java.util.List;
 
 @TeleOp(name = "TeleOp 2", group = "TeleOp 2")
 public class TeleOpMode2 extends OpMode {
+    int i = 0;
     Robot robot = new Robot();
     private SmartGamepad driver;
     ElapsedTime timerr = new ElapsedTime();
     double startTime=0;
-    List<Subsystem> subsystemsDriver;
     TrajectorySequenceRunner runner = new TrajectorySequenceRunner();
 
     @Override
     public void init() {
         robot.configGamepadManager(gamepad1, gamepad2);
         robot.init(hardwareMap, telemetry); // Don't remove this line
-
-        subsystemsDriver = RobotSubsystems.get();
 
         DrivetrainBuilder.getInstance().setPose2d(new Pose2d(0,0,0));
 
@@ -40,7 +38,8 @@ public class TeleOpMode2 extends OpMode {
         TrajectorySequence trajectorySequence= new TrajectorySequenceBuilder()
                 .startTrajectoryCourse(new Pose2d(0,10,0),0,90)
                 .addBasicCommand(()->{
-                    telemetry.addData("boo","ahh!");
+                    telemetry.addData("boo", i);
+                    i++;
                 })
                 .addCourseSegment(new Pose2d(10,10,90),10)
                 .buildCourse()
@@ -56,22 +55,22 @@ public class TeleOpMode2 extends OpMode {
 
     @Override
     public void start() {
-        //subsystemsDriver.forEach(Subsystem::start);
+        robot.start();
         telemetry.update();
         timerr.reset();
     }
 
     @Override
     public void loop() {
-        //subsystemsDriver.forEach(subsystem -> subsystem.execute( null));
-        runner.execute(timerr.seconds(),startTime);
+        robot.loop();
+        runner.execute(timerr.seconds(), startTime);
         telemetry.update();
         startTime = timerr.seconds();
     }
 
     @Override
     public void stop() {
-        subsystemsDriver.forEach(Subsystem::stop);
+        robot.stop();
         telemetry.update();
     }
 

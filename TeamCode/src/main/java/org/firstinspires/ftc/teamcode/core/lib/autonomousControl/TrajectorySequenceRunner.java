@@ -23,6 +23,7 @@ public class TrajectorySequenceRunner {
 
         if (!structureStarted) {
             sequence.TrajectoryStructureList.get(currentStructureID).start(0);
+            structureStarted = true;
         } else {
             structureDone = sequence.TrajectoryStructureList.get(currentStructureID).execute(
                     DrivetrainBuilder.getInstance().getCurrentPose(),
@@ -37,6 +38,7 @@ public class TrajectorySequenceRunner {
         if (structureDone){
             currentStructureID++;
             currentStructureSegmentID =0;
+            structureStarted = false;
         }
 
             for (AutonomousCommand autonomousCommand : sequence.CommandList) {

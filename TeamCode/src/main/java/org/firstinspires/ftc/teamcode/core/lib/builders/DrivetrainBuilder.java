@@ -119,8 +119,8 @@ public class DrivetrainBuilder implements Subsystem {
     public void execute(GamepadManager gamepadConfig) {
         driver = gamepadConfig.getDriver();
 
-        //telemetry.addData("DrivetrainBuilder Subsystem", "Running");
-        //arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
+        telemetry.addData("DrivetrainBuilder Subsystem", "Running");
+        arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
     }
 
     public void arcadeDrive(double xSpeed, double zRotation, SmartGamepad driver) {
@@ -139,8 +139,8 @@ public class DrivetrainBuilder implements Subsystem {
     }
 
     public void setPower(double leftSpeed, double rightSpeed) {
-        //motorLeft.setPower(leftSpeed);
-        //motorRight.setPower(rightSpeed);
+        motorFrontLeft.setPower(leftSpeed);
+        motorFrontRight.setPower(rightSpeed);
     }
     public void setPower(double FLSpeed,double FRSpeed,double BLSpeed,double BRSpeed){
         motorFrontLeft.setPower(FLSpeed);

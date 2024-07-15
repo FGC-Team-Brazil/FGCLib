@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.robot.RobotSubsystems;
 import java.util.ArrayList;
 import java.util.List;
 
-@TeleOp(name = "TeleOp 2", group = "TeleOp 2")
+@TeleOp(name = "LocalizationTest", group = "TeleOp 2")
 public class LocalizationTest extends OpMode {
     Robot robot = new Robot();
     private SmartGamepad driver;

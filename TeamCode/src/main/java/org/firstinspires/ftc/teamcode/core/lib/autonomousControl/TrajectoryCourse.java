@@ -20,7 +20,7 @@ public class TrajectoryCourse implements TrajectoryStructure{
     private int LastIndex =0;
     private int CurrentIndex=0;
     int currentSegmentId;
-    TargetVelocityData vData;
+    TargetVelocityData vData = new TargetVelocityData(0,0,0,0,0 );
 
     @Override
     public StructureType getType(){
@@ -173,14 +173,14 @@ public class TrajectoryCourse implements TrajectoryStructure{
             xVelocity =Math.cos(alpha)*AutonomousConstants.MAXSPEED;
             yVelocity =Math.sin(alpha)*AutonomousConstants.MAXSPEED;
         }
-        double desiredHeading = (CurrentIndex%100)*(pose2dList.get(getSegmentID()-1).getHeadingRadians()-pose2dList.get(getSegmentID()).getHeadingRadians())+pose2dList.get(getSegmentID()-1).getHeadingRadians();
+        double desiredHeading = (CurrentIndex%100)*(pose2dList.get(getSegmentID()).getHeadingRadians()-pose2dList.get(getSegmentID()+1).getHeadingRadians())+pose2dList.get(getSegmentID()).getHeadingRadians();
         return new TargetVelocityData(xVelocity,yVelocity,alpha,desiredHeading,CurrentIndex);
 
     }
 
     @Override
     public void start(double startTime) {
-        for (int i=0;i<pose2dList.size();i++){
+        for (int i=0;i<pose2dList.size() - 1;i++){
             calculateSegment(pose2dList.get(i),pose2dList.get(i+1),tangentList.get(i),tangentList.get(i+1));
         }
         CurrentIndex = 0;

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.core.lib.autonomousControl;
 
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
-
 public interface TrajectoryStructure {
     enum StructureType{
         COURSE,

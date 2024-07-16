@@ -14,12 +14,12 @@ public class RobotMovementState {
     double deaccelerationDistance;
 
     public RobotMovementState(double startVX, double startVY){
-        double VX = startVX;
-        double VY = startVY;
-        double AX = 0;
-        double AY = 0;
-        double elapsedTime = 0;
-        double deaccelerationDistance = -(Math.pow(AutonomousConstants.MAXACCELERATION,2)+Math.pow(AutonomousConstants.MAXSPEED,2))/(2*AutonomousConstants.MAXACCELERATION);
+        VX = startVX;
+        VY = startVY;
+        AX = 0;
+        AY = 0;
+        elapsedTime = 0;
+        deaccelerationDistance = -(Math.pow(AutonomousConstants.MAXACCELERATION,2)+Math.pow(AutonomousConstants.MAXSPEED,2))/(2*AutonomousConstants.MAXACCELERATION);
     }
 
     public RobotMovementState update(double ax, double ay,double timePassed){

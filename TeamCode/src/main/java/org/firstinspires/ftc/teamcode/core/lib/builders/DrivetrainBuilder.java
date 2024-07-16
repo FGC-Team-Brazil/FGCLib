@@ -4,36 +4,34 @@ import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderCo
 
 import androidx.annotation.NonNull;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
+
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.MotorVelocityData;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.Pose2d;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.RobotMovementState;
 import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.TargetVelocityData;
-import org.firstinspires.ftc.teamcode.core.lib.autonomousControl.Vector2d;
+
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 import org.firstinspires.ftc.teamcode.robot.constants.AutonomousConstants;
-import org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderConstants;
 
-import java.util.List;
+
+
 
 public class DrivetrainBuilder implements Subsystem {
     private static DrivetrainBuilder instance;
-    private DcMotorSimple.Direction motorRightDirection;
-    private DcMotorSimple.Direction motorLeftDirection;
+
     private String motorLeftFrontName;
     private String motorRightFrontName;
     private String motorLeftBackName;
@@ -43,10 +41,8 @@ public class DrivetrainBuilder implements Subsystem {
     private DcMotorEx motorFrontLeft;
     private DcMotorEx motorBackRight;
     private DcMotorEx motorBackLeft;
-    private PIDController motorFLPID = AutonomousConstants.pathFollowingPID;
-    private PIDController motorFRPID = AutonomousConstants.pathFollowingPID;
-    private PIDController motorBLPID = AutonomousConstants.pathFollowingPID;
-    private PIDController motorBRPID = AutonomousConstants.pathFollowingPID;
+    private PIDController motorPID = AutonomousConstants.pathFollowingPID;
+
 
     private IMU imu; //deppends on how old each driver hub is, I dont know what is the imu we have
     private Telemetry telemetry;
@@ -61,10 +57,20 @@ public class DrivetrainBuilder implements Subsystem {
     public RobotMovementState movementState = new RobotMovementState(0,0);
     private String imuName;
 
+    int prevFLTicks1 = 0;
+    int prevFRTicks1 = 0;
+    int prevBLTicks1 = 0;
+    int prevBRTicks1 = 0;
+    int prevFLTicks2 = 0;
+    int prevFRTicks2 = 0;
+    int prevBLTicks2 = 0;
+    int prevBRTicks2 = 0;
+
     private DrivetrainBuilder() {
     }
 
-    public static DrivetrainBuilder build(@NonNull String motorFrontRightName, @NonNull String motorFrontLeftName,@NonNull String motorBackRightName, @NonNull String motorBackLeftName,@NonNull String imuName, boolean isMotorRightInverted, boolean isMotorLeftInverted,Pose2d botStartingPosition) {
+    public static DrivetrainBuilder build(@NonNull String motorFrontRightName, @NonNull String motorFrontLeftName,@NonNull String motorBackRightName, @NonNull String motorBackLeftName,
+                                          @NonNull String imuName, boolean isMotorRightInverted, boolean isMotorLeftInverted,Pose2d botStartingPosition) {
 
         getInstance();
         instance.currentPose = botStartingPosition;
@@ -90,6 +96,18 @@ public class DrivetrainBuilder implements Subsystem {
         motorFrontRight = hardwareMap.get(DcMotorEx.class, motorRightFrontName);
         motorBackLeft = hardwareMap.get(DcMotorEx.class, motorLeftBackName);
         motorBackRight = hardwareMap.get(DcMotorEx.class, motorRightBackName);
+
+
+        motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        motorFrontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorFrontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         imu = hardwareMap.get(IMU.class,imuName);
 
         imu.initialize(new IMU.Parameters(
@@ -100,6 +118,14 @@ public class DrivetrainBuilder implements Subsystem {
         ));
         imu.resetYaw();
 
+        prevFLTicks1 = 0;
+        prevFRTicks1 = 0;
+        prevBLTicks1 = 0;
+        prevBRTicks1 = 0;
+        prevFLTicks2 = 0;
+        prevFRTicks2 = 0;
+        prevBLTicks2 = 0;
+        prevBRTicks2 = 0;
         //motorLeft.setDirection(motorLeftDirection);
         //motorRight.setDirection(motorRightDirection);
     }
@@ -171,12 +197,12 @@ public class DrivetrainBuilder implements Subsystem {
         Pose2d desiredVelocityBot = fieldToRobotVelocity(desiredVelocityField);
 
         MotorVelocityData desiredMotorSpeed = getDesiredWheelVelocities(desiredVelocityBot);
-        MotorVelocityData actualMotorSpeed = getRegistredWheelVelocities();
+        MotorVelocityData actualMotorSpeed = getRegistredWheelVelocities(elapsedTime);
         //pid for motor speeds
-        double appliedFL = motorFLPID.calculate(desiredMotorSpeed.velocityFrontLeft,actualMotorSpeed.velocityFrontLeft);
-        double appliedFR = motorFLPID.calculate(desiredMotorSpeed.velocityFrontRight,actualMotorSpeed.velocityFrontRight);
-        double appliedBL = motorFLPID.calculate(desiredMotorSpeed.velocityBackLeft,actualMotorSpeed.velocityBackLeft);
-        double appliedBR = motorFLPID.calculate(desiredMotorSpeed.velocityBackRight,actualMotorSpeed.velocityBackRight);
+        double appliedFL = motorPID.calculate(desiredMotorSpeed.velocityFrontLeft,actualMotorSpeed.velocityFrontLeft);
+        double appliedFR = motorPID.calculate(desiredMotorSpeed.velocityFrontRight,actualMotorSpeed.velocityFrontRight);
+        double appliedBL = motorPID.calculate(desiredMotorSpeed.velocityBackLeft,actualMotorSpeed.velocityBackLeft);
+        double appliedBR = motorPID.calculate(desiredMotorSpeed.velocityBackRight,actualMotorSpeed.velocityBackRight);
 
         setPower(appliedFL,appliedFR,appliedBL,appliedBR);
     }
@@ -185,11 +211,12 @@ public class DrivetrainBuilder implements Subsystem {
     public MotorVelocityData getDesiredWheelVelocities(Pose2d botRelativeVelocity){
         return new MotorVelocityData().updateAppliedVelocities(botRelativeVelocity).normalize();
     }
-    public MotorVelocityData getRegistredWheelVelocities(){
-        double frontLeft = (motorFrontLeft.getVelocity(AngleUnit.RADIANS)*AutonomousConstants.WHEEL_RADIUS);
-        double rearLeft = (motorBackLeft.getVelocity(AngleUnit.RADIANS)*AutonomousConstants.WHEEL_RADIUS);
-        double rearRight = (motorBackRight.getVelocity(AngleUnit.RADIANS)*AutonomousConstants.WHEEL_RADIUS);
-        double frontRight = (motorFrontRight.getVelocity(AngleUnit.RADIANS)*AutonomousConstants.WHEEL_RADIUS);
+    public MotorVelocityData getRegistredWheelVelocities(double elapsedTime){
+        double frontLeft = (motorFrontLeft.getCurrentPosition()-prevFLTicks2)/2.0/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS/elapsedTime;
+        double rearLeft = (motorBackLeft.getCurrentPosition()-prevBLTicks2)/2.0/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS/elapsedTime;
+        double rearRight = (motorBackLeft.getCurrentPosition()-prevBRTicks2)/2.0/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS/elapsedTime;
+        double frontRight = (motorFrontRight.getCurrentPosition()-prevFRTicks2)/2.0/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS/elapsedTime;
+
         return new MotorVelocityData(frontLeft,frontRight,rearLeft,rearRight);
     }
     public void setPose2d(Pose2d newPose){
@@ -227,10 +254,21 @@ public class DrivetrainBuilder implements Subsystem {
     }
     public Pose2d wheelToRobotVelocities() {
         //double k = (AutonomousConstants.TRACK_WIDTH + AutonomousConstants.WHEEL_BASE) / 2.0;
-        double frontLeft = (motorFrontLeft.getVelocity(AngleUnit.RADIANS)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS);
-        double rearLeft = (motorBackLeft.getVelocity(AngleUnit.RADIANS)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS);
-        double rearRight = (motorBackRight.getVelocity(AngleUnit.RADIANS)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS);
-        double frontRight = (motorFrontRight.getVelocity(AngleUnit.RADIANS)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS);
+        double frontLeft = (motorFrontLeft.getCurrentPosition()-prevFLTicks1)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS;
+        double rearLeft = (motorBackLeft.getCurrentPosition()-prevBLTicks1)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS;
+        double rearRight = (motorBackRight.getCurrentPosition()-prevBRTicks1)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS;
+        double frontRight = (motorFrontRight.getCurrentPosition()-prevFRTicks1)/AutonomousConstants.MOTOR_REDUCTION*AutonomousConstants.WHEEL_RADIUS;
+
+        prevFLTicks2 = prevFLTicks1;
+        prevFRTicks2 = prevFRTicks1;
+        prevBRTicks2 = prevBRTicks1;
+        prevBLTicks2 = prevBLTicks1;
+
+        prevFLTicks1 = motorFrontLeft.getCurrentPosition();
+        prevFRTicks1 = motorFrontRight.getCurrentPosition();
+        prevBLTicks1 = motorBackLeft.getCurrentPosition();
+        prevBRTicks1 = motorBackRight.getCurrentPosition();
+
 
         //i think this shouldnt be divided by 4, instead should be multiplied by root(2) but gotta test that first
         return new Pose2d(

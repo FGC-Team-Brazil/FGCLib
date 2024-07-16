@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.core.lib.autonomousControl;
 
-import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.robot.constants.AutonomousConstants;
 
@@ -27,15 +26,11 @@ public class TrajectoryCourse implements TrajectoryStructure{
         return StructureType.COURSE;
     }
 
-    ArrayList<Pose2d> pose2dList = new ArrayList<Pose2d>();
+    ArrayList<Pose2d> pose2dList = new ArrayList<>();
     ArrayList<Double> tangentList = new ArrayList<>();
-    ArrayList<Double> xPointList = new ArrayList<Double>();
-    ArrayList<Double> yPointList = new ArrayList<Double>();
-    //ArrayList<Double> timeAtIndexList = new ArrayList<Double>();
-    //ArrayList<Double> DistanceTraveledAtIndexList = new ArrayList<Double>();
-    //double currentCouseTime = 0;
-    //double currentDistanceTraveled =0;
-    private final double bezierControlConstant = Math.E;
+    ArrayList<Double> xPointList = new ArrayList<>();
+    ArrayList<Double> yPointList = new ArrayList<>();
+
     public void addPose2d(Pose2d newPose2d,double endTangent){
         pose2dList.add(newPose2d);
         tangentList.add(endTangent);
@@ -48,75 +43,50 @@ public class TrajectoryCourse implements TrajectoryStructure{
 
     public void calculateSegment(Pose2d start, Pose2d end,double startTangent,double endTangent){
         int startT;
-        double segmentLengh = Math.hypot(Math.pow(end.getX() - start.getX(),2)
+        double bezierControlConstant = Math.E;
+        double segmentLength = Math.hypot(Math.pow(end.getX() - start.getX(),2)
                                         , Math.pow(end.getY() - start.getY(),2));
-        Vector2d ControlPoint1 = new Vector2d(
-                segmentLengh/bezierControlConstant*Math.cos(Math.toRadians(startTangent))+start.getX(),
-                segmentLengh/bezierControlConstant*Math.sin(Math.toRadians(startTangent))+start.getY()
-        );
-        Vector2d ControlPoint2 = new Vector2d(
-                segmentLengh/bezierControlConstant*Math.cos(Math.toRadians(endTangent))+end.getX(),
-                segmentLengh/bezierControlConstant*Math.sin(Math.toRadians(endTangent))+end.getY()
-        );
+        /*
+        functions that could be future added idk
+
+        //ArrayList<Double> timeAtIndexList = new ArrayList<Double>();
+        //ArrayList<Double> DistanceTraveledAtIndexList = new ArrayList<Double>();
+        //double currentCourseTime = 0;
+        //double currentDistanceTraveled =0;
+
+         */
+        double x1 = start.getX();
+        double y1 = start.getY();
+        double x2 = segmentLength/ bezierControlConstant *Math.cos(Math.toRadians(startTangent))+start.getX();
+        double y2 = segmentLength/ bezierControlConstant *Math.sin(Math.toRadians(startTangent))+start.getY();
+        double x3 = segmentLength/ bezierControlConstant *Math.cos(Math.toRadians(endTangent))+end.getX();
+        double y3 = segmentLength/ bezierControlConstant *Math.sin(Math.toRadians(endTangent))+end.getY();
+        double x4 = end.getX();
+        double y4 = end.getY();
+
         if (!xPointList.isEmpty()){
             //this prevents calculating the same point twice at the beginning and end of two consecutive segments
             startT=1;
-
         } else{
             startT = 0;
         }
 
-        for (int t = startT; t<=100; t++){
-            /*
-            in here we have the fully expanded code for ease of comprehension, it may be a good idea to minify this to
-            reduce computation time and make it a bit faster at calculating, expanded equation can be left as a comment
-            in other words: the reduction of this math stuff is left as an exercise for the reader :)
-             */
+        for (int at = startT; at<=100; at++){
+            double t = at/100.0;
+            double xxx = t*t*t*(x4+3*(x2-x3)-x1)+t*t*(3*(x3-2*x2+x1))+3*t*(x2-x1)+x1;
+            double yyy = t*t*t*(y4+3*(y2-y3)-y1)+t*t*(3*(y3-2*y2+y1))+3*t*(y2-y1)+y1;
 
-            //the variable t was used instead of the usual i in the for loop because this is the norm for parametric functions
-
-            //main points are calculated according to t
-            Vector2d linearPoint1 = new Vector2d(
-                    (ControlPoint1.getX()-start.getX())*t/100+start.getX(),
-                    (ControlPoint1.getY()-start.getY())*t/100+start.getY());
-            Vector2d linearPoint2 = new Vector2d(
-                    (ControlPoint2.getX()-ControlPoint1.getX())*t/100+ControlPoint1.getX(),
-                    (ControlPoint2.getY()-ControlPoint1.getY())*t/100+ControlPoint1.getY());
-            Vector2d linearPoint3 = new Vector2d(
-                    (end.getX()-ControlPoint2.getX())*t/100+ControlPoint2.getX(),
-                    (end.getY()-ControlPoint2.getY())*t/100+ControlPoint2.getY());
-
-            //then secondary points are calculated taking into account the linear points
-            Vector2d quadraticPoint1 = new Vector2d(
-                    (linearPoint2.getX()-linearPoint1.getX())*t/100+linearPoint1.getX(),
-                    (linearPoint2.getY()-linearPoint1.getY())*t/100+linearPoint1.getY());
-            Vector2d quadraticPoint2 = new Vector2d(
-                    (linearPoint3.getX()-linearPoint2.getX())*t/100+linearPoint2.getX(),
-                    (linearPoint3.getY()-linearPoint2.getY())*t/100+linearPoint2.getY());
-
-            //here we calculate the point that actually belongs to the spline segment
-            Vector2d cubicPoint = new Vector2d(
-                    quadraticPoint2.getX()-quadraticPoint1.getX()*t/100+ quadraticPoint1.getX(),
-                    quadraticPoint2.getY()-quadraticPoint1.getY()*t/100+ quadraticPoint1.getY());
-
-            //if (!xPointList.isEmpty()){
-                //currentDistanceTraveled += Math.hypot(cubicPoint.getX()-xPointList.get(xPointList.size()-1),cubicPoint.getY()-yPointList.get(yPointList.size()-1));
-                //for use with the
-
-                //currentCouseTime += currentDistanceTraveled / AutonomousConstants.MAXSPEED*0.6; //guarantees that the course finishes even if the robot gets stuck
-            //}
-
-            xPointList.add(cubicPoint.getX());
-            yPointList.add(cubicPoint.getY());
+            xPointList.add(xxx);
+            yPointList.add(yyy);
             //DistanceTraveledAtIndexList.add(currentDistanceTraveled);
-            //timeAtIndexList.add(currentCouseTime);
+            //timeAtIndexList.add(currentCourseTime);
 
         }
     }
 
     public void updateCurrentIndex(Pose2d currentBotPosition, RobotMovementState currentBotState){
-        double distanceToNextIndex=0;
-        double distanceToThisIndex=0;
+        double distanceToNextIndex;
+        double distanceToThisIndex;
 
         distanceToThisIndex = Math.hypot(currentBotPosition.getX()-xPointList.get(CurrentIndex)
                 ,currentBotPosition.getY()-yPointList.get(CurrentIndex));
@@ -136,13 +106,15 @@ public class TrajectoryCourse implements TrajectoryStructure{
                 AutonomousConstants.LOOKFORWARDCONSTANT;
 
         while (lookForwardDistance >distanceToNextIndex){
+            distanceToNextIndex = Math.hypot(currentBotPosition.getX()-xPointList.get(CurrentIndex)
+                    ,currentBotPosition.getY()-yPointList.get(CurrentIndex));
             if (CurrentIndex+1>yPointList.size()){break;}
             CurrentIndex++;
         }
 
     }
     public int getSegmentID(){
-        return (int) Math.round(((double) vData.index-50)/100);
+        return (int) Math.round((vData.index-50)/100.0);
     }
     public int segmentIDatIndex(int index){
         return (int) Math.round(((double)index-50)/100);
@@ -158,7 +130,6 @@ public class TrajectoryCourse implements TrajectoryStructure{
         if(LastIndex>CurrentIndex){
             CurrentIndex=LastIndex; //prevents robot going back the trajectory
         }
-        double a = Math.PI;
         // calculates desired X and Y speed
         double alpha = Math.atan2(yPointList.get(CurrentIndex)-currentBotPosition.YPos,
         xPointList.get(CurrentIndex)-currentBotPosition.XPos);

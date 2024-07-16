@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.core.lib.autonomousControl;
 
 import org.firstinspires.ftc.teamcode.robot.constants.AutonomousConstants;
-import org.opencv.core.Mat;
 
 public class MotorVelocityData {
     public double velocityFrontLeft;

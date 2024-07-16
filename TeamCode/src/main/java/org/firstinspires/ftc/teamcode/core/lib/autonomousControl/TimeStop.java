@@ -27,7 +27,7 @@ public class TimeStop implements TrajectoryStructure{
 
     @Override
     public boolean execute(Pose2d botPosition,RobotMovementState currentBotState,double elapsedTime) {
-
+        DrivetrainBuilder.getInstance().relativeOdometryUpdate(elapsedTime);
         //DrivetrainBuilder.controlBasedOnVelocity();
         // todo make this return an appropriate velocity data as a paramether to the drivebase that keeps robot stationary
         return currentBotState.elapsedTime - startTime >= waitTime;

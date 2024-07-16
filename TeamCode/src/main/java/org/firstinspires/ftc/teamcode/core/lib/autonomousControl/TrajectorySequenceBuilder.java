@@ -17,14 +17,13 @@ public class TrajectorySequenceBuilder {
     }
     public TrajectorySequenceBuilder startTrajectoryCourse(Pose2d end,double startTangent,double endTangent){
         courseUnderConstruction = new TrajectoryCourseBuilder();
-        courseUnderConstruction
-                .startTrajectory(lastPose2d,startTangent,endTangent)
-                .addSegment(end,endTangent);
+        courseUnderConstruction = courseUnderConstruction
+                                    .startTrajectory(lastPose2d,startTangent,endTangent)
+                                    .addSegment(end,endTangent);
         return this;
     }
     public TrajectorySequenceBuilder addCourseSegment(Pose2d end,double endTangent){
-        courseUnderConstruction
-                .addSegment(end,endTangent);
+        courseUnderConstruction = courseUnderConstruction.addSegment(end,endTangent);
         lastPose2d = end;
         currentStructureSegmentID++;
         return this;

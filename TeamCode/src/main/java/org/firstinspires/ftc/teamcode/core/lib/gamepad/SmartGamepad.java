@@ -11,6 +11,14 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class SmartGamepad extends GamepadButton {
     public Gamepad gamepad;
 
+    public enum Color {
+        RED,
+        BLUE,
+        GREEN,
+        WHITE,
+
+    }
+
     public SmartGamepad(Gamepad gamepad) {
         super(gamepad);
         this.gamepad = gamepad;
@@ -24,11 +32,54 @@ public class SmartGamepad extends GamepadButton {
         gamepad.rumbleBlips(counts);
     }
 
-    public void rumbleEnable(){
+    public void rumbleEnable() {
         gamepad.rumble(1, 1, Gamepad.RUMBLE_DURATION_CONTINUOUS);
     }
 
     public void rumbleStop() {
         gamepad.stopRumble();
+    }
+
+    public void ledSetColor(Color color) {
+        double[] rgb = getRGBValues(color);
+        gamepad.setLedColor(rgb[0], rgb[1], rgb[2], Gamepad.LED_DURATION_CONTINUOUS);
+    }
+
+    public void ledSetColor(Color color, int durationMS) {
+        double[] rgb = getRGBValues(color);
+        gamepad.setLedColor(rgb[0], rgb[1], rgb[2], durationMS);
+    }
+
+    private double[] getRGBValues(Color color) {
+        double r = 0;
+        double g = 0;
+        double b = 0;
+
+        switch (color) {
+            case RED:
+                r = 1;
+                break;
+            case GREEN:
+                g = 1;
+                break;
+            case BLUE:
+                b = 1;
+                break;
+            case WHITE:
+                r = 1;
+                g = 1;
+                b = 1;
+                break;
+        }
+
+        return new double[]{r, g, b};
+    }
+
+    public void ledSetRGB(double r, double g, double b, int durationMS) {
+        gamepad.setLedColor(r, g, b, durationMS);
+    }
+
+    public void ledSetRGB(double r, double g, double b) {
+        gamepad.setLedColor(r, g, b, Gamepad.LED_DURATION_CONTINUOUS);
     }
 }

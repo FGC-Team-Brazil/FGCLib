@@ -6,12 +6,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 
 /**
- * md
  * Standard interface used to build subsystems.
+ * <p>
  * Contains 3 essential methods:
  * Initialize: instantiates the subsystem hardware;
  * Execute: runs all the commands executed by the subsystem;
  * Stop: deactivates the subsystem hardware.
+ * </p>
  */
 public interface Subsystem {
     /**

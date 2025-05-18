@@ -11,7 +11,10 @@ public class SubsystemExampleConstants {
     public static final String LIMIT_RIGHT = "subsystemExample_limitRight";
     public static final int TARGET_DEGREE = 110;
 
-
+    /**
+     * It is possible to subdivide constants by using subclasses for further organization
+     * <p>the following example shows how to do this to a PID's constants</p>
+     */
     public static class PID {
         public static final double kP = 1.8;
         public static final double kI = 0.0;

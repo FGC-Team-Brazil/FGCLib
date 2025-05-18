@@ -25,12 +25,11 @@ public class RobotSubsystems {
 
     /**
      * Get all the subsystem instances
-     * @return
+     * <p>puts all subsystems in a neat little array to be used by
+     * the Robot class to run everything in an organized manner</p>
+     * @return list with all subsystems
      */
     public static List<Subsystem> get() {
         return Arrays.asList(subsystems);
-    }
-
-    private RobotSubsystems() {
     }
 }

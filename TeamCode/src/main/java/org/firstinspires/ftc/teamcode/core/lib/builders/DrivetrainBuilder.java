@@ -17,11 +17,14 @@ import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 /**
  * DrivetrainBuilder is a helper class that assists on the creation
  * of a Drivetrain Subsystem.
+ * <p>
  * It contains some usual boilerplate for creating a subsystem.
  * Use it when creating tank drivetrains with two motors.
+ * </p>
  * <p>
  * Caution: This class don't support holonomic
  * drivetrains
+ * </p>
  */
 public class DrivetrainBuilder implements Subsystem {
     private static DrivetrainBuilder instance;
@@ -38,6 +41,14 @@ public class DrivetrainBuilder implements Subsystem {
     private DrivetrainBuilder() {
     }
 
+    /**
+     *
+     * @param motorRightName the name of the motor used on the right side
+     * @param motorLeftName  the name of the motor used on the left side
+     * @param isMotorRightInverted use true if counterclockwise rotation makes the robot go forward
+     * @param isMotorLeftInverted  use true if counterclockwise rotation makes the robot go forward
+     * @return DrivetrainBuilder instance
+     */
     public static DrivetrainBuilder build(@NonNull String motorRightName, @NonNull String motorLeftName, boolean isMotorRightInverted, boolean isMotorLeftInverted) {
         getInstance();
 
@@ -53,6 +64,8 @@ public class DrivetrainBuilder implements Subsystem {
 
     /**
      * Initialize method from Subsystem Interface
+     * @param hardwareMap hardware map must be used as a parameter for the DcMotor objects to be read from outside opmode files
+     * @param telemetry using telemetry as a parameter allows for common telemetry commands to be used outside of opmode file
      */
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {

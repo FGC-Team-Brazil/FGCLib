@@ -10,10 +10,12 @@ import static org.firstinspires.ftc.teamcode.core.lib.pid.PIDController.Mode.ANG
 import static org.firstinspires.ftc.teamcode.robot.constants.SubsystemExampleConstants.*;
 import static org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants.*;
 
+import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
+import org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants;
 
 /**
  * Example subsystem that implements the FGCLib.
@@ -50,7 +52,7 @@ public class SubsystemExample implements Subsystem {
         motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        PIDController = new PIDController(PID.kP, PID.kI, PID.kD, PID.kF, ANGLE);
+        PIDController = new PIDController(PID.kP, PID.kI, PID.kD, PID.kF, ANGLE, CORE_HEX_TICKS_PER_REVOLUTION);
 
         telemetry.addData("SubsystemExample Subsystem", "Initialized");
     }
@@ -70,20 +72,20 @@ public class SubsystemExample implements Subsystem {
         operator.whileButtonLeftBumper()
                 .and(operator.isButtonRightBumper())
                 .run(() -> {
-                    PIDController.setPowerMotor(motorLeft, CORE_HEX_TICKS_PER_REVOLUTION);
-                    PIDController.setPowerMotor(motorRight, CORE_HEX_TICKS_PER_REVOLUTION);
+                    PIDController.setPowerMotor(motorLeft);
+                    PIDController.setPowerMotor(motorRight);
                 });
 
         operator.whileButtonRightBumper()
                 .run(() -> {
                     motorLeft.setPower(0);
-                    PIDController.setPowerMotor(motorRight, CORE_HEX_TICKS_PER_REVOLUTION);
+                    PIDController.setPowerMotor(motorRight);
                 });
 
         operator.whileButtonLeftBumper()
                 .run(() -> {
                     motorRight.setPower(0);
-                    PIDController.setPowerMotor(motorLeft, CORE_HEX_TICKS_PER_REVOLUTION);
+                    PIDController.setPowerMotor(motorLeft);
                 });
 
         operator.whileLeftTriggerPressed()

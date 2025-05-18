@@ -14,6 +14,7 @@ public class PIDController {
     public enum Mode {
         POSITION,
         ANGLE,
+        VELOCITY
     }
 
     private double kP;
@@ -35,24 +36,31 @@ public class PIDController {
 
     private int revolutionEncoder = 0;
 
-    public PIDController(double kP, double kI, double kD, double kF) {
-        this.kP = kP;
-        this.kI = kI;
-        this.kD = kD;
-        this.kF = kF;
-        this.actualMode = Mode.POSITION;
-    }
-
-    public PIDController(double kP, double kI, double kD, double kF, Mode mode) {
+    /**
+     *
+     * @param kP double
+     * @param kI double
+     * @param kD double
+     * @param kF double
+     * @param mode ANGLE if the PID is used for an arm;
+     *            POSITION if the PID is used for linear slides/robot movement
+     *             VELOCITY if the PID is used for a launcher/shooter
+     * @param ticksPerEncoderRevolution int number of ticks in a revolution
+     */
+    public PIDController(double kP, double kI, double kD, double kF, Mode mode,int ticksPerEncoderRevolution) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
         this.kF = kF;
         this.actualMode = mode;
+        this.revolutionEncoder = ticksPerEncoderRevolution;
     }
 
     /**
      * Calculates the controller output given a setpoint and a reference
+     * <p>
+     *     If the PID mode is ANGLE uses the angleWrap method to make controlling it easier
+     * </p>
      * @param setPoint
      * @param realPosition
      * @return
@@ -82,14 +90,7 @@ public class PIDController {
         return output;
     }
 
-    public double calculate(double realPosition) {
-        double setPoint = this.setPoint;
-        double output = calculate(setPoint, realPosition);
-
-        return output;
-    }
-
-    public void setPowerMotor(DcMotor dcMotor, int revolutionEncoder) {
+    public void setPowerMotor(DcMotor dcMotor) {
         int conversionValue = this.revolutionEncoder / 360;
         dcMotor.setPower(output * conversionValue);
     }

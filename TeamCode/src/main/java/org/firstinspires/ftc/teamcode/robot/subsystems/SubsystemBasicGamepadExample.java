@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -19,21 +20,21 @@ import org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants;
 
 /**
  * Example subsystem that implements the FGCLib.
- * Look at the example to build your own subsystems
- * This example also shows how to use the GamepadManager
- * section of the LIB
+ * Look at the example to build your own subsystems.
+ * This example does the same thing as Subsystem example but
+ * without using the GamepadManager portion of the lib
  */
-public class SubsystemExample implements Subsystem {
-    private static SubsystemExample instance;
+public class SubsystemBasicGamepadExample implements Subsystem {
+    private static SubsystemBasicGamepadExample instance;
     private Telemetry telemetry;
     private DcMotor motorRight;
     private DcMotor motorLeft;
     private TouchSensor limitRight;
     private TouchSensor limitLeft;
-    private SmartGamepad operator;
+    private Gamepad operator;
     private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
+    private SubsystemBasicGamepadExample(){
 
-    private SubsystemExample() {
     }
 
     /**
@@ -65,57 +66,41 @@ public class SubsystemExample implements Subsystem {
      */
     @Override
     public void execute(GamepadManager gamepadManager) {
-        operator = gamepadManager.getOperator();
+        operator = gamepadManager.getOperatorBasic();
 
         telemetry.addData("SubsystemExample Subsystem", "Running");
 
         PIDController.calculate(TARGET_DEGREE, motorLeft.getCurrentPosition());
+        if (operator.left_bumper && operator.right_bumper){
+            PIDController.setPowerMotor(motorLeft);
+            PIDController.setPowerMotor(motorRight);
+        }
+        if (operator.left_bumper) {
+            motorRight.setPower(0);
+            PIDController.setPowerMotor(motorLeft);
+        }
+        if (operator.right_bumper) {
+            motorLeft.setPower(0);
+            PIDController.setPowerMotor(motorRight);
+        }
 
-        operator.whileButtonLeftBumper()
-                .and(operator.isButtonRightBumper())
-                .run(() -> {
-                    PIDController.setPowerMotor(motorLeft);
-                    PIDController.setPowerMotor(motorRight);
-                });
+        if (operator.left_trigger>0.9 && operator.right_trigger>0.9 && !(isLimitLeft()) && !(isLimitRight())){
+            motorRight.setPower(operator.right_trigger);
+            motorLeft.setPower(operator.left_trigger);
+        }
 
-        operator.whileButtonRightBumper()
-                .run(() -> {
-                    motorLeft.setPower(0);
-                    PIDController.setPowerMotor(motorRight);
-                });
+        if (operator.left_trigger>0.9 && !(isLimitLeft())){
+            motorLeft.setPower(operator.left_trigger);
+            resetEncoder(motorLeft);
+            operator.rumble( 200);
+        }
 
-        operator.whileButtonLeftBumper()
-                .run(() -> {
-                    motorRight.setPower(0);
-                    PIDController.setPowerMotor(motorLeft);
-                });
+        if (operator.right_trigger>0.9 && !(isLimitRight())){
+            motorRight.setPower(operator.right_trigger);
+            resetEncoder(motorRight);
+            operator.rumble(200);
+        }
 
-        operator.whileLeftTriggerPressed()
-                .and(operator.isRightTriggerPressed())
-                .andNot(isLimitRight())
-                .andNot(isLimitLeft())
-                .run(() -> {
-                    motorRight.setPower(operator.getRightTrigger());
-                    motorLeft.setPower(operator.getLeftTrigger());
-                });
-
-        operator.whileLeftTriggerPressed()
-                .andNot(isLimitLeft())
-                .run(() -> {
-                    motorLeft.setPower(operator.getLeftTrigger());
-                }, () -> {
-                    resetEncoder(motorLeft);
-                    operator.rumbleTimer( 200);
-                });
-
-        operator.whileRightTriggerPressed()
-                .andNot(isLimitRight())
-                .run(() -> {
-                    motorRight.setPower(operator.getRightTrigger());
-                }, () -> {
-                    resetEncoder(motorRight);
-                    operator.rumbleTimer(200);
-                });
     }
 
     /**
@@ -153,11 +138,11 @@ public class SubsystemExample implements Subsystem {
      * It's not good to have many objects of the same subsystem, so every
      * subsystem in FGCLib will have just one instance, that is created
      * with the getInstance method
-     * @return SubsystemExample SingleTon
+     * @return SubsystemBasicGamepadExample SingleTon
      */
-    public static synchronized SubsystemExample getInstance() {
+    public static SubsystemBasicGamepadExample getInstance() {
         if (instance == null) {
-            instance = new SubsystemExample();
+            instance = new SubsystemBasicGamepadExample();
         }
         return instance;
     }

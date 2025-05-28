@@ -17,6 +17,7 @@ apply from: '../build.dependencies.gradle'
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
+    buildToolsVersion '35.0.0'
 
     packagingOptions {
         jniLibs.useLegacyPackaging true
@@ -25,5 +26,4 @@ android {
 
 dependencies {
     implementation project(':FtcRobotController')
-    annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
 }

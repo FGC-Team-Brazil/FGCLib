@@ -1,4 +1,4 @@
-![FGC Team Brazil](doc/media/logoTeamBrazil.png)
+![logoTeamBrazil](https://github.com/user-attachments/assets/e4eb1ff4-9f25-475e-837c-5bbe0f090740)
 
 [![Static Badge](https://img.shields.io/badge/pt_br-readme-green)](doc/pt-br/README.md)
 
@@ -39,7 +39,7 @@ written documentation, as well as explanatory videos with step-by-step guides on
 On the repository home page, click on the Code button, then click on Download ZIP to download the
 .zip file. 
 
-![Github Code Button](doc/media/githubCodeButton.png)
+![githubCodeButton](https://github.com/user-attachments/assets/685db7c3-917a-4f88-bfdc-51318c22e651)
 
 After installation, simply extract the code from the file and open it in an IDE of your choice.
 

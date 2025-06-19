@@ -54,7 +54,7 @@ public class GamepadManager {
      *
      * @return Gamepad assingned to the Driver
      */
-    public Gamepad getDriverBasic() {
+    public Gamepad getRawDriverGamepad() {
         return driver.gamepad;
     }
     /** Returns the SmartGamepad instance assigned to the operator
@@ -68,7 +68,7 @@ public class GamepadManager {
      *
      * @return Gamepad assingned to the operator
      */
-    public Gamepad getOperatorBasic() {
+    public Gamepad getRawOperatorGamepad() {
         return operator.gamepad;
     }
 }

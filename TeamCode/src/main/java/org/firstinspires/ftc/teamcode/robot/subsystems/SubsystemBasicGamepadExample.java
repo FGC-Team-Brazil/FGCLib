@@ -66,7 +66,7 @@ public class SubsystemBasicGamepadExample implements Subsystem {
      */
     @Override
     public void execute(GamepadManager gamepadManager) {
-        operator = gamepadManager.getOperatorBasic();
+        operator = gamepadManager.getRawOperatorGamepad();
 
         telemetry.addData("SubsystemExample Subsystem", "Running");
 

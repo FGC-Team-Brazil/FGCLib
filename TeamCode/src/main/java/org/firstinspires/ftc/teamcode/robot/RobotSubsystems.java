@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderConstants;
+import org.firstinspires.ftc.teamcode.robot.subsystems.CameraSubsystem;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,7 @@ public class RobotSubsystems {
                     DrivetrainBuilderConstants.MOTOR_RIGHT_INVERTED,
                     DrivetrainBuilderConstants.MOTOR_LEFT_INVERTED
             ),
+            CameraSubsystem.getInstance()
             // Add more subsystems here
     };
 

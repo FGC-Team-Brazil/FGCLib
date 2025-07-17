@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.core.util.cameraProcessors;
 import android.graphics.Canvas;
+import android.icu.text.Transliterator;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
@@ -29,6 +30,7 @@ public class OpenCVSampleDetection implements VisionProcessor {
     private Mat inputContours = new Mat();
 
     private MatOfPoint biggestContour = null;
+    private Point centerOfLargestContour= null;
     @Override
     public Mat processFrame(Mat input, long captureTimeNanos) {
         Imgproc.cvtColor(input, hsvMat, Imgproc.COLOR_RGB2HSV);
@@ -53,9 +55,6 @@ public class OpenCVSampleDetection implements VisionProcessor {
         hierarchy.release();
         Imgproc.findContours(hsvBinaryMatErodedDilated, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        input.copyTo(inputContours);
-        Imgproc.drawContours(inputContours, contours, -1, lineColor, lineThickness);
-
         this.biggestContour = null;
         for(MatOfPoint contour : contours) {
             if((biggestContour == null) || (Imgproc.contourArea(contour) > Imgproc.contourArea(biggestContour))) {
@@ -73,12 +72,13 @@ public class OpenCVSampleDetection implements VisionProcessor {
             double contourArea = Imgproc.contourArea(biggestContour);
 
             Scalar crosshairCol = new Scalar(0.0, 255.0, 0.0);
-
-            Imgproc.line(inputContours, new Point(centroidX - 10, centroidY), new Point(centroidX + 10, centroidY), crosshairCol, 5);
-            Imgproc.line(inputContours, new Point(centroidX, centroidY - 10), new Point(centroidX, centroidY + 10), crosshairCol, 5);
+            Imgproc.drawContours(input,contours,-1,lineColor,lineThickness);
+            Imgproc.line(input, new Point(centroidX - 10, centroidY), new Point(centroidX + 10, centroidY), crosshairCol, 5);
+            Imgproc.line(input, new Point(centroidX, centroidY - 10), new Point(centroidX, centroidY + 10), crosshairCol, 5);
+            centerOfLargestContour = new Point(centroidX,centroidY);
         }
 
-        return inputContours;
+        return input;
     }
 
     @Override
@@ -89,5 +89,9 @@ public class OpenCVSampleDetection implements VisionProcessor {
     @Override
     public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
 
+    }
+
+    public Point getCenterOfLargestContour(){
+        return centerOfLargestContour;
     }
 }

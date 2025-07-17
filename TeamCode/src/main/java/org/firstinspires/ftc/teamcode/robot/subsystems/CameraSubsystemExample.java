@@ -4,35 +4,29 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
-import org.firstinspires.ftc.teamcode.core.util.cameraProcessors.MyAprilTagProcessor;
 import org.firstinspires.ftc.teamcode.core.util.cameraProcessors.OpenCVSampleDetection;
 import org.firstinspires.ftc.teamcode.robot.constants.CameraConstants;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessorImpl;
-import org.opencv.core.Mat;
 
-import android.graphics.Canvas;
 import android.util.Size;
-public class CameraSubsystem implements Subsystem {
-    CameraSubsystem(){
+public class CameraSubsystemExample implements Subsystem {
+
+    CameraSubsystemExample(){
 
     }
-    static CameraSubsystem instance;
+    private Telemetry telemetry;
+    static CameraSubsystemExample instance;
     VisionPortal.Builder myVisionPortalBuilder;
     VisionPortal myVisionPortal;
-    MyAprilTagProcessor normalATprocessor;
     OpenCVSampleDetection openCVDetection;
-
+    AprilTagProcessor myAprilTagProcessor;
     void initOpenCV(){
         openCVDetection = new OpenCVSampleDetection();
     }
     AprilTagProcessor initAprilTag() {
-        AprilTagProcessor myAprilTagProcessor;
         // Create the AprilTag processor.
         myAprilTagProcessor = new AprilTagProcessor.Builder()
                 // The following default settings are available to comment/un-comment and edit as needed.
@@ -40,7 +34,7 @@ public class CameraSubsystem implements Subsystem {
                 .setDrawCubeProjection(true)
                 .setDrawTagOutline(false)
                 // .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-                // .setTagLibrary()
+                // .setTagLibrary() we have to set a custom tag library in fgc, unfortunately FIRST has yet to upload said tag library up until this moment
                 // .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
                 // .setCameraPose(CameraConstants.CameraPosition, CameraConstants.CameraOrientation)
 
@@ -63,7 +57,7 @@ public class CameraSubsystem implements Subsystem {
     }
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-        normalATprocessor = new MyAprilTagProcessor();
+        this.telemetry = telemetry;
         initOpenCV();
         // Create a new VisionPortal Builder object.
         myVisionPortalBuilder = new VisionPortal.Builder();
@@ -72,9 +66,8 @@ public class CameraSubsystem implements Subsystem {
         myVisionPortalBuilder.setCamera(hardwareMap.get(WebcamName.class, CameraConstants.WebcamName));      // Other choices are: RC phone camera and "switchable camera name".
 
         // Add the AprilTag Processor to the VisionPortal Builder.
-        myVisionPortalBuilder.addProcessor(normalATprocessor);//Adds April Tag detection processor
         myVisionPortalBuilder.addProcessor(openCVDetection);//Adds Basic OpenCVSampleDetection detection processor
-        //myVisionPortalBuilder.addProcessor(initAprilTag()); see if other works first, otherwise use this
+        myVisionPortalBuilder.addProcessor(initAprilTag());
         // Optional: set other custom features of the VisionPortal (4 are shown here).
         myVisionPortalBuilder.setCameraResolution(new Size(640, 480));  // Each resolution, for each camera model, needs calibration values for good pose estimation.
         myVisionPortalBuilder.setStreamFormat(VisionPortal.StreamFormat.YUY2);  // MJPEG format uses less bandwidth than the default YUY2.
@@ -85,7 +78,7 @@ public class CameraSubsystem implements Subsystem {
         myVisionPortal = myVisionPortalBuilder.build();
 
         myVisionPortal.setProcessorEnabled(openCVDetection, false);
-        myVisionPortal.setProcessorEnabled(normalATprocessor, false);
+        myVisionPortal.setProcessorEnabled(myAprilTagProcessor, false);
     }
 
     @Override
@@ -102,16 +95,35 @@ public class CameraSubsystem implements Subsystem {
 
     @Override
     public void execute(GamepadManager gamepadManager) {
-
+        if (openCVDetection.getCenterOfLargestContour() != null){
+            telemetry.addData("center of largest detection", "X = " + openCVDetection.getCenterOfLargestContour().x + "Y= " + openCVDetection.getCenterOfLargestContour().y);
+        } else {
+            telemetry.addLine("No openCV detection :(");
+        }
+        if (!myAprilTagProcessor.getDetections().isEmpty()){
+            telemetry.addData("detection of center of first april tag", "X = "+myAprilTagProcessor.getDetections().get(0).center.x,"Y = "+myAprilTagProcessor.getDetections().get(0).center.y);
+        } else {
+            telemetry.addLine("No april tag on frame");
+        }
     }
-    public static CameraSubsystem getInstance() {
+    public static CameraSubsystemExample getInstance() {
         if (instance == null) {
-            instance = new CameraSubsystem();
+            instance = new CameraSubsystemExample();
         }
         return instance;
     }
-
-    public void loopAprilTags(){
-
+    public void enableAprilTags(){
+        myVisionPortal.setProcessorEnabled(myAprilTagProcessor,true);
     }
+    public void disableAprilTags(){
+        myVisionPortal.setProcessorEnabled(myAprilTagProcessor,false);
+    }
+    public void enableOpenCV(){
+        myVisionPortal.setProcessorEnabled(openCVDetection,true);
+    }
+    public void disableOpenCV(){
+        myVisionPortal.setProcessorEnabled(openCVDetection,false);
+    }
+
+
 }

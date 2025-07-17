@@ -33,6 +33,7 @@ public class CameraSubsystemExample implements Subsystem {
                 .setDrawAxes(false)
                 .setDrawCubeProjection(true)
                 .setDrawTagOutline(false)
+                .setTagLibrary(CameraConstants.getFeedingTheFutureTagLibrary())
                 // .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
                 // .setTagLibrary() we have to set a custom tag library in fgc, unfortunately FIRST has yet to upload said tag library up until this moment
                 // .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)

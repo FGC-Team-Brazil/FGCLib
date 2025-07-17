@@ -36,8 +36,6 @@ public class CameraConstants {
                 .addTag(103, "Blue Nexus Goal - Field Center - Facing Food Warehouse", 160.0D, DistanceUnit.MM)
                 .addTag(104, "Blue Nexus Goal - Field Edge - Alliance Station", 160.0D, DistanceUnit.MM)
                 .addTag(105, "Blue Nexus Goal - Field Edge - Center Field", 160.0D, DistanceUnit.MM)
-                .addTag(106, "Red Nexus Goal - Field Edge - Center Field", 160.0D, DistanceUnit.MM)
-                .addTag(107, "Red Nexus Goal - Field Edge - Alliance Station", 160.0D, DistanceUnit.MM)
                 .build();
     }
 }

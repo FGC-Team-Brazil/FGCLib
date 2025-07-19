@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.core.util.cameraProcessors;
 import android.graphics.Canvas;
-import android.icu.text.Transliterator;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.*;
@@ -10,7 +8,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 
 public class OpenCVSampleDetection implements VisionProcessor {
-    Telemetry telemetry;
+
     public Scalar lowerHSV = new Scalar(6.0, 60.0, 85.0, 0.0);
     public Scalar upperHSV = new Scalar(69.0, 252.0, 255.0, 0.0);
     private Mat hsvMat = new Mat();

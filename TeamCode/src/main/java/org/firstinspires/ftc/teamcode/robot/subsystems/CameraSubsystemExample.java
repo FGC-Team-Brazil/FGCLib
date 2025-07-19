@@ -79,7 +79,7 @@ public class CameraSubsystemExample implements Subsystem {
         myVisionPortal = myVisionPortalBuilder.build();
 
         myVisionPortal.setProcessorEnabled(openCVDetection, false);
-        myVisionPortal.setProcessorEnabled(myAprilTagProcessor, false);
+        //myVisionPortal.setProcessorEnabled(myAprilTagProcessor, false);
     }
 
     @Override

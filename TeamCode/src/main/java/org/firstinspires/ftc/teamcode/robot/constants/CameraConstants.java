@@ -26,16 +26,14 @@ public class CameraConstants {
     public static final String WebcamName = "webcam1";
     public static final Position CameraPosition = new Position(DistanceUnit.CM, 0, 0, 0, 0);
     public static final YawPitchRollAngles CameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
-
-    //example of how to make an april tag lib since they wont release the darn robot manual with the april tags >:(
-    public static AprilTagLibrary getFeedingTheFutureTagLibrary() {
+    public static AprilTagLibrary getEcoEquilibriumTagLibrary() {
         return (new AprilTagLibrary.Builder())
-                .addTag(100, "Blue Nexus Goal - Field Center - Facing Platform", 160.0D, new VectorF(0,0,0), DistanceUnit.MM,new Quaternion(0,0,0,0,0))
-                .addTag(101, "Red Nexus Goal - Field Center - Facing Platform", 160.0D, DistanceUnit.MM)
-                .addTag(102, "Red Nexus Goal - Field Center - Facing Food Warehouse", 160.0D, DistanceUnit.MM)
-                .addTag(103, "Blue Nexus Goal - Field Center - Facing Food Warehouse", 160.0D, DistanceUnit.MM)
-                .addTag(104, "Blue Nexus Goal - Field Edge - Alliance Station", 160.0D, DistanceUnit.MM)
-                .addTag(105, "Blue Nexus Goal - Field Edge - Center Field", 160.0D, DistanceUnit.MM)
+                .addTag(100, "Red Side - Facing Audience", 160.0D, new VectorF(0,0,0), DistanceUnit.MM,new Quaternion(0,0,0,0,0))
+                .addTag(101, "Red Side - Facing Dispenser", 160.0D, DistanceUnit.MM)
+                .addTag(102, "Center - Facing Audience", 160.0D, DistanceUnit.MM)
+                .addTag(103, "Center - Facing Dispenser", 160.0D, DistanceUnit.MM)
+                .addTag(104, "Blue Side - Facing Audience", 160.0D, DistanceUnit.MM)
+                .addTag(105, "Blue Side - Facing Dispenser", 160.0D, DistanceUnit.MM)
                 .build();
     }
 }

@@ -23,9 +23,18 @@ public class CameraSubsystemExample implements Subsystem {
     VisionPortal myVisionPortal;
     OpenCVSampleDetection openCVDetection;
     AprilTagProcessor myAprilTagProcessor;
+    /* The original file is OpenCVSampleDetection and serves as an example of color
+    detection pipeline.
+
+     */
     void initOpenCV(){
         openCVDetection = new OpenCVSampleDetection();
     }
+    /*
+    This section is all the code needed to initialize the AprilTag Processor
+    Is does not need a separate file because the FTC SDK comes with a AprilTagProcessorBuilder
+    that already does most of the work needed
+     */
     AprilTagProcessor initAprilTag() {
         // Create the AprilTag processor.
         myAprilTagProcessor = new AprilTagProcessor.Builder()
@@ -33,11 +42,9 @@ public class CameraSubsystemExample implements Subsystem {
                 .setDrawAxes(false)
                 .setDrawCubeProjection(true)
                 .setDrawTagOutline(false)
-                .setTagLibrary(CameraConstants.getFeedingTheFutureTagLibrary())
-                // .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-                // .setTagLibrary() we have to set a custom tag library in fgc, unfortunately FIRST has yet to upload said tag library up until this moment
+                .setTagLibrary(CameraConstants.getEcoEquilibriumTagLibrary())
                 // .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-                // .setCameraPose(CameraConstants.CameraPosition, CameraConstants.CameraOrientation)
+                // .setCameraPose(CameraConstants.CameraPosition, CameraConstants.CameraOrientation) //the specific camera position can be set on the robot with this command
 
                 // == CAMERA CALIBRATION ==
                 // If you do not manually specify calibration parameters, the SDK will attempt
@@ -53,9 +60,14 @@ public class CameraSubsystemExample implements Subsystem {
         // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second (default)
         // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second (default)
         // Note: Decimation can be changed on-the-fly to adapt during a match.
-        myAprilTagProcessor.setDecimation(3);
+        myAprilTagProcessor.setDecimation(2);
         return myAprilTagProcessor;
     }
+    /*
+    On initialize() we set up the Vision Portal, which allows us to control all
+    active processors at the same time, when building a vision portal, pass all your
+    vision processors through the .addProcessor(Vision Processor) method to add them to the vision portal
+     */
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -79,7 +91,7 @@ public class CameraSubsystemExample implements Subsystem {
         myVisionPortal = myVisionPortalBuilder.build();
 
         myVisionPortal.setProcessorEnabled(openCVDetection, false);
-        //myVisionPortal.setProcessorEnabled(myAprilTagProcessor, false);
+        myVisionPortal.setProcessorEnabled(myAprilTagProcessor, true);
     }
 
     @Override
@@ -93,7 +105,9 @@ public class CameraSubsystemExample implements Subsystem {
         //myVisionPortal.setProcessorEnabled(myAprilTagProcessor, false);
         myVisionPortal.close();
     }
-
+    /*
+    Here we have a simple example of how data can be colected from the vision processors during run time
+     */
     @Override
     public void execute(GamepadManager gamepadManager) {
         if (openCVDetection.getCenterOfLargestContour() != null){
@@ -113,6 +127,7 @@ public class CameraSubsystemExample implements Subsystem {
         }
         return instance;
     }
+    //The following methods are how we can enable and disable processors by making calls from inside or outside the subsystem
     public void enableAprilTags(){
         myVisionPortal.setProcessorEnabled(myAprilTagProcessor,true);
     }

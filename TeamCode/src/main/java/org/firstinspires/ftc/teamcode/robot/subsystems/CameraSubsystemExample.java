@@ -9,9 +9,13 @@ import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.util.cameraProcessors.OpenCVSampleDetection;
 import org.firstinspires.ftc.teamcode.robot.constants.CameraConstants;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import android.util.Size;
+
+import java.util.ArrayList;
+
 public class CameraSubsystemExample implements Subsystem {
 
     CameraSubsystemExample(){
@@ -23,6 +27,7 @@ public class CameraSubsystemExample implements Subsystem {
     VisionPortal myVisionPortal;
     OpenCVSampleDetection openCVDetection;
     AprilTagProcessor myAprilTagProcessor;
+    ArrayList<AprilTagDetection> detectionList;
     /* The original file is OpenCVSampleDetection and serves as an example of color
     detection pipeline.
 
@@ -82,7 +87,7 @@ public class CameraSubsystemExample implements Subsystem {
         myVisionPortalBuilder.addProcessor(openCVDetection);//Adds Basic OpenCVSampleDetection detection processor
         myVisionPortalBuilder.addProcessor(initAprilTag());
         // Optional: set other custom features of the VisionPortal (4 are shown here).
-        myVisionPortalBuilder.setCameraResolution(new Size(640, 480));  // Each resolution, for each camera model, needs calibration values for good pose estimation.
+        myVisionPortalBuilder.setCameraResolution(new Size(1280, 720));  // Each resolution, for each camera model, needs calibration values for good pose estimation.
         myVisionPortalBuilder.setStreamFormat(VisionPortal.StreamFormat.YUY2);  // MJPEG format uses less bandwidth than the default YUY2.
         myVisionPortalBuilder.enableLiveView(true);   // Enable LiveView (RC preview).
         myVisionPortalBuilder.setAutoStopLiveView(true);     // Automatically stop LiveView (RC preview) when all vision processors are disabled.
@@ -115,10 +120,11 @@ public class CameraSubsystemExample implements Subsystem {
         } else {
             telemetry.addLine("No openCV detection :(");
         }
-        if (!myAprilTagProcessor.getDetections().isEmpty()){
-            telemetry.addData("detection of center of first april tag", "X = "+myAprilTagProcessor.getDetections().get(0).center.x,"Y = "+myAprilTagProcessor.getDetections().get(0).center.y);
+        detectionList = myAprilTagProcessor.getDetections();
+        if (!detectionList.isEmpty()) {
+            telemetry.addData("detection of center of first april tag", "X = " + detectionList.get(0).center.x + "Y = " + detectionList.get(0).center.y);
         } else {
-            telemetry.addLine("No april tag on frame");
+            telemetry.addLine("No april tag on frame ;(");
         }
     }
     public static CameraSubsystemExample getInstance() {

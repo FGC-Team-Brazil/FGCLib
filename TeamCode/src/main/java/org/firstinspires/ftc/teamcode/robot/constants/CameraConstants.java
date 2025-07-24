@@ -23,7 +23,7 @@ public class CameraConstants {
 
     // UNITS ARE METERS
     public static double TAG_SIZE = 0.166;
-    public static final String WebcamName = "webcam1";
+    public static final String WebcamName = "Webcam 1";
     public static final Position CameraPosition = new Position(DistanceUnit.CM, 0, 0, 0, 0);
     public static final YawPitchRollAngles CameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
     public static AprilTagLibrary getEcoEquilibriumTagLibrary() {

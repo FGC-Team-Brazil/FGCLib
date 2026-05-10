@@ -22,7 +22,15 @@ import org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants;
  * Look at the example to build your own subsystems
  * This example also shows how to use the GamepadManager
  * section of the LIB
+ * 
+ * To the Logger:
+ *  // Instead of this:
+ *  SubsystemExample example = new SubsystemExample();
+ *
+ *  // Use this: 
+ *  SubsystemExampleAutoLogged example = new SubsystemExampleAutoLogged();
  */
+@Autolog(name = "SubsystemExample Subsystem", filename = "SubsystemExampleSubsystem")
 public class SubsystemExample implements Subsystem {
     private static SubsystemExample instance;
     private Telemetry telemetry;

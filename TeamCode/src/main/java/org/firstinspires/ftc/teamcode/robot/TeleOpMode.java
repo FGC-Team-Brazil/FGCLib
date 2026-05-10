@@ -22,6 +22,7 @@ public class TeleOpMode extends OpMode {
     public void init() {
         robot.configGamepadManager(gamepad1, gamepad2);
         robot.init(hardwareMap, telemetry);
+        KoalaLog.setup(hardwareMap);
     }
 
     /**
@@ -38,6 +39,7 @@ public class TeleOpMode extends OpMode {
     @Override
     public void loop() {
         robot.loop();
+        AutoLogManager.periodic();
     }
 
     /**

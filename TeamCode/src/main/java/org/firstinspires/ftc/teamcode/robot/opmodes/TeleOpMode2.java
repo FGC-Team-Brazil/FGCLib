@@ -5,6 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.core.lib.Robot;
 
+import Ori.Coval.Logging.AutoLogManager;
+import Ori.Coval.Logging.Logger.KoalaLog;
+
 /**
  * The opmodes folder is where all the opmodes
  * will be written. Just the main TeleOp mode is
@@ -27,6 +30,7 @@ public class TeleOpMode2 extends OpMode {
     @Override
     public void start() {
         robot.start();
+        KoalaLog.start();
     }
 
     @Override
@@ -38,5 +42,6 @@ public class TeleOpMode2 extends OpMode {
     @Override
     public void stop() {
         robot.stop();
+        KoalaLog.stop();
     }
 }

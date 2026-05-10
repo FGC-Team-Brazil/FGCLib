@@ -5,6 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.core.lib.Robot;
 
+import Ori.Coval.Logging.AutoLogManager;
+import Ori.Coval.Logging.Logger.KoalaLog;
+
 /**
  * TeleOp class template for building TeleOp modes.
  * Look at the example to build your own TeleOps.
@@ -31,6 +34,7 @@ public class TeleOpMode extends OpMode {
     @Override
     public void start() {
         robot.start();
+        KoalaLog.start();
     }
 
     /**
@@ -48,5 +52,6 @@ public class TeleOpMode extends OpMode {
     @Override
     public void stop() {
         robot.stop();
+        KoalaLog.stop();
     }
 }

@@ -17,6 +17,8 @@ import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 import org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants;
 
+import Ori.Coval.Logging.AutoLog;
+
 /**
  * Example subsystem that implements the FGCLib.
  * Look at the example to build your own subsystems
@@ -30,7 +32,7 @@ import org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants;
  *  // Use this: 
  *  SubsystemExampleAutoLogged example = new SubsystemExampleAutoLogged();
  */
-@Autolog(name = "SubsystemExample Subsystem", filename = "SubsystemExampleSubsystem")
+@AutoLog
 public class SubsystemExample implements Subsystem {
     private static SubsystemExample instance;
     private Telemetry telemetry;

@@ -10,8 +10,6 @@ import static org.firstinspires.ftc.teamcode.core.lib.pid.PIDController.Mode.ANG
 import static org.firstinspires.ftc.teamcode.robot.constants.SubsystemExampleConstants.*;
 import static org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants.*;
 
-import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
@@ -32,6 +30,8 @@ public class SubsystemExample implements Subsystem {
     private TouchSensor limitLeft;
     private SmartGamepad operator;
     private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
+    private double targetAngle = 0;
+    private boolean isPidEnabled = false;
 
     private SubsystemExample() {
     }
@@ -66,7 +66,14 @@ public class SubsystemExample implements Subsystem {
     public void execute() {
         telemetry.addData("SubsystemExample Subsystem", "Running");
 
-        PIDController.calculate(TARGET_DEGREE, motorLeft.getCurrentPosition());
+        if (isPidEnabled) {
+            double power = PIDController.calculate(targetAngle, motorLeft.getCurrentPosition());
+            setPower(power);
+        }
+
+        if (isLimitLeft() || isLimitRight()) {
+            telemetry.addData("Limit Switch", "Triggered!");
+        }
     }
 
     /**
@@ -84,6 +91,24 @@ public class SubsystemExample implements Subsystem {
     public void stop() {
         motorRight.setPower(0);
         motorLeft.setPower(0);
+    }
+
+    public void setPower(double power) {
+        isPidEnabled = false;
+        motorLeft.setPower(power);
+        motorRight.setPower(power);
+    }
+
+    public void setTargetAngle(double angle) {
+        this.targetAngle = angle;
+        this.isPidEnabled = true;
+    }
+
+    public void resetEncoders() {
+        motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void resetEncoder(DcMotor motor) {

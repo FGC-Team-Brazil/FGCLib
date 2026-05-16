@@ -30,6 +30,17 @@ public class RobotContainer extends RobotContainerInternal {
               .whileActive(
                       () -> drivetrain.arcadeDrive(-driver.getLeftY(), driver.getRightX())
               );
+
+        operator.y().whenActive(() -> subsystemExample.setTargetAngle(90));
+        operator.a().whenActive(() -> subsystemExample.setTargetAngle(0));
+
+        operator.on(subsystemExample::isLimitLeft)
+                .or(operator.on(subsystemExample::isLimitRight))
+                .or(operator.start().and(operator.back()))
+                .whenActive(subsystemExample::resetEncoders);
+
+        operator.y().negate().and(operator.a().negate())
+                .whenActive(() -> subsystemExample.setPower(0));
     }
 
     /**

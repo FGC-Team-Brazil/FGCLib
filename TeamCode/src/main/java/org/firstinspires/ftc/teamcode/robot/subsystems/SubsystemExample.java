@@ -34,7 +34,7 @@ import Ori.Coval.Logging.AutoLog;
  */
 @AutoLog
 public class SubsystemExample implements Subsystem {
-    private static SubsystemExample instance;
+    private static SubsystemExampleAutoLogged instance;
     private Telemetry telemetry;
     private DcMotor motorRight;
     private DcMotor motorLeft;
@@ -43,7 +43,7 @@ public class SubsystemExample implements Subsystem {
     private SmartGamepad operator;
     private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
 
-    private SubsystemExample() {
+    public SubsystemExample() {
     }
 
     /**
@@ -165,9 +165,9 @@ public class SubsystemExample implements Subsystem {
      * with the getInstance method
      * @return SubsystemExample SingleTon
      */
-    public static synchronized SubsystemExample getInstance() {
+    public static synchronized SubsystemExampleAutoLogged getInstance() {
         if (instance == null) {
-            instance = new SubsystemExample();
+            instance = new SubsystemExampleAutoLogged();
         }
         return instance;
     }

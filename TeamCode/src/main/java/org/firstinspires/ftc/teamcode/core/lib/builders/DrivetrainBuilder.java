@@ -13,6 +13,8 @@ import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 
+import Ori.Coval.Logging.AutoLog;
+
 
 /**
  * DrivetrainBuilder is a helper class that assists on the creation
@@ -26,8 +28,9 @@ import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
  * drivetrains
  * </p>
  */
+@AutoLog
 public class DrivetrainBuilder implements Subsystem {
-    private static DrivetrainBuilder instance;
+    private static DrivetrainBuilderAutoLogged instance;
     private DcMotorSimple.Direction motorRightDirection;
     private DcMotorSimple.Direction motorLeftDirection;
     private String motorLeftName;
@@ -38,7 +41,7 @@ public class DrivetrainBuilder implements Subsystem {
     private Telemetry telemetry;
     private SmartGamepad driver;
 
-    private DrivetrainBuilder() {
+    public DrivetrainBuilder() {
     }
 
     /**
@@ -138,11 +141,11 @@ public class DrivetrainBuilder implements Subsystem {
      * with the getInstance method
      * @return DriveTrainBuilder SingleTon
      */
-    public static DrivetrainBuilder getInstance() {
+    public static DrivetrainBuilderAutoLogged getInstance() {
         if (instance == null) {
-            synchronized (DrivetrainBuilder.class) {
+            synchronized (DrivetrainBuilderAutoLogged.class) {
                 if (instance == null) {
-                    instance = new DrivetrainBuilder();
+                    instance = new DrivetrainBuilderAutoLogged();
                 }
             }
         }

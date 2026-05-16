@@ -35,9 +35,7 @@ public interface Subsystem {
 
     /**
      * execute is supposed to run when the start button is pressed.
-     * It loops till the end of the opMode.
-     * @param gamepadManager
      */
-    void execute(GamepadManager gamepadManager);
+    void execute();
 
 }

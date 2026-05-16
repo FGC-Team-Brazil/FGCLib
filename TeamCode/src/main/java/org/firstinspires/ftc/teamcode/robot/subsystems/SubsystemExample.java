@@ -61,61 +61,12 @@ public class SubsystemExample implements Subsystem {
 
     /**
      * Execute method from the Subsystem Interface
-     * @param gamepadManager
      */
     @Override
-    public void execute(GamepadManager gamepadManager) {
-        operator = gamepadManager.getOperator();
-
+    public void execute() {
         telemetry.addData("SubsystemExample Subsystem", "Running");
 
         PIDController.calculate(TARGET_DEGREE, motorLeft.getCurrentPosition());
-
-        operator.whileButtonLeftBumper()
-                .and(operator.isButtonRightBumper())
-                .run(() -> {
-                    PIDController.setPowerMotor(motorLeft);
-                    PIDController.setPowerMotor(motorRight);
-                });
-
-        operator.whileButtonRightBumper()
-                .run(() -> {
-                    motorLeft.setPower(0);
-                    PIDController.setPowerMotor(motorRight);
-                });
-
-        operator.whileButtonLeftBumper()
-                .run(() -> {
-                    motorRight.setPower(0);
-                    PIDController.setPowerMotor(motorLeft);
-                });
-
-        operator.whileLeftTriggerPressed()
-                .and(operator.isRightTriggerPressed())
-                .andNot(isLimitRight())
-                .andNot(isLimitLeft())
-                .run(() -> {
-                    motorRight.setPower(operator.getRightTrigger());
-                    motorLeft.setPower(operator.getLeftTrigger());
-                });
-
-        operator.whileLeftTriggerPressed()
-                .andNot(isLimitLeft())
-                .run(() -> {
-                    motorLeft.setPower(operator.getLeftTrigger());
-                }, () -> {
-                    resetEncoder(motorLeft);
-                    operator.rumbleTimer( 200);
-                });
-
-        operator.whileRightTriggerPressed()
-                .andNot(isLimitRight())
-                .run(() -> {
-                    motorRight.setPower(operator.getRightTrigger());
-                }, () -> {
-                    resetEncoder(motorRight);
-                    operator.rumbleTimer(200);
-                });
     }
 
     /**
@@ -135,7 +86,7 @@ public class SubsystemExample implements Subsystem {
         motorLeft.setPower(0);
     }
 
-    private void resetEncoder(DcMotor motor) {
+    public void resetEncoder(DcMotor motor) {
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }

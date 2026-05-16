@@ -7,10 +7,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
-import org.firstinspires.ftc.teamcode.robot.RobotSubsystems;
+import org.firstinspires.ftc.teamcode.robot.RobotContainer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +23,8 @@ import java.util.List;
 public class Robot {
     private List<Subsystem> subsystems;
     private Telemetry telemetry;
-    private GamepadManager gamepadManager;
+
+    private final RobotContainer container = new RobotContainer();
 
     public Robot() {
     }
@@ -34,15 +35,7 @@ public class Robot {
      * @param operator
      */
     public void configGamepadManager(@NonNull Gamepad driver, @NonNull Gamepad operator) {
-        gamepadManager = GamepadManager.use(driver, operator);
-    }
-
-    /**
-     * Configure the gamepad that will be used to control the robot
-     * @param driver
-     */
-    public void configGamepadManager(@NonNull Gamepad driver){
-        gamepadManager = GamepadManager.use(driver);
+        container.setup(new SmartGamepad(driver), new SmartGamepad(operator));
     }
 
     /**
@@ -52,7 +45,7 @@ public class Robot {
      */
     public void init(@NonNull HardwareMap hardwareMap, @NonNull Telemetry telemetry) {
         this.telemetry = telemetry;
-        this.subsystems = RobotSubsystems.get();
+        this.subsystems = container.get();
 
         subsystems.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
 
@@ -71,8 +64,9 @@ public class Robot {
      * Run the loop method from all subsystems
      */
     public void loop() {
-        subsystems.forEach(subsystem -> subsystem.execute(gamepadManager));
+        subsystems.forEach(Subsystem::execute);
         telemetry.update();
+        container.update();
     }
 
     /**

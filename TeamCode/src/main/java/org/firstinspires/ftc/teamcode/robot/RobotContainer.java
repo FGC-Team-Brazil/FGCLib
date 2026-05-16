@@ -24,6 +24,7 @@ public class RobotContainer extends RobotContainerInternal {
 
     @Override
     public void configureBindings() {
+        // Driver controller
         driver.leftY(
                 Constants.Globals.Controller.CONTROLLER_DEADBAND)
               .or(driver.rightX(Constants.Globals.Controller.CONTROLLER_DEADBAND))
@@ -31,6 +32,7 @@ public class RobotContainer extends RobotContainerInternal {
                       () -> drivetrain.arcadeDrive(-driver.getLeftY(), driver.getRightX())
               );
 
+        // Operator controller
         operator.y().whenActive(() -> subsystemExample.setTargetAngle(90));
         operator.a().whenActive(() -> subsystemExample.setTargetAngle(0));
 

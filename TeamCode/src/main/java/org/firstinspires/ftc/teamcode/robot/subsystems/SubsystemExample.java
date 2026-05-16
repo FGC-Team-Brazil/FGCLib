@@ -7,13 +7,12 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import static org.firstinspires.ftc.teamcode.core.lib.pid.PIDController.Mode.ANGLE;
-import static org.firstinspires.ftc.teamcode.robot.constants.SubsystemExampleConstants.*;
-import static org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants.*;
+import static org.firstinspires.ftc.teamcode.robot.Constants.Globals.*;
+import static org.firstinspires.ftc.teamcode.robot.Constants.SubsystemExample.*;
 
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
-import org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants;
 
 /**
  * Example subsystem that implements the FGCLib.

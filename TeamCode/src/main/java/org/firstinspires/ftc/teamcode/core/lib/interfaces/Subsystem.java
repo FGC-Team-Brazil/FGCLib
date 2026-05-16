@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.core.lib.interfaces;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 
 /**
  * Standard interface used to build subsystems.

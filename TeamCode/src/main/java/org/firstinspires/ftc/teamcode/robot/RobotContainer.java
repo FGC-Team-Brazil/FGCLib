@@ -25,9 +25,8 @@ public class RobotContainer extends RobotContainerInternal {
     @Override
     public void configureBindings() {
         // Driver controller
-        driver.leftY(
-                Constants.Globals.Controller.CONTROLLER_DEADBAND)
-              .or(driver.rightX(Constants.Globals.Controller.CONTROLLER_DEADBAND))
+        driver.leftY()
+              .or(driver.rightX())
               .whileActive(
                       () -> drivetrain.arcadeDrive(-driver.getLeftY(), driver.getRightX())
               );

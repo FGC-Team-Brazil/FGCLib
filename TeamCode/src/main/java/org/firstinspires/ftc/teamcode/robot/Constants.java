@@ -1,16 +1,10 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 public class Constants {
+
     // Global constants
     public static class Globals {
-        public static final int HD_HEX_TICKS_PER_REVOLUTION = 22;
         public static final int CORE_HEX_TICKS_PER_REVOLUTION = 288;
-
-        public static class Controller {
-            public static final double CONTROLLER_DEADBAND = 0.1;
-            public static final double TRIGGER_PRESSED_THRESHOLD_VALUE = 0.9;
-
-        }
     }
 
     public static class Drivetrain {

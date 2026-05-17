@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.core.lib.gamepad;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.robot.Constants.Globals;
-
 /**
  * GamepadButton is a utility class that intermediates the access to the gamepads.
  * The class maps all the buttons of the gamepads, so other classes can use them.
@@ -107,11 +105,11 @@ public class GamepadButton {
     }
 
     public boolean isLeftTriggerPressed() {
-        return gamepad.left_trigger > Globals.Controller.TRIGGER_PRESSED_THRESHOLD_VALUE;
+        return gamepad.left_trigger > ControllerConstants.TRIGGER_PRESSED_THRESHOLD_VALUE;
     }
 
     public boolean isRightTriggerPressed() {
-        return gamepad.right_trigger > Globals.Controller.TRIGGER_PRESSED_THRESHOLD_VALUE;
+        return gamepad.right_trigger > ControllerConstants.TRIGGER_PRESSED_THRESHOLD_VALUE;
     }
 
     public boolean isButtonStart() {

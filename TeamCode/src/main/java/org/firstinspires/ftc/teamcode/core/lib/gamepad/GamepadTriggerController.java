@@ -43,7 +43,7 @@ public class GamepadTriggerController {
     public TriggerBinding rightStick() { return on(smartGamepad::isButtonRightStickButton); }
 
     public TriggerBinding leftX() {
-        return leftX(0.5);
+        return leftX(ControllerConstants.STICK_PRESSED_THRESHOLD_VALUE);
     }
 
     public TriggerBinding leftX(double threshold) {
@@ -51,7 +51,7 @@ public class GamepadTriggerController {
     }
 
     public TriggerBinding leftY() {
-        return leftY(0.5);
+        return leftY(ControllerConstants.STICK_PRESSED_THRESHOLD_VALUE);
     }
 
     public TriggerBinding leftY(double threshold) {
@@ -59,7 +59,7 @@ public class GamepadTriggerController {
     }
 
     public TriggerBinding rightX() {
-        return rightX(0.5);
+        return rightX(ControllerConstants.STICK_PRESSED_THRESHOLD_VALUE);
     }
 
     public TriggerBinding rightX(double threshold) {
@@ -67,7 +67,7 @@ public class GamepadTriggerController {
     }
 
     public TriggerBinding rightY() {
-        return rightY(0.5);
+        return rightY(ControllerConstants.STICK_PRESSED_THRESHOLD_VALUE);
     }
 
     public TriggerBinding rightY(double threshold) {

@@ -31,13 +31,13 @@ import Ori.Coval.Logging.AutoLog;
 @AutoLog
 public class DrivetrainBuilder implements Subsystem {
     private static DrivetrainBuilderAutoLogged instance;
-    private DcMotorSimple.Direction motorRightDirection;
-    private DcMotorSimple.Direction motorLeftDirection;
-    private String motorLeftName;
-    private String motorRightName;
+    public DcMotorSimple.Direction motorRightDirection;
+    public DcMotorSimple.Direction motorLeftDirection;
+    public String motorLeftName;
+    public String motorRightName;
     private double limiter;
-    private DcMotor motorRight;
-    private DcMotor motorLeft;
+    public DcMotor motorRight;
+    public DcMotor motorLeft;
     private Telemetry telemetry;
     private SmartGamepad driver;
 

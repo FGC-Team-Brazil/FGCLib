@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.robot.Constants;
 
@@ -49,8 +48,7 @@ public class Drivetrain implements Subsystem {
     }
 
     @Override
-    public void start() {
-    }
+    public void start() {}
 
     @Override
     public void stop() {

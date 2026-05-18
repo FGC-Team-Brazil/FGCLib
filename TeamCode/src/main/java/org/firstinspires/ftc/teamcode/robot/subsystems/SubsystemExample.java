@@ -11,7 +11,6 @@ import static org.firstinspires.ftc.teamcode.robot.Constants.Globals.*;
 import static org.firstinspires.ftc.teamcode.robot.Constants.SubsystemExample.*;
 
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 
 /**
@@ -27,7 +26,6 @@ public class SubsystemExample implements Subsystem {
     private DcMotor motorLeft;
     private TouchSensor limitRight;
     private TouchSensor limitLeft;
-    private SmartGamepad operator;
     private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
     private double targetAngle = 0;
     private boolean isPidEnabled = false;

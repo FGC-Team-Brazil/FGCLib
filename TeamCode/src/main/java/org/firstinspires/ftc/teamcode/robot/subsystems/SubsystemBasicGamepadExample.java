@@ -18,14 +18,17 @@ import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 import org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants;
 
+import Ori.Coval.Logging.AutoLog;
+
 /**
  * Example subsystem that implements the FGCLib.
  * Look at the example to build your own subsystems.
  * This example does the same thing as Subsystem example but
  * without using the GamepadManager portion of the lib
  */
+@AutoLog
 public class SubsystemBasicGamepadExample implements Subsystem {
-    private static SubsystemBasicGamepadExample instance;
+    private static SubsystemBasicGamepadExampleAutoLogged instance;
     private Telemetry telemetry;
     private DcMotor motorRight;
     private DcMotor motorLeft;
@@ -33,7 +36,7 @@ public class SubsystemBasicGamepadExample implements Subsystem {
     private TouchSensor limitLeft;
     private Gamepad operator;
     private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
-    private SubsystemBasicGamepadExample(){
+    public SubsystemBasicGamepadExample(){
 
     }
 
@@ -140,9 +143,9 @@ public class SubsystemBasicGamepadExample implements Subsystem {
      * with the getInstance method
      * @return SubsystemBasicGamepadExample SingleTon
      */
-    public static SubsystemBasicGamepadExample getInstance() {
+    public static SubsystemBasicGamepadExampleAutoLogged getInstance() {
         if (instance == null) {
-            instance = new SubsystemBasicGamepadExample();
+            instance = new SubsystemBasicGamepadExampleAutoLogged();
         }
         return instance;
     }

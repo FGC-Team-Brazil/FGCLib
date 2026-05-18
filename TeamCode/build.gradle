@@ -26,8 +26,8 @@ android {
 
 dependencies {
     implementation project(':FtcRobotController')
-    implementation 'com.github.ori-coval.Koala-Log:KoalaLogger:1.5.3'
-    annotationProcessor 'com.github.ori-coval.Koala-Log:KoalaLoggingProcessor:1.5.3'
+    implementation 'com.github.ori-coval.Koala-Log:KoalaLogger:1.5.5'
+    annotationProcessor 'com.github.ori-coval.Koala-Log:KoalaLoggingProcessor:1.5.5'
 }
 
 repositories {

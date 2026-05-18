@@ -13,14 +13,13 @@ import org.firstinspires.ftc.teamcode.core.lib.Robot;
  */
 @TeleOp(name = "TeleOp", group = "Official TeleOp")
 public class TeleOpMode extends OpMode {
-    private final Robot robot = new Robot();
+    private final Robot robot = new Robot(gamepad1, gamepad2);
 
     /**
      * Runs the initialize method of all subsystems
      */
     @Override
     public void init() {
-        robot.configGamepadManager(gamepad1, gamepad2);
         robot.init(hardwareMap, telemetry);
     }
 

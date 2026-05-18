@@ -4,31 +4,28 @@ import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadTriggerController;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 
 public class RobotContainerInternal {
-     public GamepadTriggerController driver;
-     public GamepadTriggerController operator;
+     private final GamepadTriggerController driver;
+     private final GamepadTriggerController operator;
 
-    public void setup(SmartGamepad driverGamepad, SmartGamepad operatorGamepad) {
-        if (driverGamepad != null) {
-            this.driver = new GamepadTriggerController(driverGamepad);
-        }
+    public RobotContainerInternal(GamepadTriggerController driverGamepad, GamepadTriggerController operatorGamepad) {
+        this.driver = driverGamepad;
+        this.operator = operatorGamepad;
 
-        if (operatorGamepad != null) {
-            this.operator = new GamepadTriggerController(operatorGamepad);
-        }
-
-        if (driverGamepad != null && operatorGamepad != null) {
-            configureBindings();
-        }
+        configureBindings();
     }
 
     public void update() {
-        if (driver != null) {
-            driver.update();
-        }
-        if (operator != null) {
-            operator.update();
-        }
+        driver.update();
+        operator.update();
     }
 
     protected void configureBindings() {}
+
+    protected GamepadTriggerController getDriver() {
+        return driver;
+    }
+
+    protected GamepadTriggerController getOperator() {
+        return operator;
+    }
 }

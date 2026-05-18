@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadTriggerController;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.util.RobotContainerInternal;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
@@ -19,12 +20,15 @@ public class RobotContainer extends RobotContainerInternal {
     private final SubsystemExample subsystemExample = SubsystemExample.getInstance();
 
     // Add more subsystems here and to the array.
-
-    public RobotContainer() {}
+    public RobotContainer(GamepadTriggerController driver, GamepadTriggerController operator) {
+        super(driver, operator);
+    }
 
     @Override
     public void configureBindings() {
+
         // Driver controller
+        GamepadTriggerController driver = getDriver();
         driver.leftY()
               .or(driver.rightX())
               .whileActive(
@@ -32,6 +36,8 @@ public class RobotContainer extends RobotContainerInternal {
               );
 
         // Operator controller
+        GamepadTriggerController operator = getOperator();
+
         operator.y().whenActive(() -> subsystemExample.setTargetAngle(90));
         operator.a().whenActive(() -> subsystemExample.setTargetAngle(0));
 

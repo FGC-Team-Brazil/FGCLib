@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadTriggerController;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.robot.RobotContainer;
@@ -23,18 +24,10 @@ public class Robot {
     private List<Subsystem> subsystems;
     private Telemetry telemetry;
 
-    private final RobotContainer container = new RobotContainer();
+    private final RobotContainer container;
 
-    public Robot() {
-    }
-
-    /**
-     * Configure the gamepads that will be used to control the robot
-     * @param driver
-     * @param operator
-     */
-    public void configGamepadManager(@NonNull Gamepad driver, @NonNull Gamepad operator) {
-        container.setup(new SmartGamepad(driver), new SmartGamepad(operator));
+    public Robot(Gamepad driver, Gamepad operator) {
+        container = new RobotContainer(new GamepadTriggerController(new SmartGamepad(driver)), new GamepadTriggerController(new SmartGamepad(operator)));
     }
 
     /**

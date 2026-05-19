@@ -54,8 +54,15 @@ public class SubsystemBasicGamepadExample implements Subsystem {
         motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        pidController = PIDController.forArm(PID.kP, PID.kI, PID.kD, PID.kF);
-        pidController.setTarget(TARGET_DEGREE);
+
+        // ── PID Controller ────────────────────────────────────────────────────
+        // Create the controller with your tuned constants from SubsystemExampleConstants.
+        // enableMotionProfile() makes the movement smooth — no sudden jerks.
+        // enableVoltageCompensation() keeps behavior consistent as the battery drains.
+        // Both are optional: remove either line if you don't need it.
+        pidController = new PIDController(PID.kP, PID.kI, PID.kD, PID.kF);
+        pidController.enableMotionProfile(2200, 4400);
+        pidController.enableVoltageCompensation(hardwareMap, 12);
 
         telemetry.addData("SubsystemBasicGamepadExample", "Initialized");
     }
@@ -67,7 +74,7 @@ public class SubsystemBasicGamepadExample implements Subsystem {
         // ── PID control ───────────────────────────────────────────────────────
         // Both motors move the same mechanism, so one encoder is enough.
         // motorLeft is used as the reference — its position represents both.
-        double power = pidController.calculate(motorLeft.getCurrentPosition());
+        double power = pidController.calculate(TARGET_DEGREE, motorLeft.getCurrentPosition());
 
         // Both bumpers → move both motors to target angle via PID
         if (operator.left_bumper && operator.right_bumper) {

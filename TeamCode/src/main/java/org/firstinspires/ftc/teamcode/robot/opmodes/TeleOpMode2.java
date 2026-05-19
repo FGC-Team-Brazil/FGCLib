@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.core.lib.Robot;
+import org.firstinspires.ftc.teamcode.robot.RobotContainer;
 
 /**
  * The opmodes folder is where all the opmodes
@@ -15,11 +15,11 @@ import org.firstinspires.ftc.teamcode.core.lib.Robot;
  */
 @TeleOp(name = "TeleOp 2", group = "TeleOp 2")
 public class TeleOpMode2 extends OpMode {
-    private Robot robot;
+    private RobotContainer robot;
 
     @Override
     public void init() {
-        robot = new Robot(gamepad1, gamepad2);
+        robot = new RobotContainer(gamepad1, gamepad2);
         robot.init(hardwareMap, telemetry);
     }
 

@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.core.lib.Robot;
-
 /**
  * TeleOp class template for building TeleOp modes.
  * Look at the example to build your own TeleOps.
@@ -13,14 +11,14 @@ import org.firstinspires.ftc.teamcode.core.lib.Robot;
  */
 @TeleOp(name = "TeleOp", group = "Official TeleOp")
 public class TeleOpMode extends OpMode {
-    private Robot robot;
+    private RobotContainer robot;
 
     /**
      * Runs the initialize method of all subsystems
      */
     @Override
     public void init() {
-        robot = new Robot(gamepad1, gamepad2);
+        robot = new RobotContainer(gamepad1, gamepad2);
         robot.init(hardwareMap, telemetry);
     }
 

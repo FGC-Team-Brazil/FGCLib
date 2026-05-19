@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
+
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadTriggerController;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.util.RobotContainerInternal;
@@ -16,19 +18,26 @@ import java.util.List;
  */
 public class RobotContainer extends RobotContainerInternal {
 
+    private GamepadTriggerController driver;
+    private GamepadTriggerController operator;
+
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final SubsystemExample subsystemExample = SubsystemExample.getInstance();
 
-    // Add more subsystems here and to the array.
-    public RobotContainer(GamepadTriggerController driver, GamepadTriggerController operator) {
-        super(driver, operator);
+    public RobotContainer(Gamepad driver, Gamepad operator) {
+        super(driver, operator, Arrays.asList(
+                Drivetrain.getInstance(),
+                SubsystemExample.getInstance()
+                // Add more subsystems here.
+        ));
     }
 
     @Override
     public void configureBindings() {
+        driver = getDriver();
+        operator = getOperator();
 
         // Driver controller
-        GamepadTriggerController driver = getDriver();
         driver.leftY()
               .or(driver.rightX())
               .whileActive(
@@ -36,8 +45,6 @@ public class RobotContainer extends RobotContainerInternal {
               );
 
         // Operator controller
-        GamepadTriggerController operator = getOperator();
-
         operator.y().whenActive(() -> subsystemExample.setTargetAngle(90));
         operator.a().whenActive(() -> subsystemExample.setTargetAngle(0));
 
@@ -48,16 +55,5 @@ public class RobotContainer extends RobotContainerInternal {
 
         operator.y().negate().and(operator.a().negate())
                 .whenActive(() -> subsystemExample.setPower(0));
-    }
-
-    /**
-     * Get all the subsystem instances
-     * <p>puts all subsystems in this little array to be used by
-     * the Robot class to run everything in an organized manner</p>
-     * @return list with all subsystems
-     */
-    public List<Subsystem> get() {
-        // Add your subsystems here:
-        return Arrays.asList(drivetrain, subsystemExample);
     }
 }

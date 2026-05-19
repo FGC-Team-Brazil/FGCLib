@@ -20,10 +20,10 @@ public class RobotContainerInternal {
 
     private final List<Subsystem> subsystems;
 
-    public RobotContainerInternal(Gamepad driver, Gamepad operator, List<Subsystem> subsystems) {
+    public RobotContainerInternal(Gamepad driver, Gamepad operator, Subsystem... subsystems) {
         this.driver = new GamepadController(new SmartGamepad(driver));
         this.operator = new GamepadController(new SmartGamepad(operator));
-        this.subsystems = subsystems;
+        this.subsystems = List.of(subsystems);
     }
 
 

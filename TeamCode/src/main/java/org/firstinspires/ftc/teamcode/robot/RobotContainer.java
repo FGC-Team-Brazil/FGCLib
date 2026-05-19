@@ -22,11 +22,11 @@ public class RobotContainer extends RobotContainerInternal {
     private final SubsystemExample subsystemExample = SubsystemExample.getInstance();
 
     public RobotContainer(Gamepad driver, Gamepad operator) {
-        super(driver, operator, Arrays.asList(
-                drivetrain,
-                subsystemExample
+        super(driver, operator,
+                Drivetrain.getInstance(),
+                SubsystemExample.getInstance()
                 // Add more subsystems here.
-        ));
+        );
     }
 
     @Override

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class GamepadTriggerController {
+public class GamepadController {
     private final List<TriggerBinding> bindings = new ArrayList<>();
     private final SmartGamepad smartGamepad;
 
-    public GamepadTriggerController(SmartGamepad smartGamepad) {
+    public GamepadController(SmartGamepad smartGamepad) {
         this.smartGamepad = smartGamepad;
     }
 

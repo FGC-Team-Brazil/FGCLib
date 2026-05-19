@@ -6,23 +6,23 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadTriggerController;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadController;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 
 import java.util.List;
 
 public class RobotContainerInternal {
-     private final GamepadTriggerController driver;
-     private final GamepadTriggerController operator;
+     private final GamepadController driver;
+     private final GamepadController operator;
 
     private Telemetry telemetry;
 
     private final List<Subsystem> subsystems;
 
     public RobotContainerInternal(Gamepad driver, Gamepad operator, List<Subsystem> subsystems) {
-        this.driver = new GamepadTriggerController(new SmartGamepad(driver));
-        this.operator = new GamepadTriggerController(new SmartGamepad(operator));
+        this.driver = new GamepadController(new SmartGamepad(driver));
+        this.operator = new GamepadController(new SmartGamepad(operator));
         this.subsystems = subsystems;
     }
 
@@ -70,9 +70,9 @@ public class RobotContainerInternal {
 
     protected void configureBindings() {}
 
-    protected GamepadTriggerController getDriver() { return driver; }
+    protected GamepadController getDriver() { return driver; }
 
-    protected GamepadTriggerController getOperator() {
+    protected GamepadController getOperator() {
         return operator;
     }
 }

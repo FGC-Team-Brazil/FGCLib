@@ -2,14 +2,12 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadTriggerController;
-import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadController;
 import org.firstinspires.ftc.teamcode.core.util.RobotContainerInternal;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * RobotSubsystems class lists all the existing subsystems.
@@ -18,8 +16,8 @@ import java.util.List;
  */
 public class RobotContainer extends RobotContainerInternal {
 
-    private GamepadTriggerController driver;
-    private GamepadTriggerController operator;
+    private GamepadController driver;
+    private GamepadController operator;
 
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final SubsystemExample subsystemExample = SubsystemExample.getInstance();

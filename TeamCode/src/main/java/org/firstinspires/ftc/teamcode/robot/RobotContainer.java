@@ -10,9 +10,8 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
 import java.util.Arrays;
 
 /**
- * RobotSubsystems class lists all the existing subsystems.
- * All the subsystems listed here will be execute when the Robot class run.
- * Put your subsystems here always after you create a new one
+ * RobotContainer class handle instance configurations.
+ * All the subsystems listed in constructor here will be execute when the library classes run.
  */
 public class RobotContainer extends RobotContainerInternal {
 
@@ -24,8 +23,8 @@ public class RobotContainer extends RobotContainerInternal {
 
     public RobotContainer(Gamepad driver, Gamepad operator) {
         super(driver, operator, Arrays.asList(
-                Drivetrain.getInstance(),
-                SubsystemExample.getInstance()
+                drivetrain,
+                subsystemExample
                 // Add more subsystems here.
         ));
     }

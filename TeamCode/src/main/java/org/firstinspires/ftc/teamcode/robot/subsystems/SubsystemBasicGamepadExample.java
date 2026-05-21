@@ -36,7 +36,7 @@ public class SubsystemBasicGamepadExample implements Subsystem {
     private TouchSensor limitLeft;
     private Gamepad operator;
     private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
-    public SubsystemBasicGamepadExample(){
+    protected SubsystemBasicGamepadExample(){
 
     }
 

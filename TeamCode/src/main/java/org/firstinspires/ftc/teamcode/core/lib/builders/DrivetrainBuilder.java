@@ -45,7 +45,7 @@ public class DrivetrainBuilder implements Subsystem {
     public DcMotor motorLeft;
     private SmartGamepad driver;
 
-    public DrivetrainBuilder() {
+    protected DrivetrainBuilder() {
     }
 
     /**
@@ -146,7 +146,7 @@ public class DrivetrainBuilder implements Subsystem {
      * @return DriveTrainBuilder SingleTon
      */
     public static DrivetrainBuilder getInstance() {
-        if (instance == null) {
+        if (isNull(instance)) {
             instance = new DrivetrainBuilderAutoLogged();
         }
         return instance;

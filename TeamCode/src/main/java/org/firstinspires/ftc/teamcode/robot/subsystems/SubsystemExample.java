@@ -43,7 +43,7 @@ public class SubsystemExample implements Subsystem {
     private SmartGamepad operator;
     private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
 
-    public SubsystemExample() {
+    protected SubsystemExample() {
     }
 
     /**

@@ -35,6 +35,9 @@ public class SubsystemExample implements Subsystem {
     private SmartGamepad operator;
     private PIDController pidController;
 
+    private final double TICKS_PER_REV = 537.7;
+    private final double TICKS_PER_DEGREE = TICKS_PER_REV / 360.0;
+
     private SubsystemExample() {}
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
@@ -54,10 +57,6 @@ public class SubsystemExample implements Subsystem {
         motorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // ── PID Controller ────────────────────────────────────────────────────
-        // Create the controller with your tuned constants from SubsystemExampleConstants.
-        // enableMotionProfile() makes the movement smooth — no sudden jerks.
-        // enableVoltageCompensation() keeps behavior consistent as the battery drains.
-        // Both are optional: remove either line if you don't need it.
         pidController = new PIDController(PID.kP, PID.kI, PID.kD, PID.kF);
         pidController.enableMotionProfile(2200, 4400);
         pidController.enableVoltageCompensation(hardwareMap);
@@ -69,12 +68,23 @@ public class SubsystemExample implements Subsystem {
     public void execute(GamepadManager gamepadManager) {
         operator = gamepadManager.getOperator();
 
-        // ── PID control ───────────────────────────────────────────────────────
-        // Both motors move the same mechanism, so one encoder is enough.
-        // motorLeft is used as the reference — its position represents both.
-        double power = pidController.calculate(TARGET_DEGREE, motorLeft.getCurrentPosition());
+        boolean usePID = operator.isButtonLeftBumper() || operator.isButtonRightBumper();
+        boolean useManual = operator.isLeftTriggerPressed() || operator.isRightTriggerPressed();
+        double power;
 
-        // Both bumpers → move both motors to target angle via PID
+        if (usePID) {
+            double targetTicks = TARGET_DEGREE * TICKS_PER_DEGREE;
+            power = pidController.calculate(targetTicks, motorLeft.getCurrentPosition());
+        } else {
+            power = 0;
+            pidController.reset();
+        }
+
+        if (!usePID && !useManual) {
+            motorLeft.setPower(0);
+            motorRight.setPower(0);
+        }
+
         operator.whileButtonLeftBumper()
                 .and(operator.isButtonRightBumper())
                 .run(() -> {
@@ -82,23 +92,21 @@ public class SubsystemExample implements Subsystem {
                     motorRight.setPower(power);
                 });
 
-        // Right bumper only → move right motor to target
         operator.whileButtonRightBumper()
+                .andNot(operator.isButtonLeftBumper())
                 .run(() -> {
                     motorLeft.setPower(0);
                     motorRight.setPower(power);
                 });
 
-        // Left bumper only → move left motor to target
         operator.whileButtonLeftBumper()
+                .andNot(operator.isButtonRightBumper())
                 .run(() -> {
                     motorRight.setPower(0);
                     motorLeft.setPower(power);
                 });
 
-        // ── Manual control with limit switch protection ────────────────────────
-
-        // Both triggers → drive both motors manually (if neither limit is pressed)
+        // ── Comandos Manuais ──────────────────────────────────────────────────
         operator.whileLeftTriggerPressed()
                 .and(operator.isRightTriggerPressed())
                 .andNot(isLimitRight())
@@ -108,30 +116,28 @@ public class SubsystemExample implements Subsystem {
                     motorLeft.setPower(operator.getLeftTrigger());
                 });
 
-        // Left trigger → drive left motor; reset encoder when limit is hit
         operator.whileLeftTriggerPressed()
+                .andNot(operator.isRightTriggerPressed())
                 .andNot(isLimitLeft())
-                .run(
-                        () -> motorLeft.setPower(operator.getLeftTrigger()),
-                        () -> {
-                            resetEncoder(motorLeft);
-                            operator.rumbleTimer(200);
-                        }
-                );
+                .run(() -> motorLeft.setPower(operator.getLeftTrigger()));
 
-        // Right trigger → drive right motor; reset encoder when limit is hit
         operator.whileRightTriggerPressed()
+                .andNot(operator.isLeftTriggerPressed())
                 .andNot(isLimitRight())
-                .run(
-                        () -> motorRight.setPower(operator.getRightTrigger()),
-                        () -> {
-                            resetEncoder(motorRight);
-                            operator.rumbleTimer(200);
-                        }
-                );
+                .run(() -> motorRight.setPower(operator.getRightTrigger()));
+
+        // ── Proteção de Hardware e Reset de Encoders ──────────────────────────
+        if (isLimitLeft()) {
+            resetEncoderSafely(motorLeft);
+        }
+
+        if (isLimitRight()) {
+            resetEncoderSafely(motorRight);
+        }
 
         telemetry.addData("SubsystemExample", "Running");
-        telemetry.addData("Position", motorLeft.getCurrentPosition());
+        telemetry.addData("Position (Ticks)", motorLeft.getCurrentPosition());
+        telemetry.addData("Position (Degrees)", motorLeft.getCurrentPosition() / TICKS_PER_DEGREE);
         telemetry.addData("At target", pidController.atTarget());
     }
 
@@ -146,9 +152,16 @@ public class SubsystemExample implements Subsystem {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private void resetEncoder(DcMotor motor) {
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    private void resetEncoderSafely(DcMotor motor) {
+        if (motor.getCurrentPosition() != 0) {
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            pidController.reset();
+
+            if (operator != null) {
+                operator.rumbleTimer(200);
+            }
+        }
     }
 
     public boolean isLimitRight() { return limitRight.isPressed(); }
@@ -156,11 +169,6 @@ public class SubsystemExample implements Subsystem {
 
     // ── Singleton ─────────────────────────────────────────────────────────────
 
-    /**
-     * Returns the single instance of this subsystem.
-     * FGCLib uses the singleton pattern so there is never more than one
-     * object per subsystem running at the same time.
-     */
     public static synchronized SubsystemExample getInstance() {
         if (instance == null) instance = new SubsystemExample();
         return instance;

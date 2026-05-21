@@ -20,6 +20,9 @@ android {
     buildToolsVersion '35.0.0'
 
     packagingOptions {
+        jniLibs {
+            pickFirsts += ['**/*.so']
+        }
         jniLibs.useLegacyPackaging true
     }
 }

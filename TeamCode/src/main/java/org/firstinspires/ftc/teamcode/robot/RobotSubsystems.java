@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
+import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilderAutoLogged;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderConstants;
 
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class RobotSubsystems {
     private static final Subsystem[] subsystems = {
-            DrivetrainBuilder.build(
+            DrivetrainBuilderAutoLogged.build(
                     DrivetrainBuilderConstants.MOTOR_RIGHT,
                     DrivetrainBuilderConstants.MOTOR_LEFT,
                     DrivetrainBuilderConstants.MOTOR_RIGHT_INVERTED,

@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 
 import Ori.Coval.Logging.AutoLog;
+import Ori.Coval.Logging.Logger.KoalaLog;
 
 
 /**
@@ -30,15 +31,18 @@ import Ori.Coval.Logging.AutoLog;
  */
 @AutoLog
 public class DrivetrainBuilder implements Subsystem {
-    private static DrivetrainBuilderAutoLogged instance;
+    private static DrivetrainBuilder instance;
     public DcMotorSimple.Direction motorRightDirection;
     public DcMotorSimple.Direction motorLeftDirection;
     public String motorLeftName;
     public String motorRightName;
     private double limiter;
+
+    public double leftSpeed;
+
+    public double rightSpeed;
     public DcMotor motorRight;
     public DcMotor motorLeft;
-    private Telemetry telemetry;
     private SmartGamepad driver;
 
     public DrivetrainBuilder() {
@@ -72,7 +76,6 @@ public class DrivetrainBuilder implements Subsystem {
      */
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.telemetry = telemetry;
         motorLeft = hardwareMap.get(DcMotor.class, motorLeftName);
         motorRight = hardwareMap.get(DcMotor.class, motorRightName);
         motorLeft.setDirection(motorLeftDirection);
@@ -95,7 +98,6 @@ public class DrivetrainBuilder implements Subsystem {
     public void execute(GamepadManager gamepadConfig) {
         driver = gamepadConfig.getDriver();
 
-        telemetry.addData("DrivetrainBuilder Subsystem", "Running");
         arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
     }
 
@@ -123,13 +125,15 @@ public class DrivetrainBuilder implements Subsystem {
         double xSpeedLimited = Math.max(-limiter, Math.min(limiter, xSpeed));
         double zRotationLimited = Math.max(-limiter, Math.min(limiter, zRotation));
 
-        double leftSpeed = xSpeedLimited - zRotationLimited;
-        double rightSpeed = xSpeedLimited + zRotationLimited;
+        leftSpeed = xSpeedLimited - zRotationLimited;
+        rightSpeed = xSpeedLimited + zRotationLimited;
 
         setPower(leftSpeed, rightSpeed);
     }
 
     public void setPower(double leftSpeed, double rightSpeed) {
+        this.leftSpeed = leftSpeed;
+        this.rightSpeed = rightSpeed;
         motorLeft.setPower(leftSpeed);
         motorRight.setPower(rightSpeed);
     }
@@ -141,13 +145,9 @@ public class DrivetrainBuilder implements Subsystem {
      * with the getInstance method
      * @return DriveTrainBuilder SingleTon
      */
-    public static DrivetrainBuilderAutoLogged getInstance() {
+    public static DrivetrainBuilder getInstance() {
         if (instance == null) {
-            synchronized (DrivetrainBuilderAutoLogged.class) {
-                if (instance == null) {
-                    instance = new DrivetrainBuilderAutoLogged();
-                }
-            }
+            instance = new DrivetrainBuilderAutoLogged();
         }
         return instance;
     }

@@ -5,114 +5,172 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-import static org.firstinspires.ftc.teamcode.core.lib.pid.PIDController.Mode.ANGLE;
-import static org.firstinspires.ftc.teamcode.robot.Constants.Globals.*;
-import static org.firstinspires.ftc.teamcode.robot.Constants.SubsystemExample.*;
-
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
-
-import java.util.Objects;
+import org.firstinspires.ftc.teamcode.robot.Constants;
 
 /**
- * Example subsystem that implements the FGCLib.
- * Look at the example to build your own subsystems
- * This example also shows how to use the GamepadManager
- * section of the LIB
+ * Example subsystem for FGCLib.
+ *
+ * This subsystem isolates the hardware logic from the control logic.
+ * Methods like setPower() and setTargetAngle() should be called by Commands
+ * or the RobotContainer to control the mechanism. The execute() method runs
+ * the PID loop and hardware protections automatically.
  */
 public class SubsystemExample implements Subsystem {
+
     private static SubsystemExample instance;
     private Telemetry telemetry;
+
     private DcMotor motorRight;
     private DcMotor motorLeft;
     private TouchSensor limitRight;
     private TouchSensor limitLeft;
-    private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
-    private double targetAngle = 0;
+
+    private PIDController pidController;
+
+    private final double TICKS_PER_REV = 537.7;
+    private final double TICKS_PER_DEGREE = TICKS_PER_REV / 360.0;
+
     private boolean isPidEnabled = false;
+    private double targetAngle = 0.0;
+    private double manualPower = 0.0;
 
-    private SubsystemExample() {
-    }
+    private SubsystemExample() {}
 
-    /**
-     * Initialize method from the Subsystem Interface
-     * @param hardwareMap
-     * @param telemetry
-     */
+    // ── Lifecycle ──────────────────────────────────────────────────────────────
+
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-        motorRight = hardwareMap.get(DcMotor.class, MOTOR_RIGHT);
-        motorLeft = hardwareMap.get(DcMotor.class, MOTOR_LEFT);
-        limitRight = hardwareMap.get(TouchSensor.class, LIMIT_RIGHT);
-        limitLeft = hardwareMap.get(TouchSensor.class, LIMIT_LEFT);
         this.telemetry = telemetry;
+
+        motorRight = hardwareMap.get(DcMotor.class, Constants.SubsystemExample.MOTOR_RIGHT);
+        motorLeft  = hardwareMap.get(DcMotor.class, Constants.SubsystemExample.MOTOR_LEFT);
+        limitRight = hardwareMap.get(TouchSensor.class, Constants.SubsystemExample.LIMIT_RIGHT);
+        limitLeft  = hardwareMap.get(TouchSensor.class, Constants.SubsystemExample.LIMIT_LEFT);
 
         motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        PIDController = new PIDController(PID.kP, PID.kI, PID.kD, PID.kF, ANGLE, CORE_HEX_TICKS_PER_REVOLUTION);
+        pidController = new PIDController(
+                Constants.SubsystemExample.PID.kP,
+                Constants.SubsystemExample.PID.kI,
+                Constants.SubsystemExample.PID.kD,
+                Constants.SubsystemExample.PID.kF
+        );
+        pidController.enableMotionProfile(2200, 4400);
+        pidController.enableVoltageCompensation(hardwareMap);
 
-        telemetry.addData("SubsystemExample Subsystem", "Initialized");
+        telemetry.addData("SubsystemExample", "Initialized");
+    }
+
+    @Override
+    public void start() {
+        // Called when the OpMode starts
     }
 
     /**
-     * Execute method from the Subsystem Interface
+     * Periodic method called every loop iteration.
+     * Handles hardware safety (limit switches) and PID calculations.
      */
     @Override
     public void execute() {
-        telemetry.addData("SubsystemExample Subsystem", "Running");
+        // 1. Otimização I2C: Lê o encoder uma única vez por loop
+        int currentPosition = motorLeft.getCurrentPosition();
+        double currentAngle = currentPosition / TICKS_PER_DEGREE;
+
+        // 2. Hardware Protection: Reset encoders se o fim de curso for acionado
+        if (isLimitLeft()) {
+            resetEncoderSafely(motorLeft);
+            currentPosition = 0; // Atualiza a variável local imediatamente
+        }
+        if (isLimitRight()) {
+            resetEncoderSafely(motorRight);
+        }
+
+        // 3. Control Loop
+        double power = 0.0;
 
         if (isPidEnabled) {
-            double power = PIDController.calculate(targetAngle, motorLeft.getCurrentPosition());
-            setPower(power);
+            double targetTicks = targetAngle * TICKS_PER_DEGREE;
+            power = pidController.calculate(targetTicks, currentPosition);
+        } else {
+            // Mantém o PID resetado para evitar Integral Windup fantasma
+            pidController.reset();
+            power = manualPower;
         }
 
-        if (isLimitLeft() || isLimitRight()) {
-            telemetry.addData("Limit Switch", "Triggered!");
+        // 4. Trava de Segurança Física (Opcional, mas muito recomendada)
+        // Impede que o motor force o mecanismo caso o botão de limite esteja pressionado
+        if (isLimitLeft() && power < 0) { // Supondo que força negativa vai contra o limite esquerdo
+            power = 0;
         }
-    }
+        if (isLimitRight() && power > 0) { // Supondo que força positiva vai contra o limite direito
+            power = 0;
+        }
 
-    /**
-     * Start method from the Subsystem Interface
-     */
-    @Override
-    public void start() {
-
-    }
-
-    /**
-     * Stop method from the Subsystem Interface
-     */
-    @Override
-    public void stop() {
-        motorRight.setPower(0);
-        motorLeft.setPower(0);
-    }
-
-    public void setPower(double power) {
-        isPidEnabled = false;
+        // 5. Aplica a força final aos motores
         motorLeft.setPower(power);
         motorRight.setPower(power);
+
+        // 6. Telemetry Update
+        telemetry.addData("SubsystemExample", "Running");
+        telemetry.addData("Mode", isPidEnabled ? "PID (Auto)" : "Manual");
+        telemetry.addData("Motor Power", power);
+        telemetry.addData("Position (Ticks)", currentPosition);
+        telemetry.addData("Position (Degrees)", currentAngle);
+        telemetry.addData("Target Angle", targetAngle);
+        telemetry.addData("At target", pidController.atTarget());
     }
 
+    @Override
+    public void stop() {
+        setPower(0);
+        isPidEnabled = false;
+    }
+
+    // ── Control Methods ───────────────────────────────────────────────────────
+
+    /**
+     * Sets the manual power to the motors and disables the PID controller.
+     * @param power Motor power from -1.0 to 1.0
+     */
+    public void setPower(double power) {
+        this.isPidEnabled = false;
+        this.manualPower = power;
+    }
+
+    /**
+     * Sets the target angle and enables the PID controller.
+     * @param angle Target angle in degrees
+     */
     public void setTargetAngle(double angle) {
         this.targetAngle = angle;
         this.isPidEnabled = true;
     }
 
-    public void resetEncoders() {
-        motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    // ── Hardware Helpers ──────────────────────────────────────────────────────
+
+    /**
+     * Safely resets the motor encoder without completely stopping the loop flow.
+     * @param motor The DcMotor to reset
+     */
+    private void resetEncoderSafely(DcMotor motor) {
+        if (motor.getCurrentPosition() != 0) {
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            pidController.reset();
+        }
     }
 
-    public void resetEncoder(DcMotor motor) {
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    /**
+     * Resets both motor encoders manually.
+     */
+    public void resetEncoders() {
+        resetEncoderSafely(motorLeft);
+        resetEncoderSafely(motorRight);
     }
 
     public boolean isLimitRight() {
@@ -123,15 +181,14 @@ public class SubsystemExample implements Subsystem {
         return limitLeft.isPressed();
     }
 
+    // ── Singleton ─────────────────────────────────────────────────────────────
+
     /**
-     * getInstance is a method used to create a instance of the subsystem.
-     * It's not good to have many objects of the same subsystem, so every
-     * subsystem in FGCLib will have just one instance, that is created
-     * with the getInstance method
-     * @return SubsystemExample SingleTon
+     * Returns the singleton instance of the subsystem.
+     * @return SubsystemExample instance
      */
-    public static SubsystemExample getInstance() {
-        if (Objects.isNull(instance)) {
+    public static synchronized SubsystemExample getInstance() {
+        if (instance == null) {
             instance = new SubsystemExample();
         }
         return instance;

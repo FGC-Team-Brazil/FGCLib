@@ -6,90 +6,107 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import static org.firstinspires.ftc.teamcode.core.lib.pid.PIDController.Mode.ANGLE;
 import static org.firstinspires.ftc.teamcode.robot.constants.SubsystemExampleConstants.*;
 import static org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants.*;
 
-import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
-import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
+import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
-import org.firstinspires.ftc.teamcode.robot.constants.GlobalConstants;
 
 /**
- * Example subsystem that implements the FGCLib.
- * Look at the example to build your own subsystems
- * This example also shows how to use the GamepadManager
- * section of the LIB
+ * Example subsystem for FGCLib — SmartGamepad version.
+ *
+ * Shows how to use PIDController with SmartGamepad's fluent API
+ * (whileButtonX().run(), whileTriggerPressed().andNot().run(), etc.).
+ *
+ * Copy this file and adapt it to your mechanism.
+ * See SubsystemBasicGamepadExample for a simpler version without SmartGamepad.
  */
 public class SubsystemExample implements Subsystem {
+
     private static SubsystemExample instance;
-    private Telemetry telemetry;
-    private DcMotor motorRight;
-    private DcMotor motorLeft;
-    private TouchSensor limitRight;
-    private TouchSensor limitLeft;
+
+    private Telemetry    telemetry;
+    private DcMotor      motorRight;
+    private DcMotor      motorLeft;
+    private TouchSensor  limitRight;
+    private TouchSensor  limitLeft;
     private SmartGamepad operator;
-    private org.firstinspires.ftc.teamcode.core.lib.pid.PIDController PIDController;
+    private PIDController pidController;
 
-    private SubsystemExample() {
-    }
+    private final double TICKS_PER_REV = 537.7;
+    private final double TICKS_PER_DEGREE = TICKS_PER_REV / 360.0;
 
-    /**
-     * Initialize method from the Subsystem Interface
-     * @param hardwareMap
-     * @param telemetry
-     */
+    private SubsystemExample() {}
+
+    // ── Lifecycle ──────────────────────────────────────────────────────────────
+
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-        motorRight = hardwareMap.get(DcMotor.class, MOTOR_RIGHT);
-        motorLeft = hardwareMap.get(DcMotor.class, MOTOR_LEFT);
-        limitRight = hardwareMap.get(TouchSensor.class, LIMIT_RIGHT);
-        limitLeft = hardwareMap.get(TouchSensor.class, LIMIT_LEFT);
         this.telemetry = telemetry;
+
+        motorRight = hardwareMap.get(DcMotor.class, MOTOR_RIGHT);
+        motorLeft  = hardwareMap.get(DcMotor.class, MOTOR_LEFT);
+        limitRight = hardwareMap.get(TouchSensor.class, LIMIT_RIGHT);
+        limitLeft  = hardwareMap.get(TouchSensor.class, LIMIT_LEFT);
 
         motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        PIDController = new PIDController(PID.kP, PID.kI, PID.kD, PID.kF, ANGLE, CORE_HEX_TICKS_PER_REVOLUTION);
+        // ── PID Controller ────────────────────────────────────────────────────
+        pidController = new PIDController(PID.kP, PID.kI, PID.kD, PID.kF);
+        pidController.enableMotionProfile(2200, 4400);
+        pidController.enableVoltageCompensation(hardwareMap);
 
-        telemetry.addData("SubsystemExample Subsystem", "Initialized");
+        telemetry.addData("SubsystemExample", "Initialized");
     }
 
-    /**
-     * Execute method from the Subsystem Interface
-     * @param gamepadManager
-     */
     @Override
     public void execute(GamepadManager gamepadManager) {
         operator = gamepadManager.getOperator();
 
-        telemetry.addData("SubsystemExample Subsystem", "Running");
+        boolean usePID = operator.isButtonLeftBumper() || operator.isButtonRightBumper();
+        boolean useManual = operator.isLeftTriggerPressed() || operator.isRightTriggerPressed();
+        double power;
 
-        PIDController.calculate(TARGET_DEGREE, motorLeft.getCurrentPosition());
+        if (usePID) {
+            double targetTicks = TARGET_DEGREE * TICKS_PER_DEGREE;
+            power = pidController.calculate(targetTicks, motorLeft.getCurrentPosition());
+        } else {
+            power = 0;
+            pidController.reset();
+        }
+
+        if (!usePID && !useManual) {
+            motorLeft.setPower(0);
+            motorRight.setPower(0);
+        }
 
         operator.whileButtonLeftBumper()
                 .and(operator.isButtonRightBumper())
                 .run(() -> {
-                    PIDController.setPowerMotor(motorLeft);
-                    PIDController.setPowerMotor(motorRight);
+                    motorLeft.setPower(power);
+                    motorRight.setPower(power);
                 });
 
         operator.whileButtonRightBumper()
+                .andNot(operator.isButtonLeftBumper())
                 .run(() -> {
                     motorLeft.setPower(0);
-                    PIDController.setPowerMotor(motorRight);
+                    motorRight.setPower(power);
                 });
 
         operator.whileButtonLeftBumper()
+                .andNot(operator.isButtonRightBumper())
                 .run(() -> {
                     motorRight.setPower(0);
-                    PIDController.setPowerMotor(motorLeft);
+                    motorLeft.setPower(power);
                 });
 
+        // ── Comandos Manuais ──────────────────────────────────────────────────
         operator.whileLeftTriggerPressed()
                 .and(operator.isRightTriggerPressed())
                 .andNot(isLimitRight())
@@ -100,65 +117,60 @@ public class SubsystemExample implements Subsystem {
                 });
 
         operator.whileLeftTriggerPressed()
+                .andNot(operator.isRightTriggerPressed())
                 .andNot(isLimitLeft())
-                .run(() -> {
-                    motorLeft.setPower(operator.getLeftTrigger());
-                }, () -> {
-                    resetEncoder(motorLeft);
-                    operator.rumbleTimer( 200);
-                });
+                .run(() -> motorLeft.setPower(operator.getLeftTrigger()));
 
         operator.whileRightTriggerPressed()
+                .andNot(operator.isLeftTriggerPressed())
                 .andNot(isLimitRight())
-                .run(() -> {
-                    motorRight.setPower(operator.getRightTrigger());
-                }, () -> {
-                    resetEncoder(motorRight);
-                    operator.rumbleTimer(200);
-                });
+                .run(() -> motorRight.setPower(operator.getRightTrigger()));
+
+        // ── Proteção de Hardware e Reset de Encoders ──────────────────────────
+        if (isLimitLeft()) {
+            resetEncoderSafely(motorLeft);
+        }
+
+        if (isLimitRight()) {
+            resetEncoderSafely(motorRight);
+        }
+
+        telemetry.addData("SubsystemExample", "Running");
+        telemetry.addData("Position (Ticks)", motorLeft.getCurrentPosition());
+        telemetry.addData("Position (Degrees)", motorLeft.getCurrentPosition() / TICKS_PER_DEGREE);
+        telemetry.addData("At target", pidController.atTarget());
     }
 
-    /**
-     * Start method from the Subsystem Interface
-     */
     @Override
-    public void start() {
+    public void start() {}
 
-    }
-
-    /**
-     * Stop method from the Subsystem Interface
-     */
     @Override
     public void stop() {
         motorRight.setPower(0);
         motorLeft.setPower(0);
     }
 
-    private void resetEncoder(DcMotor motor) {
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
-    public boolean isLimitRight() {
-        return limitRight.isPressed();
-    }
+    private void resetEncoderSafely(DcMotor motor) {
+        if (motor.getCurrentPosition() != 0) {
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            pidController.reset();
 
-    public boolean isLimitLeft() {
-        return limitLeft.isPressed();
-    }
-
-    /**
-     * getInstance is a method used to create a instance of the subsystem.
-     * It's not good to have many objects of the same subsystem, so every
-     * subsystem in FGCLib will have just one instance, that is created
-     * with the getInstance method
-     * @return SubsystemExample SingleTon
-     */
-    public static synchronized SubsystemExample getInstance() {
-        if (instance == null) {
-            instance = new SubsystemExample();
+            if (operator != null) {
+                operator.rumbleTimer(200);
+            }
         }
+    }
+
+    public boolean isLimitRight() { return limitRight.isPressed(); }
+    public boolean isLimitLeft()  { return limitLeft.isPressed(); }
+
+    // ── Singleton ─────────────────────────────────────────────────────────────
+
+    public static synchronized SubsystemExample getInstance() {
+        if (instance == null) instance = new SubsystemExample();
         return instance;
     }
 }

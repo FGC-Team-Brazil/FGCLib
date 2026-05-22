@@ -39,7 +39,6 @@ public class SubsystemExample implements Subsystem {
     private SubsystemExample() {}
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
-
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -77,45 +76,37 @@ public class SubsystemExample implements Subsystem {
      */
     @Override
     public void execute() {
-        // 1. Otimização I2C: Lê o encoder uma única vez por loop
         int currentPosition = motorLeft.getCurrentPosition();
         double currentAngle = currentPosition / TICKS_PER_DEGREE;
 
-        // 2. Hardware Protection: Reset encoders se o fim de curso for acionado
         if (isLimitLeft()) {
             resetEncoderSafely(motorLeft);
-            currentPosition = 0; // Atualiza a variável local imediatamente
+            currentPosition = 0;
         }
         if (isLimitRight()) {
             resetEncoderSafely(motorRight);
         }
 
-        // 3. Control Loop
         double power = 0.0;
 
         if (isPidEnabled) {
             double targetTicks = targetAngle * TICKS_PER_DEGREE;
             power = pidController.calculate(targetTicks, currentPosition);
         } else {
-            // Mantém o PID resetado para evitar Integral Windup fantasma
             pidController.reset();
             power = manualPower;
         }
 
-        // 4. Trava de Segurança Física (Opcional, mas muito recomendada)
-        // Impede que o motor force o mecanismo caso o botão de limite esteja pressionado
-        if (isLimitLeft() && power < 0) { // Supondo que força negativa vai contra o limite esquerdo
+        if (isLimitLeft() && power < 0) {
             power = 0;
         }
-        if (isLimitRight() && power > 0) { // Supondo que força positiva vai contra o limite direito
+        if (isLimitRight() && power > 0) {
             power = 0;
         }
 
-        // 5. Aplica a força final aos motores
         motorLeft.setPower(power);
         motorRight.setPower(power);
 
-        // 6. Telemetry Update
         telemetry.addData("SubsystemExample", "Running");
         telemetry.addData("Mode", isPidEnabled ? "PID (Auto)" : "Manual");
         telemetry.addData("Motor Power", power);

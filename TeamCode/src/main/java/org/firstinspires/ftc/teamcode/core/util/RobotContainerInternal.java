@@ -13,16 +13,21 @@ import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import java.util.List;
 
 public class RobotContainerInternal {
-     private final GamepadController driver;
-     private final GamepadController operator;
+
+    private final SmartGamepad smartDriver;
+    private final SmartGamepad smartOperator;
+    private final GamepadController driver;
+    private final GamepadController operator;
 
     private Telemetry telemetry;
 
     private final List<Subsystem> subsystems;
 
     public RobotContainerInternal(Gamepad driver, Gamepad operator, Subsystem... subsystems) {
-        this.driver = new GamepadController(new SmartGamepad(driver));
-        this.operator = new GamepadController(new SmartGamepad(operator));
+        this.smartDriver = new SmartGamepad(driver);
+        this.smartOperator = new SmartGamepad(operator);
+        this.driver = new GamepadController(smartDriver);
+        this.operator = new GamepadController(smartOperator);
         this.subsystems = List.of(subsystems);
     }
 

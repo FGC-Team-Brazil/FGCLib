@@ -15,11 +15,8 @@ import java.util.Arrays;
  */
 public class RobotContainer extends RobotContainerInternal {
 
-    private GamepadController driver;
-    private GamepadController operator;
-
-    private final Drivetrain drivetrain = Drivetrain.getInstance();
-    private final SubsystemExample subsystemExample = SubsystemExample.getInstance();
+    private final Drivetrain drivetrain;
+    private final SubsystemExample subsystemExample;
 
     public RobotContainer(Gamepad driver, Gamepad operator) {
         super(driver, operator,
@@ -27,12 +24,16 @@ public class RobotContainer extends RobotContainerInternal {
                 SubsystemExample.getInstance()
                 // Add more subsystems here.
         );
+
+        drivetrain = Drivetrain.getInstance();
+        subsystemExample = SubsystemExample.getInstance();
+        // You need to add the subsystems here too.
     }
 
     @Override
     public void configureBindings() {
-        driver = getDriver();
-        operator = getOperator();
+        GamepadController driver = getDriver();
+        GamepadController operator = getOperator();
 
         // Driver controller
         driver.leftY()
@@ -42,15 +43,20 @@ public class RobotContainer extends RobotContainerInternal {
               );
 
         // Operator controller
-        operator.y().whenActive(() -> subsystemExample.setTargetAngle(90));
-        operator.a().whenActive(() -> subsystemExample.setTargetAngle(0));
+        operator.y()
+                .whenActive(() -> subsystemExample.setTargetAngle(90));
+
+        operator.a()
+                .whenActive(() -> subsystemExample.setTargetAngle(0));
 
         operator.on(subsystemExample::isLimitLeft)
                 .or(operator.on(subsystemExample::isLimitRight))
                 .or(operator.start().and(operator.back()))
                 .whenActive(subsystemExample::resetEncoders);
 
-        operator.y().negate().and(operator.a().negate())
+        operator.y()
+                .negate()
+                .and(operator.a().negate())
                 .whenActive(() -> subsystemExample.setPower(0));
     }
 }

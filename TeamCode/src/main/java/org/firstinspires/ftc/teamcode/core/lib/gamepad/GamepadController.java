@@ -17,7 +17,7 @@ public class GamepadController {
     }
 
     public TriggerBinding on(BooleanSupplier condition) {
-        TriggerBinding binding = new TriggerBinding(condition);
+        TriggerBinding binding = new TriggerBinding(this, condition);
         bindings.add(binding);
         return binding;
     }
@@ -100,58 +100,6 @@ public class GamepadController {
     public void update() {
         for (TriggerBinding binding : bindings) {
             binding.poll();
-        }
-    }
-
-    public class TriggerBinding {
-        private final BooleanSupplier condition;
-        private Runnable activeAction, risingAction, fallingAction;
-        private boolean lastState = false;
-
-        public TriggerBinding(BooleanSupplier condition) {
-            this.condition = condition;
-        }
-
-        public TriggerBinding or(TriggerBinding other) {
-            return on(() -> this.condition.getAsBoolean() || other.getCondition().getAsBoolean());
-        }
-
-        public TriggerBinding and(TriggerBinding other) {
-            return on(() -> this.condition.getAsBoolean() && other.getCondition().getAsBoolean());
-        }
-
-        public TriggerBinding negate() {
-            return on(() -> !this.condition.getAsBoolean());
-        }
-
-        public BooleanSupplier getCondition() {
-            return condition;
-        }
-
-        public TriggerBinding whileActive(Runnable action) {
-            this.activeAction = action;
-            return this;
-        }
-
-        public TriggerBinding whenActive(Runnable action) {
-            this.risingAction = action;
-            return this;
-        }
-
-        public TriggerBinding whenInactive(Runnable action) {
-            this.fallingAction = action;
-            return this;
-        }
-
-        public void poll() {
-            boolean currentState = condition.getAsBoolean();
-            if (currentState) {
-                if (activeAction != null) activeAction.run();
-                if (!lastState && risingAction != null) risingAction.run();
-            } else if (lastState && fallingAction != null) {
-                fallingAction.run();
-            }
-            lastState = currentState;
         }
     }
 }

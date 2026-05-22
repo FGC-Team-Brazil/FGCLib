@@ -13,6 +13,8 @@ import static org.firstinspires.ftc.teamcode.robot.Constants.SubsystemExample.*;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 
+import java.util.Objects;
+
 /**
  * Example subsystem that implements the FGCLib.
  * Look at the example to build your own subsystems
@@ -128,8 +130,8 @@ public class SubsystemExample implements Subsystem {
      * with the getInstance method
      * @return SubsystemExample SingleTon
      */
-    public static synchronized SubsystemExample getInstance() {
-        if (instance == null) {
+    public static SubsystemExample getInstance() {
+        if (Objects.isNull(instance)) {
             instance = new SubsystemExample();
         }
         return instance;

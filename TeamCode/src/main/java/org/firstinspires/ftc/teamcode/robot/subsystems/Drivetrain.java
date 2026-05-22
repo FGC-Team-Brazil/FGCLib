@@ -6,6 +6,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.robot.Constants;
 
+import java.util.Objects;
+
 public class Drivetrain implements Subsystem {
     private static Drivetrain instance;
     private DcMotor motorLeft, motorRight;
@@ -13,8 +15,8 @@ public class Drivetrain implements Subsystem {
 
     private Drivetrain() {}
 
-    public static synchronized Drivetrain getInstance() {
-        if (instance == null) {
+    public static Drivetrain getInstance() {
+        if (Objects.isNull(instance)) {
             instance = new Drivetrain();
         }
         return instance;

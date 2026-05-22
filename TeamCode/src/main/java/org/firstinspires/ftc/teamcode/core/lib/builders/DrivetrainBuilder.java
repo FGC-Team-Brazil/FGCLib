@@ -146,7 +146,7 @@ public class DrivetrainBuilder implements Subsystem {
      * @return DriveTrainBuilder SingleTon
      */
     public static DrivetrainBuilder getInstance() {
-        if (isNull(instance)) {
+        if (instance == null) {
             instance = new DrivetrainBuilderAutoLogged();
         }
         return instance;

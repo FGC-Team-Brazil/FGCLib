@@ -17,7 +17,7 @@ public class GamepadController {
     }
 
     public TriggerBinding on(BooleanSupplier condition) {
-        TriggerBinding binding = new TriggerBinding(this, condition);
+        var binding = new TriggerBinding(this, condition);
         bindings.add(binding);
         return binding;
     }
@@ -98,7 +98,7 @@ public class GamepadController {
     public double getRightTriggerAxis() { return smartGamepad.getRightTrigger(); }
 
     public void update() {
-        for (TriggerBinding binding : bindings) {
+        for (var binding : bindings) {
             binding.poll();
         }
     }

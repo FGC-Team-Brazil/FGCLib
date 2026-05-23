@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
@@ -12,176 +11,177 @@ import org.firstinspires.ftc.teamcode.robot.Constants;
 /**
  * Example subsystem for FGCLib.
  *
- * This subsystem isolates the hardware logic from the control logic.
- * Methods like setPower() and setTargetAngle() should be called by Commands
- * or the RobotContainer to control the mechanism. The execute() method runs
- * the PID loop and hardware protections automatically.
+ * <p>This subsystem isolates the hardware logic from the control logic. Methods like setPower() and
+ * setTargetAngle() should be called by Commands or the RobotContainer to control the mechanism. The
+ * execute() method runs the PID loop and hardware protections automatically.
  */
 public class SubsystemExample implements Subsystem {
 
-    private static SubsystemExample instance;
-    private Telemetry telemetry;
+  private static SubsystemExample instance;
+  private Telemetry telemetry;
 
-    private DcMotor motorRight;
-    private DcMotor motorLeft;
-    private TouchSensor limitRight;
-    private TouchSensor limitLeft;
+  private DcMotor motorRight;
+  private DcMotor motorLeft;
+  private TouchSensor limitRight;
+  private TouchSensor limitLeft;
 
-    private PIDController pidController;
+  private PIDController pidController;
 
-    private final double TICKS_PER_REV = 537.7;
-    private final double TICKS_PER_DEGREE = TICKS_PER_REV / 360.0;
+  private final double TICKS_PER_REV = 537.7;
+  private final double TICKS_PER_DEGREE = TICKS_PER_REV / 360.0;
 
-    private boolean isPidEnabled = false;
-    private double targetAngle = 0.0;
-    private double manualPower = 0.0;
+  private boolean isPidEnabled = false;
+  private double targetAngle = 0.0;
+  private double manualPower = 0.0;
 
-    private SubsystemExample() {}
+  private SubsystemExample() {}
 
-    // ── Lifecycle ──────────────────────────────────────────────────────────────
-    @Override
-    public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.telemetry = telemetry;
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+  @Override
+  public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
+    this.telemetry = telemetry;
 
-        motorRight = hardwareMap.get(DcMotor.class, Constants.SubsystemExample.MOTOR_RIGHT);
-        motorLeft  = hardwareMap.get(DcMotor.class, Constants.SubsystemExample.MOTOR_LEFT);
-        limitRight = hardwareMap.get(TouchSensor.class, Constants.SubsystemExample.LIMIT_RIGHT);
-        limitLeft  = hardwareMap.get(TouchSensor.class, Constants.SubsystemExample.LIMIT_LEFT);
+    motorRight = hardwareMap.get(DcMotor.class, Constants.SubsystemExample.MOTOR_RIGHT);
+    motorLeft = hardwareMap.get(DcMotor.class, Constants.SubsystemExample.MOTOR_LEFT);
+    limitRight = hardwareMap.get(TouchSensor.class, Constants.SubsystemExample.LIMIT_RIGHT);
+    limitLeft = hardwareMap.get(TouchSensor.class, Constants.SubsystemExample.LIMIT_LEFT);
 
-        motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    motorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    motorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        pidController = new PIDController(
-                Constants.SubsystemExample.PID.kP,
-                Constants.SubsystemExample.PID.kI,
-                Constants.SubsystemExample.PID.kD,
-                Constants.SubsystemExample.PID.kF
-        );
-        pidController.enableMotionProfile(2200, 4400);
-        pidController.enableVoltageCompensation(hardwareMap);
+    pidController =
+        new PIDController(
+            Constants.SubsystemExample.PID.kP,
+            Constants.SubsystemExample.PID.kI,
+            Constants.SubsystemExample.PID.kD,
+            Constants.SubsystemExample.PID.kF);
+    pidController.enableMotionProfile(2200, 4400);
+    pidController.enableVoltageCompensation(hardwareMap);
 
-        telemetry.addData("SubsystemExample", "Initialized");
+    telemetry.addData("SubsystemExample", "Initialized");
+  }
+
+  @Override
+  public void start() {
+    // Called when the OpMode starts
+  }
+
+  /**
+   * Periodic method called every loop iteration. Handles hardware safety (limit switches) and PID
+   * calculations.
+   */
+  @Override
+  public void execute() {
+    int currentPosition = motorLeft.getCurrentPosition();
+    double currentAngle = currentPosition / TICKS_PER_DEGREE;
+
+    if (isLimitLeft()) {
+      resetEncoderSafely(motorLeft);
+      currentPosition = 0;
+    }
+    if (isLimitRight()) {
+      resetEncoderSafely(motorRight);
     }
 
-    @Override
-    public void start() {
-        // Called when the OpMode starts
+    double power = 0.0;
+
+    if (isPidEnabled) {
+      double targetTicks = targetAngle * TICKS_PER_DEGREE;
+      power = pidController.calculate(targetTicks, currentPosition);
+    } else {
+      pidController.reset();
+      power = manualPower;
     }
 
-    /**
-     * Periodic method called every loop iteration.
-     * Handles hardware safety (limit switches) and PID calculations.
-     */
-    @Override
-    public void execute() {
-        int currentPosition = motorLeft.getCurrentPosition();
-        double currentAngle = currentPosition / TICKS_PER_DEGREE;
-
-        if (isLimitLeft()) {
-            resetEncoderSafely(motorLeft);
-            currentPosition = 0;
-        }
-        if (isLimitRight()) {
-            resetEncoderSafely(motorRight);
-        }
-
-        double power = 0.0;
-
-        if (isPidEnabled) {
-            double targetTicks = targetAngle * TICKS_PER_DEGREE;
-            power = pidController.calculate(targetTicks, currentPosition);
-        } else {
-            pidController.reset();
-            power = manualPower;
-        }
-
-        if (isLimitLeft() && power < 0) {
-            power = 0;
-        }
-        if (isLimitRight() && power > 0) {
-            power = 0;
-        }
-
-        motorLeft.setPower(power);
-        motorRight.setPower(power);
-
-        telemetry.addData("SubsystemExample", "Running");
-        telemetry.addData("Mode", isPidEnabled ? "PID (Auto)" : "Manual");
-        telemetry.addData("Motor Power", power);
-        telemetry.addData("Position (Ticks)", currentPosition);
-        telemetry.addData("Position (Degrees)", currentAngle);
-        telemetry.addData("Target Angle", targetAngle);
-        telemetry.addData("At target", pidController.atTarget());
+    if (isLimitLeft() && power < 0) {
+      power = 0;
+    }
+    if (isLimitRight() && power > 0) {
+      power = 0;
     }
 
-    @Override
-    public void stop() {
-        setPower(0);
-        isPidEnabled = false;
+    motorLeft.setPower(power);
+    motorRight.setPower(power);
+
+    telemetry.addData("SubsystemExample", "Running");
+    telemetry.addData("Mode", isPidEnabled ? "PID (Auto)" : "Manual");
+    telemetry.addData("Motor Power", power);
+    telemetry.addData("Position (Ticks)", currentPosition);
+    telemetry.addData("Position (Degrees)", currentAngle);
+    telemetry.addData("Target Angle", targetAngle);
+    telemetry.addData("At target", pidController.atTarget());
+  }
+
+  @Override
+  public void stop() {
+    setPower(0);
+    isPidEnabled = false;
+  }
+
+  // ── Control Methods ───────────────────────────────────────────────────────
+
+  /**
+   * Sets the manual power to the motors and disables the PID controller.
+   *
+   * @param power Motor power from -1.0 to 1.0
+   */
+  public void setPower(double power) {
+    this.isPidEnabled = false;
+    this.manualPower = power;
+  }
+
+  /**
+   * Sets the target angle and enables the PID controller.
+   *
+   * @param angle Target angle in degrees
+   */
+  public void setTargetAngle(double angle) {
+    this.targetAngle = angle;
+    this.isPidEnabled = true;
+  }
+
+  // ── Hardware Helpers ──────────────────────────────────────────────────────
+
+  /**
+   * Safely resets the motor encoder without completely stopping the loop flow.
+   *
+   * @param motor The DcMotor to reset
+   */
+  private void resetEncoderSafely(DcMotor motor) {
+    if (motor.getCurrentPosition() != 0) {
+      motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      pidController.reset();
     }
+  }
 
-    // ── Control Methods ───────────────────────────────────────────────────────
+  /** Resets both motor encoders manually. */
+  public void resetEncoders() {
+    resetEncoderSafely(motorLeft);
+    resetEncoderSafely(motorRight);
+  }
 
-    /**
-     * Sets the manual power to the motors and disables the PID controller.
-     * @param power Motor power from -1.0 to 1.0
-     */
-    public void setPower(double power) {
-        this.isPidEnabled = false;
-        this.manualPower = power;
+  public boolean isLimitRight() {
+    return limitRight.isPressed();
+  }
+
+  public boolean isLimitLeft() {
+    return limitLeft.isPressed();
+  }
+
+  // ── Singleton ─────────────────────────────────────────────────────────────
+
+  /**
+   * Returns the singleton instance of the subsystem.
+   *
+   * @return SubsystemExample instance
+   */
+  public static synchronized SubsystemExample getInstance() {
+    if (instance == null) {
+      instance = new SubsystemExample();
     }
-
-    /**
-     * Sets the target angle and enables the PID controller.
-     * @param angle Target angle in degrees
-     */
-    public void setTargetAngle(double angle) {
-        this.targetAngle = angle;
-        this.isPidEnabled = true;
-    }
-
-    // ── Hardware Helpers ──────────────────────────────────────────────────────
-
-    /**
-     * Safely resets the motor encoder without completely stopping the loop flow.
-     * @param motor The DcMotor to reset
-     */
-    private void resetEncoderSafely(DcMotor motor) {
-        if (motor.getCurrentPosition() != 0) {
-            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            pidController.reset();
-        }
-    }
-
-    /**
-     * Resets both motor encoders manually.
-     */
-    public void resetEncoders() {
-        resetEncoderSafely(motorLeft);
-        resetEncoderSafely(motorRight);
-    }
-
-    public boolean isLimitRight() {
-        return limitRight.isPressed();
-    }
-
-    public boolean isLimitLeft() {
-        return limitLeft.isPressed();
-    }
-
-    // ── Singleton ─────────────────────────────────────────────────────────────
-
-    /**
-     * Returns the singleton instance of the subsystem.
-     * @return SubsystemExample instance
-     */
-    public static synchronized SubsystemExample getInstance() {
-        if (instance == null) {
-            instance = new SubsystemExample();
-        }
-        return instance;
-    }
+    return instance;
+  }
 }

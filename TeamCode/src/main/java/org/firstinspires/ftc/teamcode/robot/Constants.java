@@ -2,19 +2,11 @@ package org.firstinspires.ftc.teamcode.robot;
 
 public class Constants {
 
-  // Global constants
-  public static class Globals {
-    public static final int CORE_HEX_TICKS_PER_REVOLUTION = 288;
-  }
-
-  public static class Drivetrain {
-    public static final double LIMITER_MIN = 0.7;
-    public static final double LIMITER_DEFAULT = 1.0;
-
-    public static final String MOTOR_RIGHT_NAME = "motor_right";
-    public static final String MOTOR_LEFT_NAME = "motor_left";
-    public static final boolean IS_MOTOR_RIGHT_INVERTED = false;
-    public static final boolean IS_MOTOR_LEFT_INVERTED = true;
+  public class DrivetrainBuilderConstants {
+    public static final String MOTOR_RIGHT = "drivetrain_motorRight";
+    public static final String MOTOR_LEFT = "drivetrain_motorLeft";
+    public static final boolean MOTOR_RIGHT_INVERTED = false;
+    public static final boolean MOTOR_LEFT_INVERTED = true;
   }
 
   public static class SubsystemExample {

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.Trigger;
 import org.firstinspires.ftc.teamcode.core.util.RobotContainerInternal;
 import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
 
@@ -12,14 +13,20 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
  */
 public class RobotContainer extends RobotContainerInternal {
 
+  private final SmartGamepad driver;
+  private final SmartGamepad operator;
+
   private final SubsystemExample subsystemExample;
   private final DrivetrainBuilder drivetrain;
 
   public RobotContainer(Gamepad driver, Gamepad operator) {
     super(
-        driver, operator, DrivetrainBuilder.getInstance(), SubsystemExample.getInstance()
+        DrivetrainBuilder.getInstance(), SubsystemExample.getInstance()
         // Add more subsystems here.
         );
+
+    this.driver = new SmartGamepad(driver);
+    this.operator = new SmartGamepad(operator);
 
     drivetrain =
         DrivetrainBuilder.build(
@@ -33,23 +40,22 @@ public class RobotContainer extends RobotContainerInternal {
 
   @Override
   public void configureBindings() {
-    SmartGamepad driver = getDriver();
-    SmartGamepad operator = getOperator();
 
     // Driver controller
     driver
         .leftY()
         .or(driver.rightX())
-        .whileTrue(() -> drivetrain.arcadeDrive(-driver.getLeftY(), driver.getRightX()));
+        .whileTrue(() -> drivetrain.arcadeDrive(-driver.getLeftY(), driver.getRightX()))
+        .onFalse(drivetrain::stop);
 
     // Operator controller
     operator.y().onTrue(() -> subsystemExample.setTargetAngle(90));
 
     operator.a().onTrue(() -> subsystemExample.setTargetAngle(0));
 
-    operator.on(subsystemExample::isLimitLeft).onTrue(subsystemExample::resetEncoders);
+    new Trigger(subsystemExample::isLimitLeft).onTrue(subsystemExample::resetEncoders);
 
-    operator.on(subsystemExample::isLimitRight).onTrue(subsystemExample::resetEncoders);
+    new Trigger(subsystemExample::isLimitRight).onTrue(subsystemExample::resetEncoders);
 
     operator.start().and(operator.back()).onTrue(subsystemExample::resetEncoders);
 

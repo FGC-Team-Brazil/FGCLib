@@ -1,15 +1,12 @@
 package org.firstinspires.ftc.teamcode.core.lib.gamepad;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class SmartGamepad {
 
   private final Gamepad gamepad;
   private final HIDController hid;
-  private final List<Trigger> triggers = new ArrayList<>();
 
   public SmartGamepad(Gamepad gamepad) {
     this.gamepad = gamepad;
@@ -21,12 +18,7 @@ public class SmartGamepad {
   }
 
   public Trigger on(BooleanSupplier condition) {
-    return register(new Trigger(condition));
-  }
-
-  public Trigger register(Trigger trigger) {
-    triggers.add(trigger);
-    return trigger;
+    return new Trigger(condition);
   }
 
   public Trigger a() {
@@ -163,11 +155,5 @@ public class SmartGamepad {
 
   public Gamepad getGamepad() {
     return gamepad;
-  }
-
-  public void update() {
-    for (Trigger trigger : triggers) {
-      trigger.poll();
-    }
   }
 }

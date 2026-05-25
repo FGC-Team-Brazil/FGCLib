@@ -1,8 +1,22 @@
 package org.firstinspires.ftc.teamcode.core.lib.gamepad;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class Trigger {
+
+  private static final List<Trigger> activeTriggers = new ArrayList<>();
+
+  public static void updateAll() {
+    for (Trigger trigger : activeTriggers) {
+      trigger.poll();
+    }
+  }
+
+  public static void clearAll() {
+    activeTriggers.clear();
+  }
 
   private final BooleanSupplier condition;
 
@@ -15,6 +29,7 @@ public class Trigger {
 
   public Trigger(BooleanSupplier condition) {
     this.condition = condition;
+    activeTriggers.add(this);
   }
 
   public boolean isTrue() {

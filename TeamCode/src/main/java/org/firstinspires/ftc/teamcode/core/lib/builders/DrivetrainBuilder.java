@@ -81,7 +81,9 @@ public class DrivetrainBuilder implements Subsystem {
 
   /** Stop method from Subsystem Interface */
   @Override
-  public void stop() {}
+  public void stop() {
+    setPower(0, 0);
+  }
 
   public void arcadeDrive(double xSpeed, double zRotation, double limit) {
     limiter = limit;

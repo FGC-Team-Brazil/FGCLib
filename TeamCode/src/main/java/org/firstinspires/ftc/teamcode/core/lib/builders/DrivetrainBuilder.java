@@ -1,155 +1,126 @@
 package org.firstinspires.ftc.teamcode.core.lib.builders;
 
-import static org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderConstants.*;
-
+import Ori.Coval.Logging.Logger.KoalaLog;
 import androidx.annotation.NonNull;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
-import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 
-import Ori.Coval.Logging.AutoLog;
-import Ori.Coval.Logging.Logger.KoalaLog;
-
-
 /**
- * DrivetrainBuilder is a helper class that assists on the creation
- * of a Drivetrain Subsystem.
- * <p>
- * It contains some usual boilerplate for creating a subsystem.
- * Use it when creating tank drivetrains with two motors.
- * </p>
- * <p>
- * Caution: This class don't support holonomic
- * drivetrains
- * </p>
+ * DrivetrainBuilder is a helper class that assists on the creation of a Drivetrain Subsystem.
+ *
+ * <p>It contains some usual boilerplate for creating a subsystem. Use it when creating tank
+ * drivetrains with two motors.
+ *
+ * <p>Caution: This class don't support holonomic drivetrains
  */
-@AutoLog
 public class DrivetrainBuilder implements Subsystem {
-    private static DrivetrainBuilder instance;
-    public DcMotorSimple.Direction motorRightDirection;
-    public DcMotorSimple.Direction motorLeftDirection;
-    public String motorLeftName;
-    public String motorRightName;
-    private double limiter;
+  private static DrivetrainBuilder instance;
+  private DcMotorSimple.Direction motorRightDirection;
+  private DcMotorSimple.Direction motorLeftDirection;
+  private String motorLeftName;
+  private String motorRightName;
+  private double limiter;
+  private DcMotor motorRight;
+  private DcMotor motorLeft;
 
-    public double leftSpeed;
+  protected DrivetrainBuilder() {}
 
-    public double rightSpeed;
-    public DcMotor motorRight;
-    public DcMotor motorLeft;
-    private SmartGamepad driver;
+  /**
+   * @param motorRightName the name of the motor used on the right side
+   * @param motorLeftName the name of the motor used on the left side
+   * @param isMotorRightInverted use true if counterclockwise rotation makes the robot go forward
+   * @param isMotorLeftInverted use true if counterclockwise rotation makes the robot go forward
+   * @return DrivetrainBuilder instance
+   */
+  public static DrivetrainBuilder build(
+      @NonNull String motorRightName,
+      @NonNull String motorLeftName,
+      boolean isMotorRightInverted,
+      boolean isMotorLeftInverted) {
+    getInstance();
 
-    protected DrivetrainBuilder() {
-    }
+    instance.motorLeftName = motorLeftName;
+    instance.motorRightName = motorRightName;
+    instance.motorLeftDirection =
+        isMotorLeftInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+    instance.motorRightDirection =
+        isMotorRightInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
 
-    /**
-     *
-     * @param motorRightName the name of the motor used on the right side
-     * @param motorLeftName  the name of the motor used on the left side
-     * @param isMotorRightInverted use true if counterclockwise rotation makes the robot go forward
-     * @param isMotorLeftInverted  use true if counterclockwise rotation makes the robot go forward
-     * @return DrivetrainBuilder instance
-     */
-    public static DrivetrainBuilder build(@NonNull String motorRightName, @NonNull String motorLeftName, boolean isMotorRightInverted, boolean isMotorLeftInverted) {
-        getInstance();
+    return instance;
+  }
 
-        instance.motorLeftName = motorLeftName;
-        instance.motorRightName = motorRightName;
-        instance.motorLeftDirection = isMotorLeftInverted
-                ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
-        instance.motorRightDirection = isMotorRightInverted
-                ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+  /**
+   * Initialize method from Subsystem Interface
+   *
+   * @param hardwareMap hardware map must be used as a parameter for the DcMotor objects to be read
+   *     from outside opmode files
+   */
+  @Override
+  public void initialize(HardwareMap hardwareMap) {
+    motorLeft = hardwareMap.get(DcMotor.class, motorLeftName);
+    motorRight = hardwareMap.get(DcMotor.class, motorRightName);
+    motorLeft.setDirection(motorLeftDirection);
+    motorRight.setDirection(motorRightDirection);
+  }
 
-        return instance;
-    }
+  /** Start method from Subsystem Interface */
+  @Override
+  public void start() {}
 
-    /**
-     * Initialize method from Subsystem Interface
-     * @param hardwareMap hardware map must be used as a parameter for the DcMotor objects to be read from outside opmode files
-     * @param telemetry using telemetry as a parameter allows for common telemetry commands to be used outside of opmode file
-     */
-    @Override
-    public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-        motorLeft = hardwareMap.get(DcMotor.class, motorLeftName);
-        motorRight = hardwareMap.get(DcMotor.class, motorRightName);
-        motorLeft.setDirection(motorLeftDirection);
-        motorRight.setDirection(motorRightDirection);
-    }
+  /** Execute method from Subsystem Interface */
+  @Override
+  public void execute() {}
 
-    /**
-     * Start method from Subsystem Interface
-     */
-    @Override
-    public void start() {
+  /** Stop method from Subsystem Interface */
+  @Override
+  public void stop() {
+    setPower(0, 0);
+  }
 
-    }
+  public void arcadeDrive(double xSpeed, double zRotation, double limit) {
+    limiter = limit;
+    calculatePower(xSpeed, zRotation);
+  }
 
-    /**
-     * Execute method from Subsystem Interface
-     * @param gamepadConfig
-     */
-    @Override
-    public void execute(GamepadManager gamepadConfig) {
-        driver = gamepadConfig.getDriver();
+  public void arcadeDrive(double xSpeed, double zRotation) {
+    limiter = 1;
+    calculatePower(xSpeed, zRotation);
+  }
 
-        arcadeDrive(-driver.getLeftStickY(), -driver.getRightStickX(), driver);
-    }
+  private void calculatePower(double xSpeed, double zRotation) {
+    double xSpeedLimited = Math.max(-limiter, Math.min(limiter, xSpeed));
+    double zRotationLimited = Math.max(-limiter, Math.min(limiter, zRotation));
 
-    /**
-     * Stop method from Subsystem Interface
-     */
-    @Override
-    public void stop() {
+    double leftSpeed = xSpeedLimited - zRotationLimited;
+    double rightSpeed = xSpeedLimited + zRotationLimited;
 
-    }
+    setPower(leftSpeed, rightSpeed);
+  }
 
-    /**
-     * Default Method for drive control. This method is for
-     * tank drivetrains.
-     * @param xSpeed
-     * @param zRotation
-     * @param driver
-     */
-    public void arcadeDrive(double xSpeed, double zRotation, SmartGamepad driver) {
-        limiter = LIMITER_DEFAULT;
+  public void setPower(double leftPower, double rightPower) {
+    motorLeft.setPower(leftPower);
+    motorRight.setPower(rightPower);
+    KoalaLog.log("Left_Power", leftPower, true);
+    KoalaLog.log("Right_Power", rightPower, true);
+  }
 
-        driver.whileButtonRightBumper()
-                .run(() -> limiter = LIMITER_MIN);
-
-        double xSpeedLimited = Math.max(-limiter, Math.min(limiter, xSpeed));
-        double zRotationLimited = Math.max(-limiter, Math.min(limiter, zRotation));
-
-        leftSpeed = xSpeedLimited - zRotationLimited;
-        rightSpeed = xSpeedLimited + zRotationLimited;
-
-        setPower(leftSpeed, rightSpeed);
-    }
-
-    public void setPower(double leftSpeed, double rightSpeed) {
-        this.leftSpeed = leftSpeed;
-        this.rightSpeed = rightSpeed;
-        motorLeft.setPower(leftSpeed);
-        motorRight.setPower(rightSpeed);
-    }
-
-    /**
-     * getInstance is a method used to create a instance of the subsystem.
-     * It's not good to have many objects of the same subsystem, so every
-     * subsystem in FGCLib will have just one instance, that is created
-     * with the getInstance method
-     * @return DriveTrainBuilder SingleTon
-     */
-    public static DrivetrainBuilder getInstance() {
+  /**
+   * getInstance is a method used to create a instance of the subsystem. It's not good to have many
+   * objects of the same subsystem, so every subsystem in FGCLib will have just one instance, that
+   * is created with the getInstance method
+   *
+   * @return DriveTrainBuilder SingleTon
+   */
+  public static DrivetrainBuilder getInstance() {
+    if (instance == null) {
+      synchronized (DrivetrainBuilder.class) {
         if (instance == null) {
-            instance = new DrivetrainBuilderAutoLogged();
+          instance = new DrivetrainBuilder();
         }
-        return instance;
+      }
     }
-
+    return instance;
+  }
 }

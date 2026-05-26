@@ -1,85 +1,159 @@
 package org.firstinspires.ftc.teamcode.core.lib.gamepad;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import java.util.function.BooleanSupplier;
 
-/**
- * SmartController class is a extension of the GamepadButton class.
- * It contains other functions of the gamepads, as rumble.
- * <br>
- * Always use this class instead of the GamepadButton.
- */
-public class SmartGamepad extends GamepadButton {
-    public Gamepad gamepad;
+public class SmartGamepad {
 
-    public enum Color {
-        RED,
-        BLUE,
-        GREEN,
-        WHITE,
+  private final Gamepad gamepad;
+  private final HIDController hid;
 
-    }
+  public SmartGamepad(Gamepad gamepad) {
+    this.gamepad = gamepad;
+    this.hid = new HIDController(gamepad);
+  }
 
-    public SmartGamepad(Gamepad gamepad) {
-        super(gamepad);
-        this.gamepad = gamepad;
-    }
+  public HIDController getHID() {
+    return hid;
+  }
 
-    public void rumbleTimer(int milliseconds) {
-        gamepad.rumble(1, 1, milliseconds);
-    }
+  public Trigger on(BooleanSupplier condition) {
+    return new Trigger(condition);
+  }
 
-    public void rumbleBlips(int counts) {
-        gamepad.rumbleBlips(counts);
-    }
+  public Trigger a() {
+    return on(() -> gamepad.a);
+  }
 
-    public void rumbleEnable() {
-        gamepad.rumble(1, 1, Gamepad.RUMBLE_DURATION_CONTINUOUS);
-    }
+  public Trigger b() {
+    return on(() -> gamepad.b);
+  }
 
-    public void rumbleStop() {
-        gamepad.stopRumble();
-    }
+  public Trigger x() {
+    return on(() -> gamepad.x);
+  }
 
-    public void ledSetColor(Color color) {
-        double[] rgb = getRGBValues(color);
-        gamepad.setLedColor(rgb[0], rgb[1], rgb[2], Gamepad.LED_DURATION_CONTINUOUS);
-    }
+  public Trigger y() {
+    return on(() -> gamepad.y);
+  }
 
-    public void ledSetColor(Color color, int durationMS) {
-        double[] rgb = getRGBValues(color);
-        gamepad.setLedColor(rgb[0], rgb[1], rgb[2], durationMS);
-    }
+  public Trigger dpadUp() {
+    return on(() -> gamepad.dpad_up);
+  }
 
-    private double[] getRGBValues(Color color) {
-        double r = 0;
-        double g = 0;
-        double b = 0;
+  public Trigger dpadDown() {
+    return on(() -> gamepad.dpad_down);
+  }
 
-        switch (color) {
-            case RED:
-                r = 1;
-                break;
-            case GREEN:
-                g = 1;
-                break;
-            case BLUE:
-                b = 1;
-                break;
-            case WHITE:
-                r = 1;
-                g = 1;
-                b = 1;
-                break;
-        }
+  public Trigger dpadLeft() {
+    return on(() -> gamepad.dpad_left);
+  }
 
-        return new double[]{r, g, b};
-    }
+  public Trigger dpadRight() {
+    return on(() -> gamepad.dpad_right);
+  }
 
-    public void ledSetRGB(double r, double g, double b, int durationMS) {
-        gamepad.setLedColor(r, g, b, durationMS);
-    }
+  public Trigger leftBumper() {
+    return on(() -> gamepad.left_bumper);
+  }
 
-    public void ledSetRGB(double r, double g, double b) {
-        gamepad.setLedColor(r, g, b, Gamepad.LED_DURATION_CONTINUOUS);
-    }
+  public Trigger rightBumper() {
+    return on(() -> gamepad.right_bumper);
+  }
+
+  public Trigger leftStick() {
+    return on(() -> gamepad.left_stick_button);
+  }
+
+  public Trigger rightStick() {
+    return on(() -> gamepad.right_stick_button);
+  }
+
+  public Trigger start() {
+    return on(() -> gamepad.start);
+  }
+
+  public Trigger back() {
+    return on(() -> gamepad.back);
+  }
+
+  public Trigger guide() {
+    return on(() -> gamepad.guide);
+  }
+
+  public Trigger leftTrigger() {
+    return on(() -> gamepad.left_trigger > ControllerConstants.TRIGGER_PRESSED_THRESHOLD_VALUE);
+  }
+
+  public Trigger leftTrigger(double threshold) {
+    return on(() -> gamepad.left_trigger > threshold);
+  }
+
+  public Trigger rightTrigger() {
+    return on(() -> gamepad.right_trigger > ControllerConstants.TRIGGER_PRESSED_THRESHOLD_VALUE);
+  }
+
+  public Trigger rightTrigger(double threshold) {
+    return on(() -> gamepad.right_trigger > threshold);
+  }
+
+  public Trigger leftX() {
+    return leftX(ControllerConstants.STICK_PRESSED_THRESHOLD_VALUE);
+  }
+
+  public Trigger leftX(double threshold) {
+    return on(() -> Math.abs(gamepad.left_stick_x) > threshold);
+  }
+
+  public Trigger leftY() {
+    return leftY(ControllerConstants.STICK_PRESSED_THRESHOLD_VALUE);
+  }
+
+  public Trigger leftY(double threshold) {
+    return on(() -> Math.abs(gamepad.left_stick_y) > threshold);
+  }
+
+  public Trigger rightX() {
+    return rightX(ControllerConstants.STICK_PRESSED_THRESHOLD_VALUE);
+  }
+
+  public Trigger rightX(double threshold) {
+    return on(() -> Math.abs(gamepad.right_stick_x) > threshold);
+  }
+
+  public Trigger rightY() {
+    return rightY(ControllerConstants.STICK_PRESSED_THRESHOLD_VALUE);
+  }
+
+  public Trigger rightY(double threshold) {
+    return on(() -> Math.abs(gamepad.right_stick_y) > threshold);
+  }
+
+  public double getLeftX() {
+    return gamepad.left_stick_x;
+  }
+
+  public double getLeftY() {
+    return gamepad.left_stick_y;
+  }
+
+  public double getRightX() {
+    return gamepad.right_stick_x;
+  }
+
+  public double getRightY() {
+    return gamepad.right_stick_y;
+  }
+
+  public double getLeftTriggerAxis() {
+    return gamepad.left_trigger;
+  }
+
+  public double getRightTriggerAxis() {
+    return gamepad.right_trigger;
+  }
+
+  public Gamepad getGamepad() {
+    return gamepad;
+  }
 }

@@ -5,7 +5,6 @@ import android.util.Size;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.GamepadManager;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
@@ -19,319 +18,334 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
+/**
+ * VisionSystem is the main vision subsystem of FGCLib.
+ *
+ * <p>
+ * Follows the same singleton pattern as DrivetrainBuilder.
+ * Use {@link #build(String)} to configure and register it
+ * in RobotSubsystems, and {@link #getInstance()} to access
+ * detections from OpModes.
+ * </p>
+ *
+ * <p>Basic usage in RobotSubsystems:</p>
+ * <pre>
+ *     VisionSystem.build(CameraConstants.WEBCAM_NAME)
+ *             .withAprilTags()
+ * </pre>
+ *
+ * <p>Usage with camera offset (recommended for accurate pose):</p>
+ * <pre>
+ *     VisionSystem.build(CameraConstants.WEBCAM_NAME)
+ *             .withCameraTransform(new AprilTagDetection.Transform3D(0.15, 0.10, 0.20))
+ *             .withAprilTags()
+ * </pre>
+ *
+ * <p>Accessing detections in OpModes:</p>
+ * <pre>
+ *     VisionSystem.getInstance().getAprilTagDetections()
+ * </pre>
+ *
+ * @author FGC Team Brazil
+ */
 public class VisionSystem implements Subsystem {
 
-    private static final long CAMERA_TIMEOUT_MS = 5000;
+    private static VisionSystem instance;
 
-    private String webcamName;
-    private CameraName camera;
-    private CameraConfig config;
-    private AprilTagLibrary tagLibrary;
+    private String                        webcamName;
+    private CameraConfig                  config;
+    private AprilTagLibrary               tagLibrary;
+    private AprilTagDetection.Transform3D cameraTransform;
+    private List<VisionProcessor>         extraProcessors;
 
-    private final List<VisionProcessor> extraProcessors =
-            new ArrayList<>();
-
-    private boolean useAprilTags = false;
-
-    private VisionPortal portal;
+    private VisionPortal      portal;
     private AprilTagProcessor aprilTagProcessor;
+    private Telemetry         telemetry;
+    private boolean           aprilTagEnabled;
 
-    private VisionSystem() {
-    }
+    private VisionSystem() {}
 
+    /**
+     * Configures and returns the VisionSystem instance.
+     *
+     * <p>Chain optional methods before adding to RobotSubsystems:</p>
+     * <pre>
+     *     VisionSystem.build(CameraConstants.WEBCAM_NAME)
+     *             .withCameraTransform(new AprilTagDetection.Transform3D(0.15, 0.10, 0.20))
+     *             .withAprilTags()
+     * </pre>
+     *
+     * @param webcamName webcam name in the HardwareMap.
+     * @return configured instance.
+     */
     public static VisionSystem build(String webcamName) {
-
-        VisionSystem vision = new VisionSystem();
-
-        vision.webcamName =
-                Objects.requireNonNull(
-                        webcamName,
-                        "webcamName não pode ser null"
-                );
-
-        return vision;
+        getInstance();
+        instance.webcamName      = webcamName;
+        instance.config          = CameraConfig.defaultConfig();
+        instance.tagLibrary      = null;
+        instance.cameraTransform = new AprilTagDetection.Transform3D(0, 0, 0);
+        instance.extraProcessors = new ArrayList<>();
+        instance.aprilTagEnabled = true;
+        return instance;
     }
 
-    public VisionSystem withAprilTags() {
-        this.useAprilTags = true;
+    /**
+     * Sets the camera position relative to the robot center.
+     *
+     * <p>
+     * Use this when the camera is not mounted at the robot center.
+     * The offset is applied to all detection coordinates so that
+     * positions are relative to the robot center instead of the camera.
+     * </p>
+     *
+     * <p>Example — camera mounted 15cm to the right,
+     * 10cm forward and 20cm above the robot center:</p>
+     * <pre>
+     *     .withCameraTransform(new AprilTagDetection.Transform3D(0.15, 0.10, 0.20))
+     * </pre>
+     *
+     * @param transform 3D offset of the camera relative to robot center.
+     * @return this instance for chaining.
+     */
+    public VisionSystem withCameraTransform(AprilTagDetection.Transform3D transform) {
+        this.cameraTransform = transform;
         return this;
     }
 
-    public VisionSystem withConfig(CameraConfig config)
-    {
-
-        this.config =
-                Objects.requireNonNull(
-                        config,
-                        "config não pode ser null"
-                );
-
+    /**
+     * Enables AprilTag detection with a custom tag library.
+     * Improves pose accuracy by providing physical tag sizes.
+     *
+     * @param library custom AprilTag library.
+     * @return this instance for chaining.
+     */
+    public VisionSystem withAprilTags(AprilTagLibrary library) {
+        this.tagLibrary = library;
         return this;
     }
 
+    /**
+     * Sets a custom camera configuration.
+     * If not called, uses {@link CameraConfig#defaultConfig()}.
+     *
+     * @param config camera configuration.
+     * @return this instance for chaining.
+     */
+    public VisionSystem withConfig(CameraConfig config) {
+        this.config = config;
+        return this;
+    }
+
+    /**
+     * Adds an extra OpenCV vision processor.
+     *
+     * @param processor processor to register in the VisionPortal.
+     * @return this instance for chaining.
+     */
     public VisionSystem withProcessor(VisionProcessor processor) {
-        this.extraProcessors.add(Objects.requireNonNull(processor, "processor não pode ser null"));
+        this.extraProcessors.add(processor);
         return this;
     }
 
     @Override
-    public void initialize(
-            HardwareMap hardwareMap,
-            Telemetry telemetry
-    ) {
+    public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.telemetry = telemetry;
 
-        if (config == null) {
-            config = CameraConfig.defaultConfig();
+        AprilTagProcessor.Builder aprilTagBuilder = new AprilTagProcessor.Builder()
+                .setDrawAxes(false)
+                .setDrawCubeProjection(true)
+                .setDrawTagOutline(false);
+
+        if (tagLibrary != null) {
+            aprilTagBuilder.setTagLibrary(tagLibrary);
         }
 
-        if (camera == null) {
+        aprilTagProcessor = aprilTagBuilder.build();
+        aprilTagProcessor.setDecimation(config.decimation);
 
-            if (webcamName == null ||
-                    webcamName.isBlank()) {
+        VisionPortal.Builder portalBuilder = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, webcamName))
+                .setCameraResolution(new Size(config.resolutionWidth, config.resolutionHeight))
+                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+                .enableLiveView(config.streamEnabled)
+                .setAutoStopLiveView(config.autoStopLiveView)
+                .addProcessor(aprilTagProcessor);
 
-                throw new IllegalStateException(
-                        "Nenhuma câmera foi definida."
-                );
-            }
-
-            camera = hardwareMap.get(
-                    WebcamName.class,
-                    webcamName
-            );
-        }
-
-        VisionPortal.Builder portalBuilder =
-                new VisionPortal.Builder()
-                        .setCamera(camera)
-                        .setCameraResolution(
-                                new Size(
-                                        config.resolutionWidth,
-                                        config.resolutionHeight
-                                )
-                        )
-                        .setStreamFormat(
-                                VisionPortal.StreamFormat.YUY2
-                        )
-                        .enableLiveView(
-                                config.streamEnabled
-                        )
-                        .setAutoStopLiveView(
-                                config.autoStopLiveView
-                        );
-
-        if (useAprilTags) {
-
-            AprilTagProcessor.Builder aprilBuilder =
-                    new AprilTagProcessor.Builder()
-                            .setDrawAxes(false)
-                            .setDrawCubeProjection(true)
-                            .setDrawTagOutline(false);
-
-            if (tagLibrary != null) {
-                aprilBuilder.setTagLibrary(tagLibrary);
-            }
-
-            aprilTagProcessor = aprilBuilder.build();
-
-            aprilTagProcessor.setDecimation(
-                    config.decimation
-            );
-
-            portalBuilder.addProcessor(
-                    aprilTagProcessor
-            );
-        }
-
-        for (VisionProcessor processor : extraProcessors) {
-            portalBuilder.addProcessor(processor);
+        for (VisionProcessor extra : extraProcessors) {
+            portalBuilder.addProcessor(extra);
         }
 
         portal = portalBuilder.build();
 
-        waitForStreaming();
-    }
-
-    @Override
-    public void start() {
-    }
-
-    @Override
-    public void stop() {
-
-        if (portal != null) {
-
-            portal.close();
-            portal = null;
-        }
-    }
-
-    @Override
-    public void execute(
-            GamepadManager gamepadManager
-    ) {
-    }
-
-    public List<AprilTagDetection>
-    getAprilTagDetections() {
-
-        if (aprilTagProcessor == null) {
-            return Collections.emptyList();
-        }
-
-        List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection>
-                raw = aprilTagProcessor.getDetections();
-
-        if (raw == null || raw.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<AprilTagDetection> result =
-                new ArrayList<>(raw.size());
-
-        for (
-                org.firstinspires.ftc.vision.apriltag.AprilTagDetection sdk
-                : raw
-        ) {
-
-            result.add(
-                    convertDetection(sdk)
-            );
-        }
-
-        return Collections.unmodifiableList(result);
-    }
-
-    public AprilTagDetection getFirstAprilTag() {
-
-        return getAprilTagDetections()
-                .stream()
-                .findFirst()
-                .orElse(null);
-    }
-
-    public AprilTagDetection getAprilTagById(
-            int id
-    ) {
-
-        for (
-                AprilTagDetection d
-                : getAprilTagDetections()
-        ) {
-
-            if (d.id == id) {
-                return d;
-            }
-        }
-
-        return null;
-    }
-
-    public boolean hasAprilTagDetections() {
-        return !getAprilTagDetections().isEmpty();
-    }
-
-    public VisionProcessor getProcessor(
-            int index
-    ) {
-
-        return extraProcessors.get(index);
-    }
-
-    public void setProcessorEnabled(
-            int index,
-            boolean enabled
-    ) {
-
-        if (portal == null) return;
-
-        if (
-                index < 0 ||
-                        index >= extraProcessors.size()
-        ) {
-            return;
-        }
-
-        portal.setProcessorEnabled(
-                extraProcessors.get(index),
-                enabled
-        );
-    }
-
-    private void waitForStreaming() {
-
-        long start =
-                System.currentTimeMillis();
-
-        while (
-                portal.getCameraState()
-                        != VisionPortal.CameraState.STREAMING
-        ) {
-
-            if (
-                    System.currentTimeMillis() - start
-                            > CAMERA_TIMEOUT_MS
-            ) {
-
-                throw new IllegalStateException(
-                        "Timeout ao iniciar VisionPortal."
-                );
-            }
-
+        while (portal.getCameraState() != VisionPortal.CameraState.STREAMING) {
             Thread.yield();
         }
     }
 
+    @Override
+    public void start() {}
+
+    @Override
+    public void stop() {
+        if (portal != null) {
+            portal.close();
+        }
+    }
+
+    @Override
+    public void execute(GamepadManager gamepadManager) {
+        List<AprilTagDetection> detections = getAprilTagDetections();
+        if (detections.isEmpty()) {
+            telemetry.addLine("[Vision] No AprilTag detected");
+        } else {
+            for (AprilTagDetection d : detections) {
+                telemetry.addData("[Vision] " + d.getDisplayName(),
+                        "x=%.2f y=%.2f z=%.2f yaw=%.1f°",
+                        d.getX(), d.getY(), d.getZ(), d.getYaw());
+            }
+        }
+    }
+
+    /**
+     * Returns all AprilTags detected in the current frame.
+     * Never returns null — returns empty list if no detections.
+     *
+     * @return immutable list of detections.
+     */
+    public List<AprilTagDetection> getAprilTagDetections() {
+        if (aprilTagProcessor == null) return Collections.emptyList();
+
+        List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection> raw =
+                aprilTagProcessor.getDetections();
+
+        if (raw == null || raw.isEmpty()) return Collections.emptyList();
+
+        List<AprilTagDetection> result = new ArrayList<>(raw.size());
+        for (org.firstinspires.ftc.vision.apriltag.AprilTagDetection sdk : raw) {
+            result.add(convertDetection(sdk));
+        }
+        return Collections.unmodifiableList(result);
+    }
+
+    /**
+     * Returns the first detected AprilTag, or null if none.
+     *
+     * @return first detection or null.
+     */
+    public AprilTagDetection getFirstAprilTag() {
+        List<AprilTagDetection> list = getAprilTagDetections();
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    /**
+     * Searches for an AprilTag by ID.
+     *
+     * @param id tag ID to search for.
+     * @return detection with the given ID, or null if not found.
+     */
+    public AprilTagDetection getAprilTagById(int id) {
+        for (AprilTagDetection d : getAprilTagDetections()) {
+            if (d.getID() == id) return d;
+        }
+        return null;
+    }
+
+    /**
+     * Returns true if at least one AprilTag is currently detected.
+     *
+     * @return true if detections are available.
+     */
+    public boolean hasAprilTagDetections() {
+        return !getAprilTagDetections().isEmpty();
+    }
+
+    public void enableAprilTags() {
+        if (portal != null && aprilTagProcessor != null) {
+            portal.setProcessorEnabled(aprilTagProcessor, true);
+            aprilTagEnabled = true;
+        }
+    }
+
+    public void disableAprilTags() {
+        if (portal != null && aprilTagProcessor != null) {
+            portal.setProcessorEnabled(aprilTagProcessor, false);
+            aprilTagEnabled = false;
+        }
+    }
+
+    public boolean isAprilTagEnabled() {
+        return aprilTagEnabled;
+    }
+
+    /**
+     * Enables or disables an extra OpenCV processor by index,
+     * in the order it was added via {@link #withProcessor}.
+     *
+     * @param processorIndex index of the processor.
+     * @param enabled        true to enable, false to disable.
+     */
+    public void setProcessorEnabled(int processorIndex, boolean enabled) {
+        if (portal != null && processorIndex < extraProcessors.size()) {
+            portal.setProcessorEnabled(extraProcessors.get(processorIndex), enabled);
+        }
+    }
+
+    /**
+     * Returns a direct reference to an extra OpenCV processor by index.
+     *
+     * @param index processor index.
+     * @return the VisionProcessor at the given index.
+     */
+    public VisionProcessor getProcessor(int index) {
+        return extraProcessors.get(index);
+    }
+
+    /**
+     * Returns the singleton instance of VisionSystem.
+     *
+     * <p>Use this in OpModes to access detections:</p>
+     * <pre>
+     *     VisionSystem.getInstance().getAprilTagDetections()
+     * </pre>
+     *
+     * @return singleton instance.
+     */
+    public static VisionSystem getInstance() {
+        if (instance == null) {
+            synchronized (VisionSystem.class) {
+                if (instance == null) {
+                    instance = new VisionSystem();
+                }
+            }
+        }
+        return instance;
+    }
+
     private AprilTagDetection convertDetection(
-            org.firstinspires.ftc.vision.apriltag.AprilTagDetection sdk
-    ) {
+            org.firstinspires.ftc.vision.apriltag.AprilTagDetection sdk) {
 
-        String name =
-                sdk.metadata != null
-                        ? sdk.metadata.name
-                        : "unknown";
+        String name = sdk.metadata != null ? sdk.metadata.name : "unknown";
 
-        double x = 0;
-        double y = 0;
-        double z = 0;
-
-        double roll = 0;
-        double pitch = 0;
-        double yaw = 0;
-
+        double x = 0, y = 0, z = 0, roll = 0, pitch = 0, yaw = 0;
         if (sdk.ftcPose != null) {
-
-            x = sdk.ftcPose.x;
-            y = sdk.ftcPose.y;
-            z = sdk.ftcPose.z;
-
-            roll = sdk.ftcPose.roll;
+            x     = sdk.ftcPose.x;   // lateral
+            y     = sdk.ftcPose.y;   // forward
+            z     = sdk.ftcPose.z;   // vertical (height)
+            roll  = sdk.ftcPose.roll;
             pitch = sdk.ftcPose.pitch;
-            yaw = sdk.ftcPose.yaw;
+            yaw   = sdk.ftcPose.yaw;
         }
 
-        double centerX =
-                sdk.center != null
-                        ? sdk.center.x
-                        : 0;
-
-        double centerY =
-                sdk.center != null
-                        ? sdk.center.y
-                        : 0;
+        double cx = sdk.center != null ? sdk.center.x : 0;
+        double cy = sdk.center != null ? sdk.center.y : 0;
 
         return new AprilTagDetection(
-                sdk.id,
-                name,
-                x,
-                y,
-                z,
-                roll,
-                pitch,
-                yaw,
-                centerX,
-                centerY
+                sdk.id, name,
+                x, y, z,
+                roll, pitch, yaw,
+                cx, cy,
+                cameraTransform
         );
     }
 }

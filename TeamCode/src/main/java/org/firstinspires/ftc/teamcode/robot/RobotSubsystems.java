@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.core.lib.vision.VisionSystem;
+import org.firstinspires.ftc.teamcode.core.lib.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.teamcode.core.lib.vision.camera.CameraConfig;
 import org.firstinspires.ftc.teamcode.robot.constants.DrivetrainBuilderConstants;
 import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
 
@@ -15,14 +18,22 @@ import java.util.List;
  */
 public class RobotSubsystems {
     private static final Subsystem[] subsystems = {
-//            DrivetrainBuilder.build(
-//                    DrivetrainBuilderConstants.MOTOR_RIGHT,
-//                    DrivetrainBuilderConstants.MOTOR_LEFT,
-//                    DrivetrainBuilderConstants.MOTOR_RIGHT_INVERTED,
-//                    DrivetrainBuilderConstants.MOTOR_LEFT_INVERTED
-//            ),
-            SubsystemExample.getInstance()
-            // Add more subsystems here
+         DrivetrainBuilder.build(
+                    DrivetrainBuilderConstants.MOTOR_RIGHT,
+                    DrivetrainBuilderConstants.MOTOR_LEFT,
+                    DrivetrainBuilderConstants.MOTOR_RIGHT_INVERTED,
+                    DrivetrainBuilderConstants.MOTOR_LEFT_INVERTED
+          ), VisionSystem.build("Webcam 1")
+            .withCameraTransform(new AprilTagDetection.Transform3D(0,0,0))
+            .withConfig(
+                    CameraConfig.build(
+                            1280,
+                            720,
+                            2,
+                            true,
+                            true
+                    )
+            )
     };
 
     /**

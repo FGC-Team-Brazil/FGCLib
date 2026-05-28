@@ -103,9 +103,9 @@ public class AprilTagDetection {
         this.id   = id;
         this.name = name;
 
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.x = x + cameraTransform.x;
+        this.y = y + cameraTransform.y;
+        this.z = z+ cameraTransform.z;
 
         this.roll  = roll;
         this.pitch = pitch;

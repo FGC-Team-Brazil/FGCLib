@@ -8,22 +8,21 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 
 /**
- * Utility subsystem for creating and controlling a two-motor differential
- * drivetrain.
+ * Utility subsystem for creating and controlling a two-motor differential drivetrain.
  *
- * <p>This builder encapsulates hardware initialization and basic arcade-drive
- * calculations, allowing teams to quickly configure tank-style drivetrains
- * without creating a dedicated subsystem.
+ * <p>This builder encapsulates hardware initialization and basic arcade-drive calculations,
+ * allowing teams to quickly configure tank-style drivetrains without creating a dedicated
+ * subsystem.
  *
  * <ul>
- *   <li>Supports two drive motors (left and right)</li>
- *   <li>Provides arcade drive control</li>
- *   <li>Supports motor direction inversion</li>
- *   <li>Automatically logs motor outputs through {@link KoalaLog}</li>
+ *   <li>Supports two drive motors (left and right)
+ *   <li>Provides arcade drive control
+ *   <li>Supports motor direction inversion
+ *   <li>Automatically logs motor outputs through {@link KoalaLog}
  * </ul>
  *
- * <p><b>Note:</b> This class does not support mecanum, omni, or other
- * holonomic drivetrain configurations.
+ * <p><b>Note:</b> This class does not support mecanum, omni, or other holonomic drivetrain
+ * configurations.
  */
 public class DrivetrainBuilder implements Subsystem {
   private static DrivetrainBuilder instance;
@@ -40,8 +39,8 @@ public class DrivetrainBuilder implements Subsystem {
   /**
    * Configures the drivetrain hardware before initialization.
    *
-   * <p>This method defines the motor names used in the robot configuration and
-   * the direction required for each side to move the robot forward.
+   * <p>This method defines the motor names used in the robot configuration and the direction
+   * required for each side to move the robot forward.
    *
    * @param motorRightName configuration name of the right drive motor
    * @param motorLeftName configuration name of the left drive motor
@@ -50,18 +49,18 @@ public class DrivetrainBuilder implements Subsystem {
    * @return configured drivetrain instance
    */
   public static DrivetrainBuilder build(
-          @NonNull String motorRightName,
-          @NonNull String motorLeftName,
-          boolean isMotorRightInverted,
-          boolean isMotorLeftInverted) {
+      @NonNull String motorRightName,
+      @NonNull String motorLeftName,
+      boolean isMotorRightInverted,
+      boolean isMotorLeftInverted) {
     getInstance();
 
     instance.motorLeftName = motorLeftName;
     instance.motorRightName = motorRightName;
     instance.motorLeftDirection =
-            isMotorLeftInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+        isMotorLeftInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
     instance.motorRightDirection =
-            isMotorRightInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+        isMotorRightInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
 
     return instance;
   }
@@ -69,8 +68,8 @@ public class DrivetrainBuilder implements Subsystem {
   /**
    * Maps and configures the drivetrain motors from the robot hardware.
    *
-   * <p>This method must be called during subsystem initialization before any
-   * drive commands are executed.
+   * <p>This method must be called during subsystem initialization before any drive commands are
+   * executed.
    *
    * @param hardwareMap FTC hardware map used to retrieve motor devices
    */
@@ -93,8 +92,7 @@ public class DrivetrainBuilder implements Subsystem {
   /**
    * Stops all drivetrain movement.
    *
-   * <p>This method is automatically called when the robot is disabled or the
-   * OpMode ends.
+   * <p>This method is automatically called when the robot is disabled or the OpMode ends.
    */
   @Override
   public void stop() {
@@ -104,8 +102,7 @@ public class DrivetrainBuilder implements Subsystem {
   /**
    * Drives the robot using arcade-drive control with an output limiter.
    *
-   * <p>{@code xSpeed} controls forward/backward movement while
-   * {@code zRotation} controls turning.
+   * <p>{@code xSpeed} controls forward/backward movement while {@code zRotation} controls turning.
    *
    * @param xSpeed forward/backward command
    * @param zRotation rotational command
@@ -146,8 +143,7 @@ public class DrivetrainBuilder implements Subsystem {
   /**
    * Applies power directly to the drivetrain motors.
    *
-   * <p>Positive values drive the robot forward according to the configured
-   * motor directions.
+   * <p>Positive values drive the robot forward according to the configured motor directions.
    *
    * @param leftPower power applied to the left motor
    * @param rightPower power applied to the right motor
@@ -162,8 +158,8 @@ public class DrivetrainBuilder implements Subsystem {
   /**
    * Returns the singleton drivetrain instance.
    *
-   * <p>Only one drivetrain should exist on a robot. This method guarantees
-   * that a single shared instance is used throughout the application.
+   * <p>Only one drivetrain should exist on a robot. This method guarantees that a single shared
+   * instance is used throughout the application.
    *
    * @return singleton {@link DrivetrainBuilder} instance
    */

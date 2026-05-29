@@ -14,10 +14,9 @@ import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 /**
  * Base container responsible for managing the robot lifecycle.
  *
- * <p>This class centralizes subsystem initialization, execution, shutdown,
- * trigger processing, telemetry forwarding, and logging integration.
- * User-defined robot containers should extend this class and override
- * {@link #configureBindings()} to register controller bindings and triggers.
+ * <p>This class centralizes subsystem initialization, execution, shutdown, trigger processing,
+ * telemetry forwarding, and logging integration. User-defined robot containers should extend this
+ * class and override {@link #configureBindings()} to register controller bindings and triggers.
  */
 public class RobotContainerInternal {
 
@@ -35,8 +34,7 @@ public class RobotContainerInternal {
   }
 
   /**
-   * Initializes all registered subsystems and prepares telemetry, triggers,
-   * and logging services.
+   * Initializes all registered subsystems and prepares telemetry, triggers, and logging services.
    *
    * @param hardwareMap FTC hardware map used for device initialization
    * @param telemetry telemetry instance used to report robot data
@@ -53,8 +51,8 @@ public class RobotContainerInternal {
   /**
    * Starts all registered subsystems and configures operator bindings.
    *
-   * <p>This method should be called once when the OpMode transitions
-   * from initialization to execution.
+   * <p>This method should be called once when the OpMode transitions from initialization to
+   * execution.
    */
   public void start() {
     subsystems.forEach(Subsystem::start);
@@ -68,8 +66,8 @@ public class RobotContainerInternal {
   /**
    * Executes one iteration of the robot control loop.
    *
-   * <p>Updates trigger states, executes all registered subsystems,
-   * refreshes telemetry, and processes automatic logging.
+   * <p>Updates trigger states, executes all registered subsystems, refreshes telemetry, and
+   * processes automatic logging.
    */
   public void loop() {
     Trigger.updateAll();
@@ -83,8 +81,8 @@ public class RobotContainerInternal {
   /**
    * Stops all registered subsystems and finalizes active logging sessions.
    *
-   * <p>This method should be called when the OpMode is terminated to ensure
-   * motors, actuators, and services are properly shut down.
+   * <p>This method should be called when the OpMode is terminated to ensure motors, actuators, and
+   * services are properly shut down.
    */
   public void stop() {
     subsystems.forEach(Subsystem::stop);
@@ -96,8 +94,8 @@ public class RobotContainerInternal {
   /**
    * Registers controller bindings, triggers, and robot actions.
    *
-   * <p>Override this method in the user robot container to configure
-   * button mappings and event-driven behaviors.
+   * <p>Override this method in the user robot container to configure button mappings and
+   * event-driven behaviors.
    */
   protected void configureBindings() {}
 }

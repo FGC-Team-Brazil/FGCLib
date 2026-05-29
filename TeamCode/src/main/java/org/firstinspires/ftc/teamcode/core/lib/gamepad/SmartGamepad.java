@@ -6,9 +6,9 @@ import java.util.function.BooleanSupplier;
 /**
  * Wrapper around the FTC {@link Gamepad} that exposes each input as a {@link Trigger}.
  *
- * <p>This class is intended to make robot control bindings cleaner and more expressive by
- * turning buttons, triggers, and stick thresholds into reusable event conditions. It also
- * provides direct access to analog axes for drive and mechanism control.
+ * <p>This class is intended to make robot control bindings cleaner and more expressive by turning
+ * buttons, triggers, and stick thresholds into reusable event conditions. It also provides direct
+ * access to analog axes for drive and mechanism control.
  */
 public class SmartGamepad {
 
@@ -31,8 +31,8 @@ public class SmartGamepad {
   /**
    * Returns the low-level HID controller wrapper.
    *
-   * <p>This can be used when direct access to controller-specific behavior is needed
-   * beyond the trigger-based API.
+   * <p>This can be used when direct access to controller-specific behavior is needed beyond the
+   * trigger-based API.
    *
    * @return the underlying HID controller wrapper
    */
@@ -188,8 +188,7 @@ public class SmartGamepad {
   /**
    * Returns a trigger for the left trigger using the default activation threshold.
    *
-   * <p>This is useful for detecting deliberate trigger pulls instead of small
-   * accidental movements.
+   * <p>This is useful for detecting deliberate trigger pulls instead of small accidental movements.
    *
    * @return trigger that becomes true while the left trigger exceeds the default threshold
    */

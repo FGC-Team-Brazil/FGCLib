@@ -7,13 +7,12 @@ import java.util.function.BooleanSupplier;
 /**
  * Represents a boolean condition that can be bound to robot actions.
  *
- * <p>This class is used to model driver inputs, sensor states, and logical
- * combinations of conditions in an event-driven control flow. It supports
- * continuous actions while a condition remains true or false, as well as
- * edge-triggered actions when the condition changes state.
+ * <p>This class is used to model driver inputs, sensor states, and logical combinations of
+ * conditions in an event-driven control flow. It supports continuous actions while a condition
+ * remains true or false, as well as edge-triggered actions when the condition changes state.
  *
- * <p>Typical uses include button presses, limit switches, sensor thresholds,
- * and combined driver control logic.
+ * <p>Typical uses include button presses, limit switches, sensor thresholds, and combined driver
+ * control logic.
  */
 public class Trigger {
 
@@ -23,8 +22,8 @@ public class Trigger {
   /**
    * Polls every active trigger and evaluates its bound actions.
    *
-   * <p>This should be called once per robot loop so all registered trigger
-   * conditions can react to input changes and maintain continuous actions.
+   * <p>This should be called once per robot loop so all registered trigger conditions can react to
+   * input changes and maintain continuous actions.
    */
   public static void updateAll() {
     for (Trigger trigger : activeTriggers) {
@@ -35,8 +34,8 @@ public class Trigger {
   /**
    * Clears all registered triggers from the active trigger list.
    *
-   * <p>This is typically called when a new OpMode begins to avoid keeping
-   * bindings from a previous robot session.
+   * <p>This is typically called when a new OpMode begins to avoid keeping bindings from a previous
+   * robot session.
    */
   public static void clearAll() {
     activeTriggers.clear();
@@ -63,8 +62,8 @@ public class Trigger {
   /**
    * Creates a new trigger from a boolean condition.
    *
-   * <p>The trigger is automatically added to the active trigger list so it
-   * can be evaluated by {@link #updateAll()}.
+   * <p>The trigger is automatically added to the active trigger list so it can be evaluated by
+   * {@link #updateAll()}.
    *
    * @param condition boolean condition that defines this trigger
    */
@@ -123,8 +122,8 @@ public class Trigger {
   /**
    * Registers an action that runs continuously while the trigger remains true.
    *
-   * <p>This is useful for mechanisms that should keep receiving power or
-   * repeated commands while a control input stays active.
+   * <p>This is useful for mechanisms that should keep receiving power or repeated commands while a
+   * control input stays active.
    *
    * @param action action to run while the condition is true
    * @return this trigger instance for chaining
@@ -150,8 +149,8 @@ public class Trigger {
   /**
    * Registers an action that runs once when the trigger transitions to true.
    *
-   * <p>This is typically used for event-driven robot actions such as toggles,
-   * setpoints, and one-shot commands.
+   * <p>This is typically used for event-driven robot actions such as toggles, setpoints, and
+   * one-shot commands.
    *
    * @param action action to run on the rising edge
    * @return this trigger instance for chaining
@@ -164,8 +163,8 @@ public class Trigger {
   /**
    * Registers an action that runs once when the trigger transitions to false.
    *
-   * <p>This is typically used to stop motors, cancel commands, or reset state
-   * when a control input is released.
+   * <p>This is typically used to stop motors, cancel commands, or reset state when a control input
+   * is released.
    *
    * @param action action to run on the falling edge
    * @return this trigger instance for chaining
@@ -178,8 +177,8 @@ public class Trigger {
   /**
    * Evaluates the trigger condition and executes the appropriate actions.
    *
-   * <p>This method handles both continuous actions and edge-triggered actions
-   * based on the current and previous state of the condition.
+   * <p>This method handles both continuous actions and edge-triggered actions based on the current
+   * and previous state of the condition.
    */
   void poll() {
     boolean current = condition.getAsBoolean();

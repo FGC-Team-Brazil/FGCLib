@@ -3,18 +3,15 @@ package org.firstinspires.ftc.teamcode.core.lib.gamepad;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 /**
- * Provides access to the gamepad Human Interface Device (HID) features such as
- * controller rumble and LED feedback.
+ * Provides access to the gamepad Human Interface Device (HID) features such as controller rumble
+ * and LED feedback.
  *
- * <p>This class allows robot code to communicate status information to drivers
- * through haptic feedback and controller lighting, improving driver awareness
- * without requiring visual telemetry.
+ * <p>This class allows robot code to communicate status information to drivers through haptic
+ * feedback and controller lighting, improving driver awareness without requiring visual telemetry.
  */
 public class HIDController {
 
-  /**
-   * Predefined LED colors that can be applied to the controller.
-   */
+  /** Predefined LED colors that can be applied to the controller. */
   public enum LedColor {
 
     /** Red LED color. */
@@ -72,8 +69,8 @@ public class HIDController {
   /**
    * Activates vibration on both rumble motors for a fixed duration.
    *
-   * <p>Useful for notifying drivers about events such as scoring,
-   * reaching a target position, or low battery warnings.
+   * <p>Useful for notifying drivers about events such as scoring, reaching a target position, or
+   * low battery warnings.
    *
    * @param durationMs vibration duration in milliseconds
    */
@@ -92,9 +89,7 @@ public class HIDController {
     gamepad.rumble(motor1, motor2, durationMs);
   }
 
-  /**
-   * Starts continuous vibration until {@link #rumbleStop()} is called.
-   */
+  /** Starts continuous vibration until {@link #rumbleStop()} is called. */
   public void rumbleContinuous() {
     gamepad.rumble(1.0, 1.0, Gamepad.RUMBLE_DURATION_CONTINUOUS);
   }
@@ -108,9 +103,7 @@ public class HIDController {
     gamepad.rumbleBlips(count);
   }
 
-  /**
-   * Stops any active rumble effect running on the controller.
-   */
+  /** Stops any active rumble effect running on the controller. */
   public void rumbleStop() {
     gamepad.stopRumble();
   }

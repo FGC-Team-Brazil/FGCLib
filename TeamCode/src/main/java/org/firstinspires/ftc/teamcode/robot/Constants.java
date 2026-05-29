@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 /**
- * Centralized storage for robot configuration values such as hardware names,
- * inversion settings, and control constants.
+ * Centralized storage for robot configuration values such as hardware names, inversion settings,
+ * and control constants.
  *
- * <p>Organizing constants in a single location makes maintenance easier and
- * avoids hardcoded values throughout the codebase.
+ * <p>Organizing constants in a single location makes maintenance easier and avoids hardcoded values
+ * throughout the codebase.
  */
 public class Constants {
 

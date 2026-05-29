@@ -8,12 +8,22 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 
 /**
- * DrivetrainBuilder is a helper class that assists on the creation of a Drivetrain Subsystem.
+ * Utility subsystem for creating and controlling a two-motor differential
+ * drivetrain.
  *
- * <p>It contains some usual boilerplate for creating a subsystem. Use it when creating tank
- * drivetrains with two motors.
+ * <p>This builder encapsulates hardware initialization and basic arcade-drive
+ * calculations, allowing teams to quickly configure tank-style drivetrains
+ * without creating a dedicated subsystem.
  *
- * <p>Caution: This class don't support holonomic drivetrains
+ * <ul>
+ *   <li>Supports two drive motors (left and right)</li>
+ *   <li>Provides arcade drive control</li>
+ *   <li>Supports motor direction inversion</li>
+ *   <li>Automatically logs motor outputs through {@link KoalaLog}</li>
+ * </ul>
+ *
+ * <p><b>Note:</b> This class does not support mecanum, omni, or other
+ * holonomic drivetrain configurations.
  */
 public class DrivetrainBuilder implements Subsystem {
   private static DrivetrainBuilder instance;
@@ -28,34 +38,41 @@ public class DrivetrainBuilder implements Subsystem {
   protected DrivetrainBuilder() {}
 
   /**
-   * @param motorRightName the name of the motor used on the right side
-   * @param motorLeftName the name of the motor used on the left side
-   * @param isMotorRightInverted use true if counterclockwise rotation makes the robot go forward
-   * @param isMotorLeftInverted use true if counterclockwise rotation makes the robot go forward
-   * @return DrivetrainBuilder instance
+   * Configures the drivetrain hardware before initialization.
+   *
+   * <p>This method defines the motor names used in the robot configuration and
+   * the direction required for each side to move the robot forward.
+   *
+   * @param motorRightName configuration name of the right drive motor
+   * @param motorLeftName configuration name of the left drive motor
+   * @param isMotorRightInverted {@code true} if the right motor must be reversed
+   * @param isMotorLeftInverted {@code true} if the left motor must be reversed
+   * @return configured drivetrain instance
    */
   public static DrivetrainBuilder build(
-      @NonNull String motorRightName,
-      @NonNull String motorLeftName,
-      boolean isMotorRightInverted,
-      boolean isMotorLeftInverted) {
+          @NonNull String motorRightName,
+          @NonNull String motorLeftName,
+          boolean isMotorRightInverted,
+          boolean isMotorLeftInverted) {
     getInstance();
 
     instance.motorLeftName = motorLeftName;
     instance.motorRightName = motorRightName;
     instance.motorLeftDirection =
-        isMotorLeftInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+            isMotorLeftInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
     instance.motorRightDirection =
-        isMotorRightInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
+            isMotorRightInverted ? DcMotorSimple.Direction.REVERSE : DcMotorSimple.Direction.FORWARD;
 
     return instance;
   }
 
   /**
-   * Initialize method from Subsystem Interface
+   * Maps and configures the drivetrain motors from the robot hardware.
    *
-   * @param hardwareMap hardware map must be used as a parameter for the DcMotor objects to be read
-   *     from outside opmode files
+   * <p>This method must be called during subsystem initialization before any
+   * drive commands are executed.
+   *
+   * @param hardwareMap FTC hardware map used to retrieve motor devices
    */
   @Override
   public void initialize(HardwareMap hardwareMap) {
@@ -65,30 +82,57 @@ public class DrivetrainBuilder implements Subsystem {
     motorRight.setDirection(motorRightDirection);
   }
 
-  /** Start method from Subsystem Interface */
+  /** Called when the robot enters the start phase. */
   @Override
   public void start() {}
 
-  /** Execute method from Subsystem Interface */
+  /** Periodic drivetrain execution method. */
   @Override
   public void execute() {}
 
-  /** Stop method from Subsystem Interface */
+  /**
+   * Stops all drivetrain movement.
+   *
+   * <p>This method is automatically called when the robot is disabled or the
+   * OpMode ends.
+   */
   @Override
   public void stop() {
     setPower(0, 0);
   }
 
+  /**
+   * Drives the robot using arcade-drive control with an output limiter.
+   *
+   * <p>{@code xSpeed} controls forward/backward movement while
+   * {@code zRotation} controls turning.
+   *
+   * @param xSpeed forward/backward command
+   * @param zRotation rotational command
+   * @param limit maximum output magnitude applied to inputs
+   */
   public void arcadeDrive(double xSpeed, double zRotation, double limit) {
     limiter = limit;
     calculatePower(xSpeed, zRotation);
   }
 
+  /**
+   * Drives the robot using arcade-drive control at full output range.
+   *
+   * @param xSpeed forward/backward command
+   * @param zRotation rotational command
+   */
   public void arcadeDrive(double xSpeed, double zRotation) {
     limiter = 1;
     calculatePower(xSpeed, zRotation);
   }
 
+  /**
+   * Converts arcade-drive commands into left and right motor powers.
+   *
+   * @param xSpeed forward/backward command
+   * @param zRotation rotational command
+   */
   private void calculatePower(double xSpeed, double zRotation) {
     double xSpeedLimited = Math.max(-limiter, Math.min(limiter, xSpeed));
     double zRotationLimited = Math.max(-limiter, Math.min(limiter, zRotation));
@@ -99,6 +143,15 @@ public class DrivetrainBuilder implements Subsystem {
     setPower(leftSpeed, rightSpeed);
   }
 
+  /**
+   * Applies power directly to the drivetrain motors.
+   *
+   * <p>Positive values drive the robot forward according to the configured
+   * motor directions.
+   *
+   * @param leftPower power applied to the left motor
+   * @param rightPower power applied to the right motor
+   */
   public void setPower(double leftPower, double rightPower) {
     motorLeft.setPower(leftPower);
     motorRight.setPower(rightPower);
@@ -107,11 +160,12 @@ public class DrivetrainBuilder implements Subsystem {
   }
 
   /**
-   * getInstance is a method used to create a instance of the subsystem. It's not good to have many
-   * objects of the same subsystem, so every subsystem in FGCLib will have just one instance, that
-   * is created with the getInstance method
+   * Returns the singleton drivetrain instance.
    *
-   * @return DriveTrainBuilder SingleTon
+   * <p>Only one drivetrain should exist on a robot. This method guarantees
+   * that a single shared instance is used throughout the application.
+   *
+   * @return singleton {@link DrivetrainBuilder} instance
    */
   public static DrivetrainBuilder getInstance() {
     if (instance == null) {

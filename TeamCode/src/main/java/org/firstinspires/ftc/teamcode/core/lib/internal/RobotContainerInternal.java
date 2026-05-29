@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.util;
+package org.firstinspires.ftc.teamcode.core.lib.internal;
 
 import Ori.Coval.Logging.AutoLogManager;
 import Ori.Coval.Logging.Logger.KoalaLog;

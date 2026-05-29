@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.core.util;
 
+import Ori.Coval.Logging.Logger.KoalaLog;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,7 +9,6 @@ public final class PeriodicTimer {
   private static final double OVERRUN_THRESHOLD_MS = 20.0;
 
   private static final Map<String, Long> starts = new ConcurrentHashMap<>();
-  private static final Map<String, Long> lastTicks = new ConcurrentHashMap<>();
   private static final Map<String, TimerStats> allStats = new ConcurrentHashMap<>();
 
   private PeriodicTimer() {}
@@ -25,36 +25,34 @@ public final class PeriodicTimer {
     updateStats(name, elapsedMs);
   }
 
-  public static void tick(String name) {
-    long now = System.nanoTime();
-    Long last = lastTicks.put(name, now);
-
-    if (last != null) {
-      double elapsedMs = (now - last) / 1_000_000.0;
-      updateStats(name, elapsedMs);
-    }
-  }
-
   private static void updateStats(String name, double elapsedMs) {
-    TimerStats s = allStats.computeIfAbsent(name, k -> new TimerStats());
-    s.addSample(elapsedMs);
+    TimerStats stats = allStats.computeIfAbsent(name, k -> new TimerStats());
+    stats.addSample(elapsedMs);
+
+    KoalaLog.log("Timers/" + name + "/LastMs", stats.getLast(), true);
+    KoalaLog.log("Timers/" + name + "/AvgMs", stats.getAverage(), true);
+    KoalaLog.log("Timers/" + name + "/MaxMs", stats.getMax(), true);
+    KoalaLog.log("Timers/" + name + "/Overruns", stats.getOverruns(), true);
   }
 
   public static String getSummary(String name) {
-    TimerStats s = allStats.get(name);
-    if (s == null) return "No data";
-    return s.toString();
+    TimerStats stats = allStats.get(name);
+    if (stats == null) return "No data";
+    return stats.toString();
   }
 
   public static void reset(String name) {
     starts.remove(name);
-    lastTicks.remove(name);
     allStats.remove(name);
   }
 
-  private static class TimerStats {
-    double last = 0, min = 999, max = 0, sum = 0;
-    long count = 0, overruns = 0;
+  private static final class TimerStats {
+    private double last = 0;
+    private double min = 999;
+    private double max = 0;
+    private double sum = 0;
+    private long count = 0;
+    private long overruns = 0;
 
     synchronized void addSample(double ms) {
       last = ms;
@@ -65,10 +63,20 @@ public final class PeriodicTimer {
       if (ms > OVERRUN_THRESHOLD_MS) overruns++;
     }
 
-    @Override
-    public synchronized String toString() {
-      return String.format(
-          "%.1fms (Avg: %.1f | Max: %.1f) [Over: %d]", last, (sum / count), max, overruns);
+    synchronized double getLast() {
+      return last;
+    }
+
+    synchronized double getAverage() {
+      return count == 0 ? 0.0 : sum / count;
+    }
+
+    synchronized double getMax() {
+      return max;
+    }
+
+    synchronized long getOverruns() {
+      return overruns;
     }
   }
 }

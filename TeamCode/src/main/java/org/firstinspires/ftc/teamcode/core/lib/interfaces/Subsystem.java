@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.core.lib.interfaces;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
  * Standard interface used to build subsystems.
@@ -14,9 +13,8 @@ public interface Subsystem {
    * Initialize: instantiates the subsystem hardware here;
    *
    * @param hardwareMap
-   * @param telemetry
    */
-  void initialize(HardwareMap hardwareMap, Telemetry telemetry);
+  void initialize(HardwareMap hardwareMap);
 
   /** Start method is supposed to run when the start button is pressed. */
   void start();

@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.Trigger;
-import org.firstinspires.ftc.teamcode.core.util.RobotContainerInternal;
+import org.firstinspires.ftc.teamcode.core.lib.internal.RobotContainerInternal;
 import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
 
 /**

@@ -1,6 +1,10 @@
-package org.firstinspires.ftc.teamcode.core.util;
+package org.firstinspires.ftc.teamcode.core.lib.internal;
 
+import Ori.Coval.Logging.AutoLogManager;
+import Ori.Coval.Logging.Logger.KoalaLog;
 import androidx.annotation.NonNull;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -24,10 +28,10 @@ public class RobotContainerInternal {
    * @param telemetry
    */
   public void init(@NonNull HardwareMap hardwareMap, @NonNull Telemetry telemetry) {
-    this.telemetry = telemetry;
+    this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+    subsystems.forEach(subsystem -> subsystem.initialize(hardwareMap));
     Trigger.clearAll();
-    subsystems.forEach(subsystem -> subsystem.initialize(hardwareMap, telemetry));
-    telemetry.update();
+    KoalaLog.setup(hardwareMap);
   }
 
   /** Run the start method from all subsystems */
@@ -35,6 +39,7 @@ public class RobotContainerInternal {
     subsystems.forEach(Subsystem::start);
     telemetry.update();
     configureBindings();
+    KoalaLog.start();
   }
 
   /** Run the loop method from all subsystems */
@@ -42,12 +47,14 @@ public class RobotContainerInternal {
     Trigger.updateAll();
     subsystems.forEach(Subsystem::execute);
     telemetry.update();
+    AutoLogManager.periodic();
   }
 
   /** Run the stop method from all subsystems */
   public void stop() {
     subsystems.forEach(Subsystem::stop);
     telemetry.update();
+    KoalaLog.stop();
   }
 
   protected void configureBindings() {}

@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.core.lib.builders;
 
+import Ori.Coval.Logging.Logger.KoalaLog;
 import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 
 /**
@@ -24,9 +24,8 @@ public class DrivetrainBuilder implements Subsystem {
   private double limiter;
   private DcMotor motorRight;
   private DcMotor motorLeft;
-  private Telemetry telemetry;
 
-  private DrivetrainBuilder() {}
+  protected DrivetrainBuilder() {}
 
   /**
    * @param motorRightName the name of the motor used on the right side
@@ -57,12 +56,9 @@ public class DrivetrainBuilder implements Subsystem {
    *
    * @param hardwareMap hardware map must be used as a parameter for the DcMotor objects to be read
    *     from outside opmode files
-   * @param telemetry using telemetry as a parameter allows for common telemetry commands to be used
-   *     outside of opmode file
    */
   @Override
-  public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-    this.telemetry = telemetry;
+  public void initialize(HardwareMap hardwareMap) {
     motorLeft = hardwareMap.get(DcMotor.class, motorLeftName);
     motorRight = hardwareMap.get(DcMotor.class, motorRightName);
     motorLeft.setDirection(motorLeftDirection);
@@ -75,9 +71,7 @@ public class DrivetrainBuilder implements Subsystem {
 
   /** Execute method from Subsystem Interface */
   @Override
-  public void execute() {
-    telemetry.addData("DrivetrainBuilder Subsystem", "Running");
-  }
+  public void execute() {}
 
   /** Stop method from Subsystem Interface */
   @Override
@@ -105,9 +99,11 @@ public class DrivetrainBuilder implements Subsystem {
     setPower(leftSpeed, rightSpeed);
   }
 
-  public void setPower(double leftSpeed, double rightSpeed) {
-    motorLeft.setPower(leftSpeed);
-    motorRight.setPower(rightSpeed);
+  public void setPower(double leftPower, double rightPower) {
+    motorLeft.setPower(leftPower);
+    motorRight.setPower(rightPower);
+    KoalaLog.log("Left_Power", leftPower, true);
+    KoalaLog.log("Right_Power", rightPower, true);
   }
 
   /**

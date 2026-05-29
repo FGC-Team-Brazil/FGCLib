@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
+import Ori.Coval.Logging.AutoLog;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
 import org.firstinspires.ftc.teamcode.robot.Constants;
@@ -15,10 +15,10 @@ import org.firstinspires.ftc.teamcode.robot.Constants;
  * setTargetAngle() should be called by Commands or the RobotContainer to control the mechanism. The
  * execute() method runs the PID loop and hardware protections automatically.
  */
+@AutoLog
 public class SubsystemExample implements Subsystem {
 
-  private static SubsystemExample instance;
-  private Telemetry telemetry;
+  private static SubsystemExampleAutoLogged instance;
 
   private DcMotor motorRight;
   private DcMotor motorLeft;
@@ -34,13 +34,11 @@ public class SubsystemExample implements Subsystem {
   private double targetAngle = 0.0;
   private double manualPower = 0.0;
 
-  private SubsystemExample() {}
+  protected SubsystemExample() {}
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   @Override
-  public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-    this.telemetry = telemetry;
-
+  public void initialize(HardwareMap hardwareMap) {
     motorRight = hardwareMap.get(DcMotor.class, Constants.SubsystemExample.MOTOR_RIGHT);
     motorLeft = hardwareMap.get(DcMotor.class, Constants.SubsystemExample.MOTOR_LEFT);
     limitRight = hardwareMap.get(TouchSensor.class, Constants.SubsystemExample.LIMIT_RIGHT);
@@ -59,8 +57,6 @@ public class SubsystemExample implements Subsystem {
             Constants.SubsystemExample.PID.kF);
     pidController.enableMotionProfile(2200, 4400);
     pidController.enableVoltageCompensation(hardwareMap);
-
-    telemetry.addData("SubsystemExample", "Initialized");
   }
 
   @Override
@@ -104,14 +100,6 @@ public class SubsystemExample implements Subsystem {
 
     motorLeft.setPower(power);
     motorRight.setPower(power);
-
-    telemetry.addData("SubsystemExample", "Running");
-    telemetry.addData("Mode", isPidEnabled ? "PID (Auto)" : "Manual");
-    telemetry.addData("Motor Power", power);
-    telemetry.addData("Position (Ticks)", currentPosition);
-    telemetry.addData("Position (Degrees)", currentAngle);
-    telemetry.addData("Target Angle", targetAngle);
-    telemetry.addData("At target", pidController.atTarget());
   }
 
   @Override
@@ -178,9 +166,9 @@ public class SubsystemExample implements Subsystem {
    *
    * @return SubsystemExample instance
    */
-  public static synchronized SubsystemExample getInstance() {
+  public static synchronized SubsystemExampleAutoLogged getInstance() {
     if (instance == null) {
-      instance = new SubsystemExample();
+      instance = new SubsystemExampleAutoLogged();
     }
     return instance;
   }

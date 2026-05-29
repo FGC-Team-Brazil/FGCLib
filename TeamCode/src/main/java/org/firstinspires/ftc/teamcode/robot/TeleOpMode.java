@@ -11,26 +11,22 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleOpMode extends OpMode {
   private RobotContainer robot;
 
-  /** Runs the initialize method of all subsystems */
   @Override
   public void init() {
     robot = new RobotContainer(gamepad1, gamepad2);
     robot.init(hardwareMap, telemetry);
   }
 
-  /** Runs the start method of all subsystems */
   @Override
   public void start() {
     robot.start();
   }
 
-  /** Runs the execute method of all subsystems */
   @Override
   public void loop() {
     robot.loop();
   }
 
-  /** Runs the stop method of all subsystems */
   @Override
   public void stop() {
     robot.stop();

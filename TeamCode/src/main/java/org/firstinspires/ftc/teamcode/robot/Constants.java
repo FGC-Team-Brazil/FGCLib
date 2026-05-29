@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.robot;
 
 public class Constants {
 
-  public class DrivetrainBuilderConstants {
+  public static class DrivetrainBuilderConstants {
     public static final String MOTOR_RIGHT = "drivetrain_motorRight";
     public static final String MOTOR_LEFT = "drivetrain_motorLeft";
     public static final boolean MOTOR_RIGHT_INVERTED = false;

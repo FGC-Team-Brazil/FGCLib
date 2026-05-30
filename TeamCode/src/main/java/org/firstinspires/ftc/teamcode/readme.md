@@ -11,10 +11,11 @@ FGCLib helps teams write cleaner, more organized, and more scalable robot code t
 - **Subsystem-based architecture** — encapsulate each robot mechanism into its own class
 - **RobotContainer** — centralized control configuration and binding management
 - **Trigger-driven controls** — reactive, event-driven gamepad input via `SmartGamepad`
+- **`@AutoLog` annotation** — automatic subsystem state publishing with zero boilerplate
 - **Built-in PIDF controller** — with motion profiling and voltage compensation
-- **KoalaLog integration** — automatic subsystem logging for telemetry and debugging
+- **KoalaLog integration** — structured subsystem logging, managed automatically by `RobotContainerInternal`
 - **FTC Dashboard support** — real-time tuning and live diagnostics via `MultipleTelemetry`
-- **HID Controller** — advanced controller feedback including rumble and LED indicators
+- **HID Controller** — advanced controller feedback including rumble effects and LED indicators
 - **Hardware abstraction helpers** — clean, centralized hardware configuration
 
 ---
@@ -70,7 +71,7 @@ To copy a sample into your TeamCode module:
 Each sample begins with annotations like:
 
 ```java
-@TeleOp(name="Template: Linear OpMode", group="Linear Opmode")
+@TeleOp(name = "Template: Linear OpMode", group = "Linear Opmode")
 @Disabled
 ```
 
@@ -99,7 +100,7 @@ Each sample begins with annotations like:
 
 Subsystems are the primary building blocks of the robot. Every mechanism — drivetrain, shooter, arm, elevator, intake, vision — should have its own `Subsystem` class.
 
-Each subsystem follows the singleton pattern and implements the `Subsystem` interface:
+Each subsystem follows the singleton pattern and implements the `Subsystem` interface. When combined with `@AutoLog` (see [AutoLog](#autolog)), the framework generates a logged variant automatically, and the singleton type becomes the generated `<ClassName>AutoLogged` class.
 
 ```java
 package org.firstinspires.ftc.teamcode.robot.subsystems;
@@ -107,17 +108,19 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.core.lib.interfaces.Subsystem;
+import org.firstinspires.ftc.teamcode.core.lib.logging.AutoLog;
 
+@AutoLog
 public class Shooter implements Subsystem {
 
-    private static Shooter instance;
+    private static ShooterAutoLogged instance;
     private DcMotorEx motor;
 
     protected Shooter() {}
 
-    public static synchronized Shooter getInstance() {
+    public static synchronized ShooterAutoLogged getInstance() {
         if (instance == null) {
-            instance = new Shooter();
+            instance = new ShooterAutoLogged();
         }
         return instance;
     }
@@ -148,16 +151,24 @@ public class Shooter implements Subsystem {
 }
 ```
 
+> **Note:** The singleton instance type is the generated `ShooterAutoLogged` — not `Shooter` directly. See [AutoLog](#autolog) for details.
+
 ---
 
 ### RobotContainer
 
-`RobotContainer` is the central configuration class of the robot. It is responsible for:
+`RobotContainer` is the central configuration class of the robot. It extends `RobotContainerInternal`, which automatically manages the full robot lifecycle — no manual setup required for the items below:
 
-- Registering all subsystems
-- Configuring controller bindings
-- Connecting commands to triggers
-- Managing all robot input logic
+| Responsibility | Managed by `RobotContainerInternal` |
+|---|---|
+| `KoalaLog.setup(hardwareMap)` | ✅ called on `init()` |
+| `KoalaLog.start()` | ✅ called on `start()` |
+| `KoalaLog.stop()` | ✅ called on `stop()` |
+| `Trigger.updateAll()` | ✅ called on every `loop()` cycle |
+| `AutoLogManager.periodic()` | ✅ called on every `loop()` cycle |
+| FTC Dashboard telemetry | ✅ forwarded automatically |
+
+All subsystems passed to `super(...)` are registered and driven by this lifecycle.
 
 ```java
 package org.firstinspires.ftc.teamcode.robot;
@@ -165,24 +176,30 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
+import org.firstinspires.ftc.teamcode.core.lib.gamepad.Trigger;
 import org.firstinspires.ftc.teamcode.core.lib.internal.RobotContainerInternal;
-import org.firstinspires.ftc.teamcode.robot.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
 
+/**
+ * RobotContainer handles instance configuration. All subsystems listed in the
+ * constructor super() call will be executed when the library lifecycle runs.
+ */
 public class RobotContainer extends RobotContainerInternal {
 
     private final SmartGamepad driver;
     private final SmartGamepad operator;
 
-    private final Shooter shooter;
+    private final SubsystemExample subsystemExample;
     private final DrivetrainBuilder drivetrain;
 
     public RobotContainer(Gamepad driver, Gamepad operator) {
         super(
             DrivetrainBuilder.getInstance(),
-            Shooter.getInstance()
+            SubsystemExample.getInstance()
+            // Add more subsystems here
         );
 
-        this.driver = new SmartGamepad(driver);
+        this.driver   = new SmartGamepad(driver);
         this.operator = new SmartGamepad(operator);
 
         drivetrain = DrivetrainBuilder.build(
@@ -192,23 +209,41 @@ public class RobotContainer extends RobotContainerInternal {
             Constants.DrivetrainBuilderConstants.MOTOR_LEFT_INVERTED
         );
 
-        shooter = Shooter.getInstance();
+        subsystemExample = SubsystemExample.getInstance();
+        // Register additional subsystems here as well
     }
 
     @Override
     public void configureBindings() {
+
+        // --- Driver ---
         driver
             .leftY()
             .or(driver.rightX())
             .whileTrue(() -> drivetrain.arcadeDrive(-driver.getLeftY(), driver.getRightX()))
             .onFalse(drivetrain::stop);
 
-        operator.b()
-            .onTrue(() -> shooter.runMotorPower(0.8))
-            .onFalse(shooter::stopMotor);
+        // --- Operator ---
+        operator.y().onTrue(() -> subsystemExample.setTargetAngle(90));
+        operator.a().onTrue(() -> subsystemExample.setTargetAngle(0));
+
+        // Stop when neither Y nor A is held
+        operator.y().negate()
+            .and(operator.a().negate())
+            .onTrue(() -> subsystemExample.setPower(0));
+
+        operator.start()
+            .and(operator.back())
+            .onTrue(subsystemExample::resetEncoders);
+
+        // --- Sensor-driven Triggers ---
+        new Trigger(subsystemExample::isLimitLeft).onTrue(subsystemExample::resetEncoders);
+        new Trigger(subsystemExample::isLimitRight).onTrue(subsystemExample::resetEncoders);
     }
 }
 ```
+
+> **Tip:** Standalone `Trigger` objects — created directly from a boolean supplier — let you react to hardware events such as limit switches or sensor thresholds using the exact same API as gamepad buttons.
 
 ---
 
@@ -233,19 +268,19 @@ driver.a().onTrue(...);
 #### Available Button Triggers
 
 ```java
-driver.a()            driver.b()
-driver.x()            driver.y()
+driver.a()             driver.b()
+driver.x()             driver.y()
 
-driver.dpadUp()       driver.dpadDown()
-driver.dpadLeft()     driver.dpadRight()
+driver.dpadUp()        driver.dpadDown()
+driver.dpadLeft()      driver.dpadRight()
 
-driver.leftBumper()   driver.rightBumper()
-driver.leftStick()    driver.rightStick()
+driver.leftBumper()    driver.rightBumper()
+driver.leftStick()     driver.rightStick()
 
-driver.start()        driver.back()
+driver.start()         driver.back()
 driver.guide()
 
-driver.leftTrigger()  driver.rightTrigger()
+driver.leftTrigger()   driver.rightTrigger()
 ```
 
 #### Available Axis Triggers
@@ -260,21 +295,35 @@ driver.rightX()   driver.rightY()
 Triggers can be composed for more advanced logic:
 
 ```java
-// Both buttons pressed
+// Both buttons pressed simultaneously
 driver.start()
     .and(driver.back())
     .onTrue(...);
 
-// Button B pressed while A is not pressed
+// Button A NOT held while B is pressed
 driver.a()
     .negate()
     .and(driver.b())
     .onTrue(...);
 
-// Either condition triggers the action
+// Either axis input triggers continuous drive
 driver.leftY()
     .or(driver.rightX())
     .whileTrue(...);
+
+// Action fires when neither Y nor A is held
+operator.y().negate()
+    .and(operator.a().negate())
+    .onTrue(() -> subsystem.setPower(0));
+```
+
+#### Standalone Triggers
+
+`Trigger` can also wrap any boolean supplier — hardware events, sensor readings, or computed conditions — and supports the same action API as gamepad triggers:
+
+```java
+new Trigger(subsystem::isLimitLeft).onTrue(subsystem::resetEncoders);
+new Trigger(subsystem::isAtTarget).onTrue(subsystem::lock);
 ```
 
 #### Trigger Actions
@@ -330,7 +379,7 @@ public class TeleOpMode extends OpMode {
 
 ### Constants
 
-Hardware names and configuration values should be centralized in `Constants.java` to avoid hardcoded strings across the codebase:
+Hardware names and configuration values should be centralized in `Constants.java` to avoid hardcoded strings spread across the codebase:
 
 ```java
 package org.firstinspires.ftc.teamcode.robot;
@@ -338,10 +387,14 @@ package org.firstinspires.ftc.teamcode.robot;
 public class Constants {
 
     public static class DrivetrainBuilderConstants {
-        public static final String MOTOR_RIGHT         = "right_drive";
-        public static final String MOTOR_LEFT          = "left_drive";
+        public static final String  MOTOR_RIGHT          = "right_drive";
+        public static final String  MOTOR_LEFT           = "left_drive";
         public static final boolean MOTOR_RIGHT_INVERTED = false;
         public static final boolean MOTOR_LEFT_INVERTED  = true;
+    }
+
+    public static class Shooter {
+        public static final String MOTOR_1_NAME = "shooter_motor_up";
     }
 }
 ```
@@ -349,6 +402,54 @@ public class Constants {
 ---
 
 ## Advanced Features
+
+### AutoLog
+
+FGCLib supports automatic subsystem state publishing through the `@AutoLog` annotation. It is the recommended way to add observability to any subsystem.
+
+When a class is annotated with `@AutoLog`, the annotation processor generates a concrete implementation named `<ClassName>AutoLogged`. This generated class automatically publishes all logged fields to **KoalaLog** and **FTC Dashboard** on every loop cycle, with no additional boilerplate.
+
+#### Defining an Auto-Logged Subsystem
+
+```java
+import org.firstinspires.ftc.teamcode.core.lib.logging.AutoLog;
+
+@AutoLog
+public class Shooter implements Subsystem {
+
+    public double motorPower = 0.0;
+    public boolean isRunning = false;
+
+    // ... rest of the subsystem implementation
+}
+```
+
+#### Using the Generated Class
+
+Because `@AutoLog` generates `ShooterAutoLogged`, the singleton must use the generated type:
+
+```java
+private static ShooterAutoLogged instance;
+
+public static synchronized ShooterAutoLogged getInstance() {
+    if (instance == null) {
+        instance = new ShooterAutoLogged();
+    }
+    return instance;
+}
+```
+
+#### Automatic Lifecycle Integration
+
+`RobotContainerInternal` calls `AutoLogManager.periodic()` on every loop cycle automatically. No additional setup is needed — all public fields in `@AutoLog`-annotated subsystems are published without manual calls.
+
+> Prefer `@AutoLog` over manual `KoalaLog.log(...)` calls for subsystem state. Reserve manual logging for one-off or dynamic values:
+
+```java
+KoalaLog.log("Shooter/MotorPower", motor.getPower(), true);
+```
+
+---
 
 ### PIDF Controller
 
@@ -375,7 +476,7 @@ Useful for: linear slides, arms, elevators, and rotating mechanisms.
 
 #### Voltage Compensation
 
-Maintains consistent behavior as battery voltage drops:
+Maintains consistent behavior as battery voltage drops throughout a match:
 
 ```java
 pid.enableVoltageCompensation(hardwareMap);
@@ -391,82 +492,88 @@ pid.runVelocity(motor, targetTicksPerSecond);
 
 ---
 
-### Logging with KoalaLog
+### FTC Dashboard
 
-FGCLib integrates with **KoalaLog** for structured subsystem logging:
+FGCLib supports **FTC Dashboard** and **MultipleTelemetry** out of the box. Telemetry is forwarded automatically to both the **Driver Station** and the **Dashboard** — no additional configuration required. This enables:
 
-```java
-KoalaLog.log("Shooter/MotorPower", motor.getPower(), true);
-```
-
-Useful for:
-- Monitoring subsystem state in real time
-- Tuning mechanism parameters
-- Tracking motor output during testing and competition
-
----
-
-### FTC Dashboard Support
-
-FGCLib supports **FTC Dashboard** and **MultipleTelemetry** out of the box.
-
-Telemetry is forwarded automatically to both the **Driver Station** and the **Dashboard**, enabling:
-
-- Real-time mechanism tuning (PIDF gains, setpoints)
+- Real-time PIDF gain tuning
 - Live subsystem diagnostics
-- Graphing of sensor data during runs
+- Sensor data graphing during runs
 
 ---
 
 ### HID Controller
 
-`HIDController` provides access to advanced controller feedback features:
+`HIDController` provides access to advanced controller feedback — rumble patterns and LED indicators. Obtain the instance from any `SmartGamepad` via `getHID()`.
+
+#### Rumble
 
 ```java
-// Rumble the controller for 500ms
+// Single rumble for a fixed duration (milliseconds)
 driver.getHID().rumble(500);
 
-// Set the controller LED to green
-driver.getHID().setLed(HIDController.LedColor.GREEN);
+// Continuous rumble until explicitly stopped
+driver.getHID().rumbleContinuous();
+
+// Short pulses repeated N times
+driver.getHID().rumbleBlips(3);
+
+// Custom programmatic rumble effect
+driver.getHID().runRumbleEffect(effect);
 ```
 
-Useful for:
-- Driver feedback on game events
-- Scoring or action confirmation
-- Warning indicators (e.g., low battery, mechanism limit reached)
-- State transition signals
+#### LED
+
+```java
+// Set a solid LED color
+driver.getHID().setLed(HIDController.LedColor.GREEN);
+
+// Run an animated LED effect
+driver.getHID().runLedEffect(effect);
+```
+
+#### Common Use Cases
+
+| Situation | Suggested Feedback |
+|---|---|
+| Scoring confirmation | `rumble(300)` + `setLed(GREEN)` |
+| Mechanism at limit | `rumbleBlips(2)` |
+| Low battery / critical warning | `rumbleContinuous()` + `setLed(RED)` |
+| Mode or state transition | `setLed(BLUE)` |
 
 ---
 
 ## Robot Lifecycle
 
-The full execution flow from startup to shutdown:
+The full execution flow from startup to shutdown, including all operations managed automatically by `RobotContainerInternal`:
 
 ```
 TeleOpMode.init()
     └── RobotContainer created
-    └── Subsystem.initialize() ← hardware mapped here
+    └── KoalaLog.setup(hardwareMap)       ← automatic
+    └── Subsystem.initialize()            ← hardware mapped here
 
 TeleOpMode.start()
+    └── KoalaLog.start()                  ← automatic
     └── Subsystem.start()
 
 TeleOpMode.loop()  [runs every cycle]
-    └── Trigger.updateAll()   ← evaluates all SmartGamepad bindings
-    └── Subsystem.execute()   ← subsystem periodic logic
+    └── Trigger.updateAll()               ← evaluates all SmartGamepad bindings
+    └── AutoLogManager.periodic()         ← publishes all @AutoLog fields
+    └── Subsystem.execute()               ← subsystem periodic logic
 
 TeleOpMode.stop()
+    └── KoalaLog.stop()                   ← automatic
     └── Subsystem.stop()
 ```
-
-This architecture keeps the robot modular, readable, and maintainable as the project grows.
 
 ---
 
 ## Advanced: Multi-Team Configuration
 
-> **Warning:** This is not recommended for inexperienced developers. Make a **full project backup** before starting, and close Android Studio before making changes.
+> **Warning:** This is not recommended for inexperienced developers. Make a **full project backup** before starting, and close Android Studio before making any file-system changes.
 
-If your club has multiple teams sharing a common codebase, you can clone the `TeamCode` module — once per team — so each team maintains its own module while still being able to see the others.
+If your club has multiple teams sharing a common codebase, you can clone the `TeamCode` module once per team so that each team maintains its own module while remaining able to view the others.
 
 ### Steps to Clone TeamCode
 
@@ -474,27 +581,34 @@ If your club has multiple teams sharing a common codebase, you can clone the `Te
 
 1. Using your OS file manager, copy the entire `TeamCode/` folder to a sibling folder with a new name (e.g., `Team0417/`).
 
-2. Inside the new `Team0417/` folder, **delete** the `TeamCode.iml` file.
+2. Inside `Team0417/`, **delete** the `TeamCode.iml` file.
 
-3. Rename the folder:
+3. Rename the source folder from:
+
    ```
    src/main/java/org/firstinspires/ftc/teamcode
    ```
+
    to a matching name with a **lowercase** `team`, e.g.:
+
    ```
    src/main/java/org/firstinspires/ftc/team0417
    ```
 
-4. Edit `Team0417/src/main/AndroidManifest.xml` — change:
+4. Edit `Team0417/src/main/AndroidManifest.xml` and change:
+
    ```xml
    package="org.firstinspires.ftc.teamcode"
    ```
+
    to:
+
    ```xml
    package="org.firstinspires.ftc.team0417"
    ```
 
 5. Add the following line to your root `settings.gradle`:
+
    ```groovy
    include ':Team0417'
    ```

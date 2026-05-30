@@ -13,35 +13,24 @@ public class HIDController {
 
   /** Predefined LED colors that can be applied to the controller. */
   public enum LedColor {
-
-    /** Red LED color. */
     RED(1.0, 0.0, 0.0),
 
-    /** Green LED color. */
     GREEN(0.0, 1.0, 0.0),
 
-    /** Blue LED color. */
     BLUE(0.0, 0.0, 1.0),
 
-    /** White LED color. */
     WHITE(1.0, 1.0, 1.0),
 
-    /** Yellow LED color. */
     YELLOW(1.0, 1.0, 0.0),
 
-    /** Cyan LED color. */
     CYAN(0.0, 1.0, 1.0),
 
-    /** Magenta LED color. */
     MAGENTA(1.0, 0.0, 1.0),
 
-    /** Orange LED color. */
     ORANGE(1.0, 0.5, 0.0),
 
-    /** Purple LED color. */
     PURPLE(0.5, 0.0, 0.5),
 
-    /** Turns the controller LED off. */
     OFF(0.0, 0.0, 0.0);
 
     final double r;

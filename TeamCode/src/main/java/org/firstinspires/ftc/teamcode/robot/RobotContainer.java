@@ -1,64 +1,100 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
-import org.firstinspires.ftc.teamcode.core.lib.builders.DrivetrainBuilder;
+
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.SmartGamepad;
 import org.firstinspires.ftc.teamcode.core.lib.gamepad.Trigger;
 import org.firstinspires.ftc.teamcode.core.lib.internal.RobotContainerInternal;
-import org.firstinspires.ftc.teamcode.robot.subsystems.SubsystemExample;
+import org.firstinspires.ftc.teamcode.robot.subsystems.VisionSubsystem;
+import org.firstinspires.ftc.teamcode.core.lib.vision.apriltag.AprilTagDetection;
 
-/**
- * RobotContainer class handle instance configurations. All the subsystems listed in constructor
- * here will be execute when the library classes run.
- */
 public class RobotContainer extends RobotContainerInternal {
 
   private final SmartGamepad driver;
-  private final SmartGamepad operator;
 
-  private final SubsystemExample subsystemExample;
-  private final DrivetrainBuilder drivetrain;
+  private final VisionSubsystem vision;
 
   public RobotContainer(Gamepad driver, Gamepad operator) {
+
     super(
-        DrivetrainBuilder.getInstance(), SubsystemExample.getInstance()
-        // Add more subsystems here.
-        );
+            VisionSubsystem.getInstance()
+    );
 
     this.driver = new SmartGamepad(driver);
-    this.operator = new SmartGamepad(operator);
 
-    drivetrain =
-        DrivetrainBuilder.build(
-            Constants.DrivetrainBuilderConstants.MOTOR_RIGHT,
-            Constants.DrivetrainBuilderConstants.MOTOR_LEFT,
-            Constants.DrivetrainBuilderConstants.MOTOR_RIGHT_INVERTED,
-            Constants.DrivetrainBuilderConstants.MOTOR_LEFT_INVERTED);
-    subsystemExample = SubsystemExample.getInstance();
-    // You need to add the subsystems here too.
+    vision = VisionSubsystem.getInstance();
   }
 
   @Override
-  public void configureBindings() {
+  protected void configureBindings() {
 
-    // Driver controller
-    driver
-        .leftY()
-        .or(driver.rightX())
-        .whileTrue(() -> drivetrain.arcadeDrive(-driver.getLeftY(), driver.getRightX()))
-        .onFalse(drivetrain::stop);
+    // Vibra quando encontra qualquer tag
+    new Trigger(vision::hasTarget)
+            .onTrue(() ->
+                    driver.getHID().rumbleBlips(1)
+            );
 
-    // Operator controller
-    operator.y().onTrue(() -> subsystemExample.setTargetAngle(90));
+    // Desabilita visão
+    driver.x()
+            .onTrue(vision::disableVision);
 
-    operator.a().onTrue(() -> subsystemExample.setTargetAngle(0));
+    // Habilita visão
+    driver.y()
+            .onTrue(vision::enableVision);
 
-    new Trigger(subsystemExample::isLimitLeft).onTrue(subsystemExample::resetEncoders);
+    // Procura especificamente a tag ID 5
+    driver.a()
+            .onTrue(() -> {
 
-    new Trigger(subsystemExample::isLimitRight).onTrue(subsystemExample::resetEncoders);
+              AprilTagDetection tag =
+                      vision.getTagById(5);
 
-    operator.start().and(operator.back()).onTrue(subsystemExample::resetEncoders);
+              if (tag != null) {
 
-    operator.y().negate().and(operator.a().negate()).onTrue(() -> subsystemExample.setPower(0));
+                System.out.println("TAG 5 ENCONTRADA");
+
+                System.out.println(
+                        "Yaw = " + tag.getYaw()
+                );
+
+                System.out.println(
+                        "Distance = " + tag.getZ()
+                );
+              }
+            });
+
+    // Mostra informações da primeira tag
+    driver.b()
+            .onTrue(() -> {
+
+              if (!vision.hasTarget()) {
+                return;
+              }
+
+              AprilTagDetection tag =
+                      vision.getTarget();
+
+              System.out.println("Primeira tag");
+
+              System.out.println(
+                      "ID = " + tag.getID()
+              );
+
+              System.out.println(
+                      "Name = " + tag.getDisplayName()
+              );
+
+              System.out.println(
+                      "X = " + tag.getX()
+              );
+
+              System.out.println(
+                      "Y = " + tag.getY()
+              );
+
+              System.out.println(
+                      "Z = " + tag.getZ()
+              );
+            });
   }
 }

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ![logoTeamBrazil](https://github.com/user-attachments/assets/e4eb1ff4-9f25-475e-837c-5bbe0f090740)
 
 [![Static Badge](https://img.shields.io/badge/pt_br-readme-green)](doc/pt-br/README.md)
@@ -1771,4 +1770,3 @@ Changes include:
  * The API for the Legacy Module and Core Device Interface Module have been updated.
    - Support for encoders with the Legacy Module is now working.
  * The hardware loop has been updated for better performance.
->>>>>>> upstream/master

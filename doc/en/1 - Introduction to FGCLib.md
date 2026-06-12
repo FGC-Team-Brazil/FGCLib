@@ -2,7 +2,7 @@
 
 Welcome to FGCLib, a library for FGC and FTC that automates some essential tasks (boilerplate)
 for programming the robot, as well as providing a standardized and easy-to-understand code structure.
-To prepare your programming environment, access this [video](https://www.youtube.com/watch?v=_te1nUU-av4).
+To prepare your programming environment, access this [video](https://www.youtube.com/watch?v=_te1nUU-av4) and [video](https://www.youtube.com/watch?v=WDku3kcykPw).
 
 ## Library structure
 The standard Lib structure is very similar to any standard FGC code. To access the code, simply navigate to
@@ -42,12 +42,6 @@ Finally, all the robot's systems will run in the robot's operational modes. The 
 The library's functionalities are divided into 2 parts:
 
 #### Utils
-Within the utils folder we have utility classes of various uses, designed to automate some functions that are normally used within the code. Currently, the library has only one class:
+Within the utils folder we have utility classes of various uses, designed to automate some functions that are normally used within the code. Currently, the library has the class:
 MathUtils.java. It includes mathematical functions that help to produce code.
-
-### Lib
-The Lib directory contains the main functionalities of the site. The functionalities are divided into:
-1. **builders**: automate the creation of subsystems, it only has the DrivetrainBuilder ([[See how to use it here](./3%20-%20Using%20the%20DrivetrainBuilder.md);
-2. **gamepad**: manage the use of gamepads to control the robot ([See more about it here](./4%20-%20Utility%20Class%20SmartGamePad.md));
-3. **interfaces**: various interfaces, currently it only contains the Subsystem interface ([See how to use it here](2%20-%20Creating%20a%20Subsystem.md));
-4. **pid**: Functions related to the use of PID control ([See how to use here](5%20-%20Using%20the%20PIDF%20Controller.md)).
+PeriodicTimer.java. This can measure the time of the periodic helping to find loop overflows.

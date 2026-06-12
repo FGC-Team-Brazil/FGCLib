@@ -1,73 +1,70 @@
 # Using the PIDF Controller
 
-In this documentation we'll teach you how to use Lib's PIDFController class.
+In this documentation we'll teach you how to use Lib's PIDFController class. 
 Using it, you will be able to create your own PIDs for your subsystems.
 
-# Table of Contents
-- What is a PID controller?
-    - Proportional
-    - Integral
-    - Derivative
-    - FeedFoward
-- PIDController class
-    - How the class works
-    - Creating the class object
-    - Complementary methods
+## Table of Contents
 
-# What is a PID controller?
-A PID controller is a controller for feedback systems. In robotics, we use PID to
-control the operation of the robot's subsystems. The PID generates an output from two inputs:
-- Setpoint: The final goal you want to achieve;
-- Reference: The current progress/position towards the goal.
-  One example is a PID for traction. Let's say your team wants to walk the robot 3m (setpoint)
-  and your robot is currently at position 0m (reference). The PID will make the robot move forward, until it walks 3m.
-  The output of the PID will vary according to the variation in the robot's position (reference), but the setpoint will always be the same.
+* What is a PID controller?
+* The Math Behind PIDF
+* PIDController class
+* Position & Velocity Control
+* Advanced Features (Motion Profiling & Voltage Comp)
 
-The PID equation consists of 3 constants: proportional, integral and derivative. Each one has a different function.
 
-## Proportional
-Varies the PID output proportionally to the reference. Example: if the reference is 2, the proportional output will be 0.5,
-when the reference goes up to 4, the proportional output will be 0.25 (indirectly proportional to the value of the reference)
+## What is a PID controller?
 
-## Integral
-The integral constant works by adding up the PID error (difference between setpoint and reference) and multiplying this by the
-constant. But why? Well, the proportional constant alone does not have the capacity to bring the robot to the setpoint,
-think, if it is proportional to the reference, when the robot is very close to the setpoint, won't the proportional be
-almost 0? This makes the robot stand still
+A PID controller is a system used to control the operation of the robot's mechanisms smoothly and accurately. The PID generates a motor output from two main inputs:
 
-To solve this problem, the integral allows the robot to move even with a very small error, because it adds up to
-it over time, until it is a significant value that makes the robot move.
+* **Setpoint:** The final goal you want to achieve (e.g., Target encoder ticks).
+* **Reference:** The current progress/position towards the goal (e.g., Current encoder ticks).
 
-## Derivative
-The derivative constant acts by predicting the robot's movement, to avoid future errors. It is proportional to the
-derivative of the error. Unlike the other constants, its operation is more complex.
+If you want an elevator to reach a height of **1000 ticks**, the PID controller calculates the error (Setpoint - Reference) and adjusts motor power continuously to reach the target without violently overshooting or stopping too early.
 
-## FeedFoward
-In addition to the common PID, the PIDController class also has a simple FeedFoward constant. It is basically
-a minimum value for the output, to prevent the output from being less than the system's friction with the medium.
+### The Math Behind PIDF
 
-# PIDController class
-The PIDController class implements PID and FeedForward in one equation. It also has some functions
-to control the operation of the PID, such as a tolerance value for the setpoint.
+* **Proportional ($k_P$):** Reacts proportionally to the current error. Large error = large power.
+* **Integral ($k_I$):** Adds up past error over time to overcome steady-state resistance (like friction or gravity) when the robot is close to the target but stuck.
+* **Derivative ($k_D$):** Predicts future error based on the rate of change, acting as a "brake" to dampen the movement and prevent overshoot.
+* **FeedForward ($k_F$):** A base baseline power applied independently of error, useful for offsetting known forces (like holding an arm up against gravity).
 
-## Class Operation
-#### Import
-````java
+## PIDController Class
+
+FGCLib's `PIDController` implements all of these terms and adds powerful robotics-specific features.
+
+### Creating the Object
+
+```java
 import org.firstinspires.ftc.teamcode.core.lib.pid.PIDController;
-````
-#### Object creation
-````java
-PIDController pidController = new PIDController(kP, kI, kD, kF);
-````
-#### Setting the Setpoint
-````java
-pidController.setSetpoint(setPoint);
-````
-### Using the class
-The calculate() method returns the output of the PID, so place it as a parameter of a setPower function, for example:
-````java
-setPower(pidController.calculate(reference));
-````
-## Complementary methods
-In addition to the standard functionality, the class has some complementary methods, such as Set and Get methods,
-a method to set the position tolerance, among others. Explore Lib to see all the methods.
+
+// Create a PIDF controller
+PIDController pid = new PIDController(kP, kI, kD, kF);
+
+```
+
+### Position vs. Velocity Control
+
+* **Position Control:** Used for arms, slides, and driving to a point.
+```java
+double power = pid.calculate(targetPosition, motor.getCurrentPosition());
+motor.setPower(power);
+
+```
+
+
+* **Velocity Control:** Used for shooters and flywheels to maintain a specific speed (ticks per second).
+```java
+pid.runVelocity(shooterMotor, targetTicksPerSecond);
+
+```
+
+
+
+### Advanced Features
+
+FGCLib's PID includes features specifically designed to improve consistency:
+
+| Feature | Description | Example Setup |
+| --- | --- | --- |
+| **Motion Profiling** | Generates a smooth trapezoidal path (limits max acceleration/velocity) to prevent mechanical shock on slides and arms. | `pid.enableMotionProfile(maxVel, maxAccel);` |
+| **Voltage Comp.** | Scales motor output based on current battery voltage, keeping mechanisms consistent as the battery drains during a match. | `pid.enableVoltageCompensation(hardwareMap);` |
